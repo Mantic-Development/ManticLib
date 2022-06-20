@@ -15,6 +15,7 @@ public class ManticPlugin extends JavaPlugin {
         super.onEnable();
     }
 
+
     @Override
     public void onDisable() {
         super.onDisable();
