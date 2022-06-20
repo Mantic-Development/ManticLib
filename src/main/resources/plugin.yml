@@ -1,0 +1,8 @@
+name: ManticLib
+version: '${project.version}'
+main: me.fullpage.manticlib.ManticLib
+prefix: ManticLib
+authors: [ Fullpage ]
+description: Libraries for Mantic Plugins
+api-version: 1.13
+website: https://discord.xmantic.dev
