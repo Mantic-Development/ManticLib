@@ -163,7 +163,9 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
 
     public static void register(ManticCommand... command) {
         if (command == null || command.length == 0) return;
-        Arrays.stream(command).forEach(ManticCommand::register);
+        for (ManticCommand manticCommand : command) {
+            manticCommand.register();
+        }
     }
 
     public void unregister() {
