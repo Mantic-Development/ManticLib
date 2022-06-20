@@ -35,15 +35,25 @@ public abstract class Integration implements Listener {
         this.requiredClasses.add(classPath);
     }
 
+    public void onEnable() {
+
+    }
+
+    public void onDisable() {
+
+    }
+
     private void checkActive() {
         if (check()) {
             if (!active) {
                 providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
+                this.onEnable();
             }
             active = true;
         } else {
             if (active) {
                 providingPlugin.getLogger().info("Disabled integration for " + pluginName + ".");
+                this.onDisable();
             }
             active = false;
         }
