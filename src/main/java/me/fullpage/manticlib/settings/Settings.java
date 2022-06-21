@@ -43,7 +43,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
         }
 
         instance = this;
-        apply(instance);
+        apply((S)instance);
 
         try (FileWriter writer = new FileWriter(file)) {
             JsonConfig.GSON.toJson(this, writer);
@@ -131,7 +131,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             e.printStackTrace();
         }
         config.save();
-        apply(instance);
+        apply((S)instance);
     }
 
 
@@ -193,10 +193,10 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
         }
     }
 
-
-    protected Settings<S> apply(Settings<S> that) {
+    @SuppressWarnings("unchecked")
+    protected S apply(S that) {
         copy(this, that);
-        return this;
+        return (S) this;
     }
 
     public static <T> void copy(T instance, T that) {
