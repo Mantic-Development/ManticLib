@@ -89,7 +89,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             e.printStackTrace();
             try {
                 Class<?>[] prams = this.getClass().getDeclaredConstructors()[0].getParameterTypes();
-                Constructor<Settings<S>> constructor = (Constructor<Settings<S>>) this.getClass().getDeclaredConstructor(prams);
+                Constructor<S> constructor = (Constructor<S>) this.getClass().getDeclaredConstructor(prams);
                 constructor.setAccessible(true);
                 Object[] inputPrams = new Object[prams.length];
                 for (int i = 0; i < prams.length; i++) {
