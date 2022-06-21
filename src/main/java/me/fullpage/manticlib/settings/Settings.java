@@ -7,6 +7,7 @@ import me.fullpage.manticlib.interfaces.Registrable;
 import me.fullpage.manticlib.interfaces.Reloadable;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.xml.bind.ValidationEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -204,6 +205,9 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
     }
 
     private static <T> void iterateFields(T instance, T that) {
+        if (instance == null || that == null || instance.equals(that)) {
+            return;
+        }
         Field[] declaredFields = instance.getClass().getDeclaredFields();
         for (Field declaredField : declaredFields) {
             if (declaredField == null || Modifier.isTransient(declaredField.getModifiers()) || Modifier.isStatic(declaredField.getModifiers())) {
@@ -211,8 +215,10 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             }
             try {
                 declaredField.setAccessible(true);
-                declaredField.set(instance, declaredField.get(that));
-            } catch (IllegalAccessException e) {
+                Object value = declaredField.get(that);
+                if (value == null) continue;
+                declaredField.set(instance, value);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
