@@ -18,12 +18,12 @@ import static org.apache.commons.lang.Validate.notNull;
 
 public class SkullUtils {
 
-    private static Material skull;
+    private static final Material skull;
 
     static {
-        Material material = Material.matchMaterial("PLAYER_HEAD");
+        Material material = Material.matchMaterial("SKULL_ITEM");
         if (material == null) {
-            skull = Material.matchMaterial("SKULL_ITEM");
+            skull = Material.matchMaterial("PLAYER_HEAD");
         } else {
             skull = material;
         }
@@ -36,7 +36,7 @@ public class SkullUtils {
         if (skullCache.containsKey(base64)) {
             return skullCache.get(base64);
         }
-        final ItemStack head = new ItemBuilder(skull);
+        final ItemStack head = new ItemBuilder(skull).durability(3);
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         GameProfile profile = new GameProfile(UUID.randomUUID(), "");
         profile.getProperties().put("textures", new Property("textures", base64));
@@ -56,7 +56,7 @@ public class SkullUtils {
     private static final HashMap<UUID, ItemStack> headCache = new HashMap<>();
 
     public static ItemStack getHead(UUID id, String name) {
-        final ItemStack head = new ItemBuilder(skull);
+        final ItemStack head = new ItemBuilder(skull).durability(3);
 
         final ItemStack itemStack = headCache.get(id);
         if (itemStack != null) {
@@ -77,7 +77,7 @@ public class SkullUtils {
 
     public static ItemStack getHead(Player player) {
         final UUID id = player.getUniqueId();
-        final ItemStack head = new ItemBuilder(skull);
+        final ItemStack head = new ItemBuilder(skull).durability(3);
         notNull(id, "id");
         final ItemStack itemStack = headCache.get(id);
         if (itemStack != null) {

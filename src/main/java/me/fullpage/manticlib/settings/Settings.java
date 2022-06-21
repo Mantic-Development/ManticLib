@@ -18,11 +18,10 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.logging.Logger;
 
-public class Settings implements Registrable, Reloadable {
+public class Settings<S extends Settings<S>> implements Registrable, Reloadable {
 
-    private transient Settings instance = null;
+    private transient Settings<S> instance = null;
     private transient JsonConfig config = null;
     private transient String prePath = null;
 
@@ -44,6 +43,7 @@ public class Settings implements Registrable, Reloadable {
         }
 
         instance = this;
+        apply(instance);
 
         try (FileWriter writer = new FileWriter(file)) {
             JsonConfig.GSON.toJson(this, writer);
@@ -78,6 +78,9 @@ public class Settings implements Registrable, Reloadable {
 
     @SuppressWarnings("unchecked")
     private void applyFields() {
+        if (config.getFile() == null) {
+            throw new IllegalStateException("config should not be null");
+        }
         final JsonObject jsonObject = config.getJsonObject();
         try (FileReader reader = new FileReader(config.getFile())) {
             this.instance = JsonConfig.GSON.fromJson(reader, this.getClass());
@@ -86,7 +89,7 @@ public class Settings implements Registrable, Reloadable {
             e.printStackTrace();
             try {
                 Class<?>[] prams = this.getClass().getDeclaredConstructors()[0].getParameterTypes();
-                Constructor<Settings> constructor = (Constructor<Settings>) this.getClass().getDeclaredConstructor(prams);
+                Constructor<Settings<S>> constructor = (Constructor<Settings<S>>) this.getClass().getDeclaredConstructor(prams);
                 constructor.setAccessible(true);
                 Object[] inputPrams = new Object[prams.length];
                 for (int i = 0; i < prams.length; i++) {
@@ -128,6 +131,7 @@ public class Settings implements Registrable, Reloadable {
             e.printStackTrace();
         }
         config.save();
+        apply(instance);
     }
 
 
@@ -189,5 +193,29 @@ public class Settings implements Registrable, Reloadable {
         }
     }
 
+
+    protected Settings<S> apply(Settings<S> that) {
+        copy(this, that);
+        return this;
+    }
+
+    public static <T> void copy(T instance, T that) {
+        iterateFields(instance, that);
+    }
+
+    private static <T> void iterateFields(T instance, T that) {
+        Field[] declaredFields = instance.getClass().getDeclaredFields();
+        for (Field declaredField : declaredFields) {
+            if (declaredField == null || Modifier.isTransient(declaredField.getModifiers()) || Modifier.isStatic(declaredField.getModifiers())) {
+                continue;
+            }
+            try {
+                declaredField.setAccessible(true);
+                declaredField.set(instance, declaredField.get(that));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

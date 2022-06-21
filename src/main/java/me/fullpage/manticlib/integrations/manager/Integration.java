@@ -44,19 +44,22 @@ public abstract class Integration implements Listener {
     }
 
     private void checkActive() {
-        if (check()) {
-            if (!active) {
-                providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
-                this.onEnable();
+        Bukkit.getScheduler().runTaskLater(providingPlugin, ()->{
+
+            if (check()) {
+                if (!active) {
+                    providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
+                    this.onEnable();
+                }
+                active = true;
+            } else {
+                if (active) {
+                    providingPlugin.getLogger().info("Disabled integration for " + pluginName + ".");
+                    this.onDisable();
+                }
+                active = false;
             }
-            active = true;
-        } else {
-            if (active) {
-                providingPlugin.getLogger().info("Disabled integration for " + pluginName + ".");
-                this.onDisable();
-            }
-            active = false;
-        }
+        }, 2L);
     }
 
     private boolean check() {
