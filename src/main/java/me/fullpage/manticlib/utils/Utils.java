@@ -48,4 +48,58 @@ public class Utils {
         return value == null;
     }
 
+
+    private boolean isNear(int chunkX, int chunkZ, int radius) {
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+                final int newX = chunkX + x;
+                final int newZ = chunkZ + z;
+                if (newX == chunkX && newZ == chunkZ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isInt(String input) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isDouble(String input) {
+        try {
+            Double.parseDouble(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isLong(String input) {
+        try {
+            Long.parseLong(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isFloat(String input) {
+        try {
+            Float.parseFloat(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isBoolean(String input) {
+        return Boolean.parseBoolean(input);
+    }
+
 }
