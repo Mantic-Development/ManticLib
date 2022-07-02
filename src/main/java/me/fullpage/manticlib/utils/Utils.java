@@ -1,9 +1,16 @@
 package me.fullpage.manticlib.utils;
 
+import lombok.SneakyThrows;
+import me.fullpage.manticlib.string.ManticString;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import java.io.File;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.*;
 
 public class Utils {
 
@@ -101,5 +108,66 @@ public class Utils {
     public static boolean isBoolean(String input) {
         return Boolean.parseBoolean(input);
     }
+
+    public static final DecimalFormat DOLLAR_BALANCE_FORMAT = (DecimalFormat) DecimalFormat.getCurrencyInstance(Locale.US);
+
+    public static String formatBalance(double balance) {
+        DOLLAR_BALANCE_FORMAT.setNegativePrefix("-$");
+        DOLLAR_BALANCE_FORMAT.setNegativeSuffix("");
+        final String format = DOLLAR_BALANCE_FORMAT.format(balance);
+        return format == null ? format : new ManticString(format).replaceLast(".00", "").toString();
+    }
+
+    public static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance();
+
+    public static String formatNumber(Number number) {
+        final String format = NUMBER_FORMAT.format(number);
+        if (format.endsWith(".00")) {
+            return new ManticString(format).replaceLast(".00", "").get();
+        }
+        return format;
+    }
+
+    public static final DecimalFormat VALUE_FORMAT = new DecimalFormat("#.##");
+
+    public static String formatValue(double value) {
+        String[] arr = {"", "k", "m", "b", "t", "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak", "al", "am", "an", "ao", "ap", "aq", "ar", "as", "at", "au", "av", "aw", "ax", "ay", "az"};
+        int index = 0;
+        while ((value / 1000) >= 1) {
+            value = value / 1000;
+            index++;
+        }
+        final boolean cannotFormat = index + 1 > arr.length;
+        return String.format("%s%s", cannotFormat ? "" : VALUE_FORMAT.format(value), cannotFormat ? NUMBER_FORMAT.format(value) : arr[index]);
+    }
+
+    @SneakyThrows
+    public static int getPing(Player p) {
+        final String version = ReflectionUtils.VERSION;
+        final Class<? extends Player> playerClass = p.getClass();
+        if (!playerClass.getName().equals("org.bukkit.craftbukkit." + version + ".entity.CraftPlayer")) { //compatibility with some plugins
+            p = Bukkit.getPlayer(p.getUniqueId()); //cast to org.bukkit.entity.Player
+        }
+
+        if (p == null) {
+            return -1;
+        }
+
+        final Object handle = ReflectionUtils.getHandle(p);
+        if (handle != null) {
+            final Optional<Field> ping = ReflectionUtils.findField(handle.getClass(), "ping");
+            if (ping.isPresent()) {
+                return ping.get().getInt(handle);
+            }
+        }
+
+        final Optional<Method> getPing = ReflectionUtils.findMethod(ReflectionUtils.CRAFT_PLAYER, "getPing");
+        if (getPing.isPresent()) {
+            return (int) getPing.get().invoke(p);
+        }
+
+        return -1;
+    }
+
 
 }

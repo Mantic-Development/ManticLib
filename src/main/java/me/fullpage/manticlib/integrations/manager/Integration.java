@@ -8,6 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,7 @@ public abstract class Integration implements Listener {
 
     private final @NotNull String pluginName;
     private List<String> requiredClasses = new ArrayList<>();
+    private List<String> requiredVersions = new ArrayList<>();
     private JavaPlugin providingPlugin;
     private boolean active;
 
@@ -31,8 +33,12 @@ public abstract class Integration implements Listener {
         this.checkActive();
     }
 
-    public void addRequiredClass(String classPath) {
+    public void addRequiredClass(@NotNull String classPath) {
         this.requiredClasses.add(classPath);
+    }
+
+    public void addRequiredVersion(@NotNull String version) {
+        this.requiredVersions.add(version);
     }
 
     public void onEnable() {
@@ -63,7 +69,7 @@ public abstract class Integration implements Listener {
     }
 
     private boolean check() {
-        if (!isPluginOn()) {
+        if (!isPlugin()) {
             return false;
         }
 
@@ -88,8 +94,23 @@ public abstract class Integration implements Listener {
         }
     }
 
-    private boolean isPluginOn() {
-        return Bukkit.getServer().getPluginManager().isPluginEnabled(this.pluginName);
+    private boolean isPlugin() {
+        if (!Bukkit.getServer().getPluginManager().isPluginEnabled(this.pluginName)) {
+            return false;
+        }
+
+        if (requiredVersions != null && !requiredVersions.isEmpty()) {
+            Plugin plugin = Bukkit.getPluginManager().getPlugin(this.pluginName);
+            for (String requiredVersion : requiredVersions) {
+                if (requiredVersion != null && plugin != null && !plugin.getDescription().getVersion().equals(requiredVersion)) {
+                    return true;
+                }
+            }
+        } else {
+            return true;
+        }
+
+        return false;
     }
 
     @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)

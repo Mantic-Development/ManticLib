@@ -95,6 +95,24 @@
     </repositories>
 
     <dependencies>
+        <!-- Public Plugin Libs -->
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Private Plugin Libs -->
+        <dependency>
+            <groupId>me.fullpage</groupId>
+            <artifactId>InfiniteKoth</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/privatelibs/InfiniteKoth-1.0.jar</systemPath>
+        </dependency>
+
+        <!-- Other -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>

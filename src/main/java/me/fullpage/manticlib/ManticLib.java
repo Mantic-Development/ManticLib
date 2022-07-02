@@ -1,11 +1,11 @@
 package me.fullpage.manticlib;
 
 import lombok.Getter;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
+import me.fullpage.manticlib.integrations.InfiniteKothIntegration;
+import me.fullpage.manticlib.integrations.VaultIntegration;
 
 @Getter
-public final class ManticLib extends JavaPlugin {
+public final class ManticLib extends ManticPlugin {
 
     private static ManticLib instance;
 
@@ -13,14 +13,16 @@ public final class ManticLib extends JavaPlugin {
         return instance;
     }
 
+    private InfiniteKothIntegration infiniteKoth;
+    private VaultIntegration vault;
+
     @Override
     public void onEnable() {
         instance = this;
-    }
 
-    @Override
-    public void onDisable() {
-        HandlerList.unregisterAll(this);
+        infiniteKoth = new InfiniteKothIntegration();
+        vault = new VaultIntegration();
+
     }
 
 }
