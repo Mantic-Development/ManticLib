@@ -107,7 +107,7 @@
             <artifactId>InfiniteKothAPI</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/libs/InfiniteKothAPI-1.0.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/InfiniteKothAPI-1.0.jar</systemPath>
         </dependency>
 
         <!-- Other -->
