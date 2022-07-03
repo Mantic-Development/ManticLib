@@ -1,4 +1,4 @@
-package me.fullpage.manticlib.settings.json;
+package me.fullpage.manticlib.settings;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
