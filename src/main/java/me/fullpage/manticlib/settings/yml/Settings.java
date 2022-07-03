@@ -1,8 +1,10 @@
 package me.fullpage.manticlib.settings.yml;
 
+import com.google.common.base.CaseFormat;
 import lombok.SneakyThrows;
 import me.fullpage.manticlib.interfaces.Registrable;
 import me.fullpage.manticlib.interfaces.Reloadable;
+import me.fullpage.manticlib.settings.yml.annotations.Comment;
 import me.fullpage.manticlib.settings.yml.annotations.ConfigComponent;
 import me.fullpage.manticlib.settings.yml.annotations.Name;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -28,6 +30,15 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
     private transient File file = null;
     private FileConfiguration fileConfiguration = null;
     private transient String prePath = null;
+    private transient Mode mode = Mode.FIELD_NAME;
+
+    public Mode getMode() {
+        return mode == null ? Mode.FIELD_NAME : mode;
+    }
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
 
     @Override
     public void register() {
@@ -76,6 +87,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
     // TODO: 03/07/2022 add list support
 
     private void checkOrAdd(final Field[] declaredFields) {
+        boolean changed = false;
         for (Field declaredField : declaredFields) {
             if (isInvalidField(declaredField)) {
                 continue;
@@ -84,37 +96,73 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             try {
                 declaredField.setAccessible(true);
                 final String name = this.getFieldSerialisedName(declaredField);
-                if (fileConfiguration.isSet(name)) {
-                    if (this.isStringOrPrimitive(declaredField)) {
-                        declaredField.set(this, fileConfiguration.get(name));
-                    } else if (declaredField.getType().isAnnotationPresent(ConfigComponent.class)) {
-                        final ReflectionFactory reflection = ReflectionFactory.getReflectionFactory();
-                        final Constructor<Object> constructor = (Constructor<Object>) reflection.newConstructorForSerialization(declaredField.getType(), Object.class.getDeclaredConstructor());
-                        final Object o = constructor.newInstance();
+                boolean isSet = fileConfiguration.isSet(name);
+                if (!isSet) {
+                    if (declaredField.isAnnotationPresent(Comment.class)) {
+                        String[] value = declaredField.getAnnotation(Comment.class).value();
+                        if (value.length > 0) {
+                            fileConfiguration.set(name + "_COMMENT", String.join("\n", value).replaceAll(":", "{{{REPLACE_ME_WITH_DOUBLE_DOTS}}}"));
+                            changed = true;
+                        }
+                    }
 
-                        for (Field field : o.getClass().getDeclaredFields()) {
-                            if (field != null && isStringOrPrimitive(field)) {
-                                field.setAccessible(true);
-                                field.set(o, fileConfiguration.get(name + "." + getFieldSerialisedName(field)));
-                            } else if (field != null && Collection.class.isAssignableFrom(field.getType())) {
-                                field.set(this, fileConfiguration.getList(name));
-                            }
+                }
+                if (this.isStringOrPrimitive(declaredField)) {
+                    if (!isSet) {
+                        fileConfiguration.set(name, declaredField.get(this));
+                        changed = true;
+                    }
+                    declaredField.set(this, fileConfiguration.get(name));
+                } else if (declaredField.getType().isAnnotationPresent(ConfigComponent.class)) {
+                    final ReflectionFactory reflection = ReflectionFactory.getReflectionFactory();
+                    final Constructor<Object> constructor = (Constructor<Object>) reflection.newConstructorForSerialization(declaredField.getType(), Object.class.getDeclaredConstructor());
+                    final Object o = constructor.newInstance();
+
+                    for (Field field : o.getClass().getDeclaredFields()) {
+                        if (isInvalidField(field)) {
+                            continue;
                         }
 
-                        declaredField.set(this, o);
+                        if (isStringOrPrimitive(field)) {
+                            field.setAccessible(true);
 
-                    } else if (Collection.class.isAssignableFrom(declaredField.getType())) {
-                        //  ParameterizedType stringListType = (ParameterizedType) declaredField.getGenericType();
-                        //   Class<?> listClass = (Class<?>) stringListType.getActualTypeArguments()[0];
+                            if (!isSet) {
+                                fileConfiguration.set(name + "." + getFieldSerialisedName(field), field.get(o));
+                                changed = true;
+                            }
 
-                        declaredField.set(this, fileConfiguration.getList(name));
-
-
+                            field.set(o, fileConfiguration.get(name + "." + getFieldSerialisedName(field)));
+                        } else if (Collection.class.isAssignableFrom(field.getType())) {
+                            if (!isSet) {
+                                fileConfiguration.set(name + "." + getFieldSerialisedName(field), field.get(o));
+                                changed = true;
+                            }
+                            field.set(this, fileConfiguration.getList(name));
+                        }
                     }
+
+                    declaredField.set(this, o);
+
+                } else if (Collection.class.isAssignableFrom(declaredField.getType())) {
+                    //  ParameterizedType stringListType = (ParameterizedType) declaredField.getGenericType();
+                    //   Class<?> listClass = (Class<?>) stringListType.getActualTypeArguments()[0];
+
+                    if (!isSet) {
+                        fileConfiguration.set(name, declaredField.get(this));
+                        changed = true;
+                    }
+
+                    declaredField.set(this, fileConfiguration.getList(name));
+
+
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        if (changed) {
+            this.save();
         }
 
     }
@@ -147,7 +195,18 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
         if (field.isAnnotationPresent(Name.class)) {
             return field.getAnnotation(Name.class).value();
         } else {
-            return field.getName();
+            switch (this.getMode()) {
+                case UPPER_UNDERSCORE:
+                    return CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, field.getName());
+                case LOWER_UNDERSCORE:
+                    return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field.getName());
+                case LOWER_HYPHON:
+                    return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, field.getName());
+                case UPPER_HYPHON:
+                    return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, field.getName()).toUpperCase();
+                default:
+                    return field.getName();
+            }
         }
     }
 
@@ -229,6 +288,14 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
                 e.printStackTrace();
             }
         }
+    }
+
+    public enum Mode {
+        UPPER_UNDERSCORE,
+        LOWER_UNDERSCORE,
+        UPPER_HYPHON,
+        LOWER_HYPHON,
+        FIELD_NAME
     }
 
 }
