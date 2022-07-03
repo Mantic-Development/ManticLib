@@ -51,5 +51,47 @@ public enum FieldNameFormatters implements FieldNameFormatter {
             }
             return builder.toString();
         }
-    }
+    },
+    /**
+     * Represents a {@code FieldNameFormatter} that transforms <i>camelCase</i> to
+     * <i>lower_hyphon</i>.
+     * <p>
+     * For example, <i>myPrivateField</i> becomes <i>my-private-field</i>.
+     */
+    LOWER_HYPHON {
+        @Override
+        public String fromFieldName(String fn) {
+            StringBuilder builder = new StringBuilder(fn.length());
+            for (char c : fn.toCharArray()) {
+                if (Character.isLowerCase(c)) {
+                    builder.append(c);
+                } else if (Character.isUpperCase(c)) {
+                    c = Character.toLowerCase(c);
+                    builder.append('-').append(c);
+                }
+            }
+            return builder.toString();
+        }
+    },
+    /**
+     * Represents a {@code FieldNameFormatter} that transforms <i>camelCase</i> to
+     * <i>upper_hyphon</i>.
+     * <p>
+     * For example, <i>myPrivateField</i> becomes <i>MY-PRIVATE-FIELD</i>.
+     */
+    UPPER_HYPHON {
+        @Override
+        public String fromFieldName(String fn) {
+            StringBuilder builder = new StringBuilder(fn.length());
+            for (char c : fn.toCharArray()) {
+                if (Character.isUpperCase(c)) {
+                    builder.append(c);
+                } else if (Character.isLowerCase(c)) {
+                    c = Character.toUpperCase(c);
+                    builder.append('-').append(c);
+                }
+            }
+            return builder.toString();
+        }
+    },
 }
