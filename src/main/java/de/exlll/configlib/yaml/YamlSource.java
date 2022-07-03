@@ -60,7 +60,7 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     }
 
     private static final class CommentAdder {
-        private static final Pattern PREFIX_PATTERN = Pattern.compile("^\\w+:.*");
+        private static final Pattern PREFIX_PATTERN = Pattern.compile("^[A-Za-z0-9_-]+:.*");
         private final String dump;
         private final Comments comments;
         private final YamlComments yamlComments;
