@@ -1,4 +1,4 @@
-package me.fullpage.manticlib.settings;
+package me.fullpage.manticlib.settings.json;
 
 import com.google.gson.*;
 import org.bukkit.plugin.Plugin;

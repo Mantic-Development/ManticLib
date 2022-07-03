@@ -132,6 +132,12 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         sendMessage("&e" + (getUsage() == null ? "&7<Cannot get usage>" : getUsage()));
     }
 
+    @Override
+    public String getUsage() {
+        String usage = super.getUsage();
+        return usage == null ? null : usage.replace("<command>", label);
+    }
+
     @NotNull
     public Command setAliases(@NotNull String... aliases) {
         return super.setAliases(Txt.list(aliases));

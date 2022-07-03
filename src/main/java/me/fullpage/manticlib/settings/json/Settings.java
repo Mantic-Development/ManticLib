@@ -1,4 +1,4 @@
-package me.fullpage.manticlib.settings;
+package me.fullpage.manticlib.settings.json;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -7,7 +7,6 @@ import me.fullpage.manticlib.interfaces.Registrable;
 import me.fullpage.manticlib.interfaces.Reloadable;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.xml.bind.ValidationEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -39,7 +38,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
 
     public void save() {
         final File file = config.getFile();
-        if (!file.getParentFile().exists()) {
+        if (file.getParentFile() != null && !file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
 
