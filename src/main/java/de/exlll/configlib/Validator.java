@@ -37,9 +37,14 @@ final class Validator {
         }
     }
 
+    private static boolean isCompatible(Class<?> classA, Class<?> classB) {
+        return classA == classB /*|| classA.isAssignableFrom(classB)*/;
+    }
+
     private static void checkCollectionType(Object element, ConversionInfo info) {
         Class<?> cls = element.getClass();
-        if (cls != info.getElementType()) {
+
+        if (!isCompatible(info.getElementType(), cls)) {
             String cNameField = selectContainerNameField(info);
             String cValues = selectContainerValues(info);
             String msg = "The type of " + cNameField + " doesn't match the " +

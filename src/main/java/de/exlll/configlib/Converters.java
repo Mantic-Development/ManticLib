@@ -3,6 +3,7 @@ package de.exlll.configlib;
 import de.exlll.configlib.Converter.ConversionInfo;
 import de.exlll.configlib.annotation.Convert;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
@@ -20,7 +21,7 @@ final class Converters {
     static final EnumConverter ENUM_CONVERTER
             = new EnumConverter();
     static final ListConverter LIST_CONVERTER
-            = new ListConverter();
+            = new ListConverter(); 
     static final SetConverter SET_CONVERTER
             = new SetConverter();
     static final MapConverter MAP_CONVERTER

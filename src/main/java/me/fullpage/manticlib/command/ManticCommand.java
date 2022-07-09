@@ -135,7 +135,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
     @Override
     public String getUsage() {
         String usage = super.getUsage();
-        return usage == null ? null : usage.replace("<command>", label);
+        return usage == null ? "/<command>" : usage;
     }
 
     @NotNull
