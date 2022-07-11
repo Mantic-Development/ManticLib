@@ -16,6 +16,7 @@ public final class ManticLib extends ManticPlugin {
     private InfiniteKothIntegration infiniteKoth;
     private VaultIntegration vault;
 
+    // TODO: 10/07/2022 seperate class for listener to plugin enable and disable in intergation 
     @Override
     public void onEnable() {
         instance = this;

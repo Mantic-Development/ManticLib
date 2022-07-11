@@ -22,7 +22,6 @@ public class ActionBar {
         }
         String nmsVersion = ReflectionUtils.VERSION;
 
-        // Call the event, if cancelled don't send Action Bar
         try {
             Object connection = ReflectionUtils.getConnection(player);
             Object packet;
