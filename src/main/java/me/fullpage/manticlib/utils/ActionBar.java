@@ -1,19 +1,15 @@
 package me.fullpage.manticlib.utils;
 
-import com.google.gson.JsonObject;
 import me.fullpage.manticlib.ManticLib;
-import me.fullpage.manticlib.settings.JsonConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.simple.JSONObject;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class ActionBar {
 
-    private static final boolean useOldMethods = ReflectionUtils.VER == 7 ||ReflectionUtils.VER == 8 || ReflectionUtils.VER == 9;
+    private static final boolean useOldMethods = ReflectionUtils.VER == 7 || ReflectionUtils.VER == 8 || ReflectionUtils.VER == 9;
 
 
     public static void sendActionBar(Player player, String message) {

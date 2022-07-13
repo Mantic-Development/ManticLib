@@ -6,3 +6,4 @@ authors: [ Fullpage ]
 description: Libraries for Mantic Plugins
 api-version: 1.13
 website: https://discord.xmantic.dev
+load: STARTUP

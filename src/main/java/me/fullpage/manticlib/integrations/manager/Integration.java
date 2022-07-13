@@ -1,15 +1,8 @@
 package me.fullpage.manticlib.integrations.manager;
 
-import jdk.internal.org.objectweb.asm.Handle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public abstract class Integration implements Listener {
+public abstract class Integration {
 
     protected static List<Integration> INTEGRATIONS = new ArrayList<>();
     private static boolean isInitialized = false;
@@ -27,17 +20,16 @@ public abstract class Integration implements Listener {
     private final @NotNull String pluginName;
     private List<String> requiredClasses = new ArrayList<>();
     private List<String> requiredVersions = new ArrayList<>();
-    private JavaPlugin providingPlugin;
+    protected JavaPlugin providingPlugin;
     private boolean active;
 
     public Integration(@NotNull String pluginName) {
         this.pluginName = pluginName;
         this.active = false;
         providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
-        Bukkit.getServer().getPluginManager().registerEvents(this, providingPlugin);
         this.checkActive();
 
-        if (!isInitialized){
+        if (!isInitialized) {
             isInitialized = true;
             Bukkit.getServer().getPluginManager().registerEvents(new IntegrationListener(), providingPlugin);
         }
@@ -60,7 +52,7 @@ public abstract class Integration implements Listener {
     }
 
     protected void checkActive() {
-        Bukkit.getScheduler().runTaskLater(providingPlugin, ()->{
+        Bukkit.getScheduler().runTaskLater(providingPlugin, () -> {
 
             if (check()) {
                 if (!active) {
