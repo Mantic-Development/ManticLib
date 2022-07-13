@@ -1,10 +1,12 @@
 package me.fullpage.manticlib.integrations.manager;
 
+import jdk.internal.org.objectweb.asm.Handle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
@@ -19,6 +21,9 @@ import java.util.List;
 @Setter
 public abstract class Integration implements Listener {
 
+    protected static List<Integration> INTEGRATIONS = new ArrayList<>();
+    private static boolean isInitialized = false;
+
     private final @NotNull String pluginName;
     private List<String> requiredClasses = new ArrayList<>();
     private List<String> requiredVersions = new ArrayList<>();
@@ -31,6 +36,11 @@ public abstract class Integration implements Listener {
         providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
         Bukkit.getServer().getPluginManager().registerEvents(this, providingPlugin);
         this.checkActive();
+
+        if (!isInitialized){
+            isInitialized = true;
+            Bukkit.getServer().getPluginManager().registerEvents(new IntegrationListener(), providingPlugin);
+        }
     }
 
     public void addRequiredClass(@NotNull String classPath) {
@@ -49,7 +59,7 @@ public abstract class Integration implements Listener {
 
     }
 
-    private void checkActive() {
+    protected void checkActive() {
         Bukkit.getScheduler().runTaskLater(providingPlugin, ()->{
 
             if (check()) {
@@ -111,15 +121,6 @@ public abstract class Integration implements Listener {
         }
 
         return false;
-    }
-
-    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPluginEnable(PluginEnableEvent event) {
-        this.checkActive();
-    }
-    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPluginDisable(PluginDisableEvent event) {
-        this.checkActive();
     }
 
 }
