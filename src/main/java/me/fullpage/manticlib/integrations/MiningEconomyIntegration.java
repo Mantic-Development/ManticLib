@@ -14,7 +14,7 @@ public class MiningEconomyIntegration extends Integration {
     private MiningEconomy miningEconomy;
 
     public MiningEconomyIntegration() {
-        super("InfiniteKoth");
+        super("MiningEconomy");
         this.addRequiredClass("me.fullpage.miningeconomy.api.MiningEconomy");
     }
 
