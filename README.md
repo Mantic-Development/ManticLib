@@ -15,7 +15,7 @@ Dependency:
 <dependency>
     <groupId>com.github.Mantic-Development</groupId>
     <artifactId>ManticLib</artifactId>
-    <version>1.0</version>
+    <version>(version)</version>
     <scope>provided</scope>
 </dependency>
   ```
