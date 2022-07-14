@@ -123,6 +123,13 @@
             <scope>system</scope>
             <systemPath>${pom.basedir}/lib/ManticHoes-1.0-API.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>me.fullpage</groupId>
+            <artifactId>ManticSwordsAPI</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/ManticSwords-1.0-stripped.jar</systemPath>
+        </dependency>
 
         <!-- Other -->
         <dependency>

@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 public abstract class Integration {
 
-    protected static List<Integration> INTEGRATIONS = new ArrayList<>();
+    public static List<Integration> INTEGRATIONS = new ArrayList<>();
     private static boolean isInitialized = false;
 
     private final @NotNull String pluginName;
@@ -61,11 +61,7 @@ public abstract class Integration {
                 }
                 active = true;
             } else {
-                if (active) {
-                    providingPlugin.getLogger().info("Disabled integration for " + pluginName + ".");
-                    this.onDisable();
-                }
-                active = false;
+                this.forceDisable();
             }
         }, 2L);
     }
@@ -84,6 +80,14 @@ public abstract class Integration {
         }
 
         return true;
+    }
+
+    public void forceDisable() {
+        if (active) {
+            providingPlugin.getLogger().info("Disabled integration for " + pluginName + ".");
+            this.onDisable();
+        }
+        active = false;
     }
 
     private boolean isClassLoaded(String classPath) {

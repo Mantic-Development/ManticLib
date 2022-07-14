@@ -1,43 +1,43 @@
 package me.fullpage.manticlib.integrations;
 
-import me.fullpage.mantichoes.ManticHoes;
-import me.fullpage.mantichoes.data.MPlayers;
-import me.fullpage.mantichoes.wrappers.MPlayer;
+import me.fullpage.manticsword.data.MPlayers;
+import me.fullpage.manticsword.wrappers.MPlayer;
 import me.fullpage.manticlib.integrations.manager.Integration;
+import me.fullpage.manticsword.ManticSwords;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class ManticHoesIntegration extends Integration {
+public class ManticSwordsIntegration extends Integration {
 
-    private ManticHoes manticHoes;
+    private ManticSwords manticSwords;
 
-    public ManticHoesIntegration() {
-        super("ManticHoes");
-        this.addRequiredClass("me.fullpage.mantichoes.ManticHoes");
+    public ManticSwordsIntegration() {
+        super("ManticSwords");
+        this.addRequiredClass("me.fullpage.manticsword.ManticSwords");
     }
 
     @Override
     public void onEnable() {
-        manticHoes = (ManticHoes) JavaPlugin.getProvidingPlugin(ManticHoes.class);
+        manticSwords = (ManticSwords) JavaPlugin.getProvidingPlugin(ManticSwords.class);
     }
 
-    public ManticHoes getManticHoes() {
-        return manticHoes;
+    public ManticSwords getManticSwords() {
+        return manticSwords;
     }
 
     public boolean hasEnough(@NotNull UUID uuid, long amount) {
         if (!isActive()) return false;
 
         MPlayer mPlayer = MPlayers.get(uuid);
-        return mPlayer.hasEnoughTokens(amount);
+        return mPlayer.hasEnoughCrystals(amount);
     }
 
     public boolean takeMoney(@NotNull UUID uuid, long amount) {
         if (!isActive()) return false;
         MPlayer mPlayer = MPlayers.get(uuid);
-        mPlayer.takeTokens(amount);
+        mPlayer.takeCrystals(amount);
         return true;
     }
 
@@ -45,7 +45,7 @@ public class ManticHoesIntegration extends Integration {
         if (!isActive()) return false;
         MPlayer mPlayer = MPlayers.get(uuid);
 
-        mPlayer.addTokens(amount);
+        mPlayer.addCrystals(amount);
         return true;
     }
 

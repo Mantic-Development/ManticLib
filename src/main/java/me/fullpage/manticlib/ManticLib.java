@@ -1,10 +1,8 @@
 package me.fullpage.manticlib;
 
 import lombok.Getter;
-import me.fullpage.manticlib.integrations.InfiniteKothIntegration;
-import me.fullpage.manticlib.integrations.ManticHoesIntegration;
-import me.fullpage.manticlib.integrations.MiningEconomyIntegration;
-import me.fullpage.manticlib.integrations.VaultIntegration;
+import me.fullpage.manticlib.integrations.*;
+import me.fullpage.manticlib.integrations.manager.Integration;
 
 @Getter
 public final class ManticLib extends ManticPlugin {
@@ -19,6 +17,7 @@ public final class ManticLib extends ManticPlugin {
     private VaultIntegration vault;
     private MiningEconomyIntegration miningEconomy;
     private ManticHoesIntegration manticHoes;
+    private ManticSwordsIntegration manticSwords;
 
     @Override
     public void onEnable() {
@@ -28,7 +27,20 @@ public final class ManticLib extends ManticPlugin {
         vault = new VaultIntegration();
         miningEconomy = new MiningEconomyIntegration();
         manticHoes = new ManticHoesIntegration();
+        manticSwords = new ManticSwordsIntegration();
 
     }
 
+    @Override
+    public void onInnerDisable() {
+        for (Integration integration : Integration.INTEGRATIONS) {
+            if (integration != null) {
+                try{
+                    integration.forceDisable();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
