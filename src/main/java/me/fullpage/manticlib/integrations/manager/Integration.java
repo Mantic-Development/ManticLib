@@ -108,7 +108,7 @@ public abstract class Integration {
         if (requiredVersions != null && !requiredVersions.isEmpty()) {
             Plugin plugin = Bukkit.getPluginManager().getPlugin(this.pluginName);
             for (String requiredVersion : requiredVersions) {
-                if (requiredVersion != null && plugin != null && !plugin.getDescription().getVersion().equals(requiredVersion)) {
+                if (requiredVersion != null && plugin != null && plugin.getDescription().getVersion().equals(requiredVersion)) {
                     return true;
                 }
             }
