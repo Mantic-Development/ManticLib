@@ -1,5 +1,5 @@
 name: ManticLib
-version: '${project.version}'
+version: ${project.version}
 main: me.fullpage.manticlib.ManticLib
 prefix: ManticLib
 authors: [ Fullpage ]

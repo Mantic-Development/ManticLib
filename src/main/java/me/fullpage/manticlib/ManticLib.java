@@ -3,6 +3,8 @@ package me.fullpage.manticlib;
 import lombok.Getter;
 import me.fullpage.manticlib.integrations.*;
 import me.fullpage.manticlib.integrations.manager.Integration;
+import me.fullpage.nmslib.NMSHandler;
+import me.fullpage.nmslib_plugin.NMSLib;
 
 @Getter
 public final class ManticLib extends ManticPlugin {
@@ -12,6 +14,7 @@ public final class ManticLib extends ManticPlugin {
     public static ManticLib get() {
         return instance;
     }
+    private NMSHandler nmsHandler;
     private InfiniteKothIntegration infiniteKoth;
     private VaultIntegration vault;
     private MiningEconomyIntegration miningEconomy;
@@ -21,7 +24,8 @@ public final class ManticLib extends ManticPlugin {
     @Override
     public void onEnable() {
         instance = this;
- 
+
+        nmsHandler = NMSLib.init(this);
         infiniteKoth = new InfiniteKothIntegration();
         vault = new VaultIntegration();
         miningEconomy = new MiningEconomyIntegration();
