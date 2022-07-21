@@ -2,6 +2,7 @@ package me.fullpage.manticlib.command;
 
 import me.fullpage.manticlib.string.Txt;
 import me.fullpage.manticlib.utils.ReflectionUtils;
+import me.fullpage.manticlib.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.*;
@@ -63,16 +64,16 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
             uuid = player.getUniqueId();
         }
 
-        if ((minimumArgs != null && args.length < minimumArgs) || (maximumArgs != null && args.length > maximumArgs)) {
-            sendUsageMessage();
-            return true;
-        }
-
-        if (permission == null || sender.hasPermission(permission) || sender.isOp()) {
+        if (permission == null || sender.hasPermission(permission)/* || sender.isOp()*/) {
+            if ((minimumArgs != null && args.length < minimumArgs) || (maximumArgs != null && args.length > maximumArgs)) {
+                sendUsageMessage();
+                return true;
+            }
             run();
         } else {
             sendNoPermissionMessage();
         }
+
         return true;
     }
 
@@ -90,7 +91,39 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         sender.sendMessage(Txt.parse("&cOnly players can run this command."));
     }
 
-    protected void sendMessage(String... messages) {
+    public void sendMessage(CommandSender sender, String message) {
+        if (Utils.isNullOrEmpty(message)) {
+            return;
+        }
+        sender.sendMessage(Txt.parse(message));
+    }
+
+
+    public void sendMessage(String message) {
+        if (Utils.isNullOrEmpty(message)) {
+            return;
+        }
+        sender.sendMessage(Txt.parse(message));
+    }
+    public void sendMessage(String[] messages) {
+       this.sendMessages(messages);
+    }
+
+    public void sendMessage(CommandSender sender, String message, Object... args) {
+        if (Utils.isNullOrEmpty(message)) {
+            return;
+        }
+        sender.sendMessage(Txt.parse(message, args));
+    }
+
+    public void sendMessage(String message, Object... args) {
+        if (Utils.isNullOrEmpty(message)) {
+            return;
+        }
+        sender.sendMessage(Txt.parse(message, args));
+    }
+
+    protected void sendMessages(String... messages) {
         Arrays.stream(messages)
                 .forEach(message -> {
                     if (Txt.isNullOrEmpty(message)) return;
@@ -98,7 +131,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
                 });
     }
 
-    protected void sendMessage(CommandSender sender, String... messages) {
+    protected void sendMessages(CommandSender sender, String... messages) {
         Arrays.stream(messages)
                 .forEach(message -> {
                     if (Txt.isNullOrEmpty(message)) return;

@@ -6,7 +6,7 @@
 
     <groupId>me.fullpage</groupId>
     <artifactId>ManticLib</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.5</version>
     <packaging>jar</packaging>
 
     <name>ManticLib</name>
@@ -32,7 +32,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -49,6 +49,10 @@
                         <relocation>
                             <pattern>de.tr7zw.changeme.nbtapi</pattern>
                             <shadedPattern>me.fullpage.manticlib.nbtapi</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>me.fullpage.nmslib</pattern>
+                            <shadedPattern>me.fullpage.manticlib.nmslib</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -70,10 +74,6 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>athion</id>
-            <url>http://ci.athion.net/job/FastAsyncWorldEdit/ws/mvn/</url>
         </repository>
         <repository>
             <id>enginehub-maven</id>
