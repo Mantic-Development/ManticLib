@@ -64,21 +64,21 @@ publishing {
     }
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>() {
+tasks.processResources {
+
+    filesMatching("**/plugin.yml") {
+        expand( project.properties )
+    }
+
+}
+
+tasks.shadowJar {
     archiveFileName.set("${project.name}-${project.version}.jar")
     destinationDirectory.set(file("out"))
 
     relocate("me.fullpage.nmslib", "me.fullpage.manticlib.nmslib")
     relocate("de.tr7zw.changeme.nbtapi", "me.fullpage.manticlib.nbtapi")
 
-
-}
-
-tasks.processResources {
-
-    filesMatching("**/plugin.yml") {
-        expand( project.properties )
-    }
 
 }
 
