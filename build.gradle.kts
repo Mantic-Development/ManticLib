@@ -86,6 +86,10 @@ tasks.clean {
     delete(file("out"))
 }
 
-tasks.withType<JavaCompile>() {
+tasks.compileJava {
     options.encoding = "UTF-8"
+}
+
+artifacts {
+    archives(tasks.shadowJar)
 }
