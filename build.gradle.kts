@@ -73,8 +73,9 @@ tasks.processResources {
 }
 
 tasks.shadowJar {
-    archiveFileName.set("${project.name}-${project.version}.jar")
-    destinationDirectory.set(file("out"))
+    //"${project.name}-${project.version}.jar"
+    archiveFileName.set("$baseName-$version.$extension")
+  //  destinationDirectory.set(file("out"))
 
     relocate("me.fullpage.nmslib", "me.fullpage.manticlib.nmslib")
     relocate("de.tr7zw.changeme.nbtapi", "me.fullpage.manticlib.nbtapi")
