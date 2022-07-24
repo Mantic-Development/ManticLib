@@ -1,9 +1,13 @@
 package me.fullpage.manticlib.utils;
 
 import lombok.SneakyThrows;
+import me.fullpage.manticlib.builders.ItemBuilder;
 import me.fullpage.manticlib.string.ManticString;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -167,6 +171,52 @@ public class Utils {
         }
 
         return -1;
+    }
+
+    public static void giveItems(Player player, ItemStack... items) {
+        if (player == null || items == null || items.length == 0) {
+            return;
+        }
+
+        for (ItemStack drop : items) {
+            if (drop == null) {
+                continue;
+            }
+
+            int count = drop.getAmount();
+            PlayerInventory inventory = player.getInventory();
+            for (int i = 0; i < inventory.getSize(); i++) {
+                if (count <= 0) {
+                    break;
+                }
+                int toGive = Math.min(64, count);
+                ItemStack item = inventory.getItem(i);
+                if (item == null) {
+                    inventory.setItem(i, ItemBuilder.from(drop).amount(toGive));
+                    count -= toGive;
+                    continue;
+                }
+
+                Material material = item.getType();
+                if (material == Material.AIR) {
+                    inventory.setItem(i, ItemBuilder.from(drop).amount(toGive));
+                    count -= toGive;
+                    continue;
+                }
+
+                if (drop.isSimilar(item)) {
+                    int amount = item.getAmount();
+                    if (amount < 64) {
+                        int toReplace = Math.min(64 - amount, toGive);
+                        item.setAmount(amount + toReplace);
+                        count -= toReplace;
+                    }
+                }
+            }
+            if (count > 0) {
+                player.getWorld().dropItemNaturally(player.getLocation().add(0, 0.5,0), ItemBuilder.from(drop).amount(count));
+            }
+        }
     }
 
 

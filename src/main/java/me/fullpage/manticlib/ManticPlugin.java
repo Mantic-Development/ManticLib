@@ -2,6 +2,9 @@ package me.fullpage.manticlib;
 
 import lombok.Getter;
 import me.fullpage.manticlib.command.ManticCommand;
+import me.fullpage.manticlib.listeners.ArmourListener;
+import me.fullpage.manticlib.listeners.DispenserArmorListener;
+import me.fullpage.manticlib.listeners.PlayerMoveListener;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,7 +15,15 @@ public class ManticPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        ArmourListener armourListener = new ArmourListener();
+        try {
+            Class.forName("org.bukkit.event.block.BlockDispenseArmorEvent");
+            DispenserArmorListener dispenserArmorListener = new DispenserArmorListener();
+        } catch (Exception e) {
+            // ignore
+        }
+
+        PlayerMoveListener playerMoveListener = new PlayerMoveListener();
     }
 
 

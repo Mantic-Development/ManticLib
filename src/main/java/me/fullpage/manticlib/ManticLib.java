@@ -25,6 +25,7 @@ public final class ManticLib extends ManticPlugin {
     public void onEnable() {
         instance = this;
 
+        // TODO: 22/07/2022 fix block setting
         nmsHandler = NMSLib.init(this);
         infiniteKoth = new InfiniteKothIntegration();
         vault = new VaultIntegration();
