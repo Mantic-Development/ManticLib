@@ -14,8 +14,8 @@ public class IntegrationListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPluginEnable(PluginEnableEvent event) {
         for (Integration integration : Integration.INTEGRATIONS) {
-            if (integration != null && integration.getPluginName().equalsIgnoreCase(event.getPlugin().getName())) {
-                integration.checkActive();
+            if (integration != null && integration.getPluginName().equals(event.getPlugin().getName())) {
+                integration.setActive(true);
             }
         }
     }
@@ -31,7 +31,7 @@ public class IntegrationListener implements Listener {
                 toRemove.add(integration);
             }
             if (integration.getPluginName().equalsIgnoreCase(event.getPlugin().getName())) {
-                integration.checkActive();
+                integration.setActive(false);
             }
         }
         if (!toRemove.isEmpty()) {

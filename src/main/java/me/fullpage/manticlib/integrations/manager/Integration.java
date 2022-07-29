@@ -27,8 +27,8 @@ public abstract class Integration {
         this.pluginName = pluginName;
         this.active = false;
         providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
-        this.checkActive();
-
+        this.setActive();
+        INTEGRATIONS.add(this);
         if (!isInitialized) {
             isInitialized = true;
             Bukkit.getServer().getPluginManager().registerEvents(new IntegrationListener(), providingPlugin);
@@ -51,19 +51,39 @@ public abstract class Integration {
 
     }
 
-    protected void checkActive() {
-        Bukkit.getScheduler().runTaskLater(providingPlugin, () -> {
+    protected void setActive() {
+        this.setActive(null);
+    }
 
-            if (check()) {
-                if (!active) {
-                    providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
-                    this.onEnable();
-                }
-                active = true;
-            } else {
-                this.forceDisable();
+    protected void setActive(Boolean active) {
+
+        if (active == null) {
+            active = this.check();
+        }
+
+        if (active == this.active) {
+            return;
+        }
+
+        if (active) {
+            this.active = true;
+            providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
+            this.onEnable();
+        } else {
+            this.active = false;
+            providingPlugin.getLogger().info("Disabled integration for " + pluginName + ".");
+            this.onDisable();
+        }
+
+        if (check()) {
+            if (!this.active) {
+                providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
+                this.onEnable();
             }
-        }, 2L);
+            this.active = true;
+        } else {
+            this.forceDisable();
+        }
     }
 
     private boolean check() {
