@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Indicates that the annotated element is saved together with explanatory
  * comments describing it.
  * <p>
- * For {@link de.exlll.configlib.configs.yaml.YamlConfiguration YamlConfiguration}s:
+ * For {@link# de.exlll.configlib.configs.yaml.YamlConfiguration YamlConfiguration}s:
  * <ul>
  * <li>
  * If this annotation is used on a class, the comments returned by the

@@ -219,5 +219,175 @@ public class Utils {
         }
     }
 
+    public static ItemStack glassFromNumber(int i) {
+        Material glassPane = Material.matchMaterial("STAINED_GLASS_PANE");
+        ItemStack glass = null;
+        switch (i) {
+            case 0:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("WHITE_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 0);
+                }
+                break;
+            case 1:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("ORANGE_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 1);
+                }
+                break;
+            case 2:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("MAGENTA_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 2);
+                }
+                break;
+            case 3:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("LIGHT_BLUE_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 3);
+                }
+                break;
+            case 4:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("YELLOW_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 4);
+                }
+                break;
+            case 5:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("LIME_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 5);
+                }
+                break;
+            case 6:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("PINK_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 6);
+                }
+                break;
+            case 7:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("GRAY_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 7);
+                }
+                break;
+            case 8:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("LIGHT_GRAY_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 8);
+                }
+                break;
+            case 9:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("CYAN_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 9);
+                }
+                break;
+            case 10:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("PURPLE_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 10);
+                }
+                break;
+            case 11:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("BLUE_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 11);
+                }
+                break;
+            case 12:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("BROWN_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 12);
+                }
+                break;
+            case 13:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("GREEN_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 13);
+                }
+                break;
+            case 14:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("RED_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 14);
+                }
+                break;
+            case 15:
+                if (glassPane == null) {
+                    Material material = Material.matchMaterial("BLACK_STAINED_GLASS_PANE");
+                    if (material != null) {
+                        glass = new ItemStack(material);
+                    }
+                } else {
+                    glass = new ItemStack(glassPane, 1, (short) 15);
+                }
+                break;
+            default:
+               return glassFromNumber(7);
+        }
+        return glass;
+    }
+
 
 }
