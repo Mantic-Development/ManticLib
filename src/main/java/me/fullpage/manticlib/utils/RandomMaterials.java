@@ -18,7 +18,7 @@ public class RandomMaterials {
         Optional<Method> isTransparent = ReflectionUtils.findMethod(Material.class, "isTransparent");
         Optional<Method> isInteractable = ReflectionUtils.findMethod(Material.class, "isInteractable");
         for (Material material : Material.values()) {
-            if (material == null) {
+            if (material == null || material.name().contains("AIR")) {
                 continue;
             }
             try {
