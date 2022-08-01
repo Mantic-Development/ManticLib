@@ -1,48 +1,49 @@
 package me.fullpage.manticlib.integrations;
 
-import me.fullpage.mantichoes.ManticHoes;
-import me.fullpage.mantichoes.data.MPlayers;
-import me.fullpage.mantichoes.wrappers.MPlayer;
 import me.fullpage.manticlib.integrations.manager.Integration;
+import me.fullpage.manticrods.ManticRods;
+import me.fullpage.manticrods.data.MPlayers;
+import me.fullpage.manticrods.wrappers.MPlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class ManticHoesIntegration extends Integration {
+public class ManticRodsIntegration extends Integration {
 
-    private ManticHoes manticHoes;
+    private ManticRods manticRods;
 
-    public ManticHoesIntegration() {
-        super("ManticHoes");
-        this.addRequiredClass("me.fullpage.mantichoes.ManticHoes");
+    public ManticRodsIntegration() {
+        super("ManticRods");
+        this.addRequiredClass("me.fullpage.manticrods.ManticRods");
     }
 
     @Override
     public void onEnable() {
-        manticHoes = (ManticHoes) JavaPlugin.getProvidingPlugin(ManticHoes.class);
+        manticRods = (ManticRods) JavaPlugin.getProvidingPlugin(ManticRods.class);
     }
 
-    public ManticHoes getManticHoes() {
-        return manticHoes;
+    public ManticRods getManticRods() {
+        return manticRods;
     }
 
     public long getBalance(UUID uuid) {
         if (!isActive()) return 0;
-        return MPlayers.get(uuid).getTokens();
+        return MPlayers.get(uuid).getShards();
     }
+
 
     public boolean hasEnough(@NotNull UUID uuid, long amount) {
         if (!isActive()) return false;
 
         MPlayer mPlayer = MPlayers.get(uuid);
-        return mPlayer.hasEnoughTokens(amount);
+        return mPlayer.hasEnoughShards(amount);
     }
 
     public boolean takeMoney(@NotNull UUID uuid, long amount) {
         if (!isActive()) return false;
         MPlayer mPlayer = MPlayers.get(uuid);
-        mPlayer.takeTokens(amount);
+        mPlayer.takeShards(amount);
         return true;
     }
 
@@ -50,7 +51,7 @@ public class ManticHoesIntegration extends Integration {
         if (!isActive()) return false;
         MPlayer mPlayer = MPlayers.get(uuid);
 
-        mPlayer.addTokens(amount);
+        mPlayer.addShards(amount);
         return true;
     }
 

@@ -117,7 +117,7 @@ public class Updater {
 
                 if (lowerCase.startsWith("manticlib")) {
                     if (lowerCase.endsWith(".jar")) {
-                        System.out.println("Found jar file: " + f.getName());
+                        plugin.getLogger().info("Found jar file: " + f.getName());
                         String version = lowerCase.substring(lowerCase.indexOf("-") + 1, lowerCase.indexOf(".jar"));
                         final Integer oldVersion = convertVersion(version);
                         if (oldVersion != 0) {

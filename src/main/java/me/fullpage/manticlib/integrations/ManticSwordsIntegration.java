@@ -27,6 +27,12 @@ public class ManticSwordsIntegration extends Integration {
         return manticSwords;
     }
 
+    public long getBalance(UUID uuid) {
+        if (!isActive()) return 0;
+        return MPlayers.get(uuid).getCrystals();
+    }
+
+
     public boolean hasEnough(@NotNull UUID uuid, long amount) {
         if (!isActive()) return false;
 

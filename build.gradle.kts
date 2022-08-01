@@ -45,6 +45,7 @@ dependencies {
     compileOnly(files("lib/InfiniteKothAPI-1.0.jar"))
     compileOnly(files("lib/ManticHoes-1.0-API.jar"))
     compileOnly(files("lib/ManticSwords-1.0-stripped.jar"))
+    compileOnly(files("lib/ManticRods-1.0-stripped.jar"))
     compileOnly(files("lib/MiningEconomy-API.jar"))
     compileOnly("com.mojang:authlib:1.5.25")
     compileOnly("org.jetbrains:annotations:20.1.0")

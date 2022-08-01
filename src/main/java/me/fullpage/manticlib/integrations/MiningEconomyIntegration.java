@@ -27,6 +27,16 @@ public class MiningEconomyIntegration extends Integration {
         return miningEconomy;
     }
 
+    public long getBalance(UUID uuid) {
+        if (!isActive()) return 0;
+        MPlayer mPlayer = this.getMiningEconomy().getMPlayer(uuid.toString());
+        if (mPlayer == null) {
+            return 0;
+        }
+        return mPlayer.getBalance();
+    }
+
+
     public boolean hasEnough(@NotNull UUID uuid, long amount) {
         if (!isActive()) return false;
 
