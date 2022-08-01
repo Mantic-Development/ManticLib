@@ -1,5 +1,6 @@
 package de.exlll.configlib;
 
+import de.exlll.configlib.format.FieldNameFormatters;
 import de.exlll.configlib.yaml.YamlConfiguration;
 import org.bukkit.configuration.file.YamlConstructor;
 import org.bukkit.configuration.file.YamlRepresenter;
@@ -33,7 +34,7 @@ public abstract class BukkitYamlConfiguration extends YamlConfiguration {
     }
 
     public static class BukkitYamlProperties extends YamlProperties {
-        public static final BukkitYamlProperties DEFAULT = builder().build();
+        public static final BukkitYamlProperties DEFAULT = builder().setFormatter(FieldNameFormatters.LOWER_HYPHON).build();
 
         private BukkitYamlProperties(Builder<?> builder) {
             super(builder);

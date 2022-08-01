@@ -4,6 +4,7 @@ import de.exlll.configlib.Comments;
 import de.exlll.configlib.Configuration;
 import de.exlll.configlib.ConfigurationSource;
 import de.exlll.configlib.ConfigurationStoreException;
+import de.exlll.configlib.format.FieldNameFormatters;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
@@ -58,7 +59,7 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
     }
 
     public static class YamlProperties extends Properties {
-        public static final YamlProperties DEFAULT = builder().build();
+        public static final YamlProperties DEFAULT = builder().setFormatter(FieldNameFormatters.LOWER_HYPHON).build();
         private final List<String> prependedComments;
         private final List<String> appendedComments;
         private final BaseConstructor constructor;
