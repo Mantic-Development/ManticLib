@@ -1,6 +1,7 @@
 package me.fullpage.manticlib;
 
 import me.fullpage.manticlib.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,13 +13,25 @@ import java.net.URL;
 public class Updater {
 
     public static String LATEST_VERSION;
+    private static boolean CLEANED;
 
     static {
+        CLEANED = true;
         try {
             LATEST_VERSION = getLatestVersion();
         } catch (Exception e) {
             LATEST_VERSION = null;
         }
+
+        Bukkit.getScheduler().runTaskTimerAsynchronously(ManticLib.get(), () -> {
+            try {
+                if (LATEST_VERSION == null) {
+                    LATEST_VERSION = getLatestVersion();
+                }
+                updateToLatest(ManticLib.get());
+            } catch (Exception ignored) {
+            }
+        }, 12000, 12000);
     }
 
     public static void updateToLatest(Plugin plugin) {
@@ -27,7 +40,10 @@ public class Updater {
             throw new IllegalArgumentException("Directory is null or not a directory");
         }
 
-        cleanOldFiles(plugin);
+        if (CLEANED) {
+            cleanOldFiles(plugin);
+            CLEANED = false;
+        }
 
         if (LATEST_VERSION == null) {
             return;

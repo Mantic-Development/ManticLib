@@ -1,6 +1,8 @@
 package me.fullpage.manticlib.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -39,6 +41,9 @@ public class RandomMaterials {
                     continue;
                 }
 
+                if (!canSpawn(material)) {
+                    continue;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -55,6 +60,17 @@ public class RandomMaterials {
 
     public static Material getRandom() {
         return materials.get((int) (Math.random() * materials.size()));
+    }
+
+    private static boolean canSpawn(Material material) {
+        try {
+            Bukkit.getServer().getUnsafe().modifyItemStack(new ItemStack(material), "{}");
+            return true;
+        } catch (final NoSuchMethodError nsme) {
+            return true;
+        } catch (final Throwable npe) {
+            return false;
+        }
     }
 
 }
