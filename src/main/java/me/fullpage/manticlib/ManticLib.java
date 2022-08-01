@@ -22,8 +22,11 @@ public final class ManticLib extends ManticPlugin {
     private MiningEconomyIntegration miningEconomy;
     private ManticHoesIntegration manticHoes;
     private ManticSwordsIntegration manticSwords;
+    private ManticRodsIntegration manticRods;
 
     private Config configuration;
+
+    // TODO: 01/08/2022 implement update checker task
 
     @Override
     public void onEnable() {
@@ -46,6 +49,7 @@ public final class ManticLib extends ManticPlugin {
         miningEconomy = new MiningEconomyIntegration();
         manticHoes = new ManticHoesIntegration();
         manticSwords = new ManticSwordsIntegration();
+        manticRods = new ManticRodsIntegration();
 
     }
 
