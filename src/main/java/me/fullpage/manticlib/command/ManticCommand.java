@@ -162,7 +162,8 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
 
     public void sendUsageMessage() {
         sendMessage("&cIncorrect usage, please try:");
-        sendMessage("&e" + (getUsage() == null ? "&7<Cannot get usage>" : getUsage()));
+        String usage = (this.getUsage() == null ? "&7<Cannot get usage>" : this.getUsage());
+        sendMessage("&e" + usage.replace("<command>", label));
     }
 
     @Override
@@ -186,6 +187,14 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
     @Override
     public Plugin getPlugin() {
         return providingPlugin;
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    public String getArgs(int index) {
+        return args[index];
     }
 
     private static final HashMap<Plugin, Set<ManticCommand>> registeredCommands = new HashMap<>();

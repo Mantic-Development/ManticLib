@@ -1,6 +1,7 @@
 package me.fullpage.manticlib;
 
 import lombok.Getter;
+import me.fullpage.manticlib.data.Config;
 import me.fullpage.manticlib.integrations.*;
 import me.fullpage.manticlib.integrations.manager.Integration;
 import me.fullpage.nmslib.NMSHandler;
@@ -14,6 +15,7 @@ public final class ManticLib extends ManticPlugin {
     public static ManticLib get() {
         return instance;
     }
+
     private NMSHandler nmsHandler;
     private InfiniteKothIntegration infiniteKoth;
     private VaultIntegration vault;
@@ -21,9 +23,21 @@ public final class ManticLib extends ManticPlugin {
     private ManticHoesIntegration manticHoes;
     private ManticSwordsIntegration manticSwords;
 
+    private Config configuration;
+
     @Override
     public void onEnable() {
         instance = this;
+
+        try {
+            configuration = new Config();
+            configuration.loadAndSave();
+            if (configuration.autoUpdate) {
+                Updater.updateToLatest(this);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // TODO: 22/07/2022 fix block setting
         nmsHandler = NMSLib.init(this);
@@ -39,7 +53,7 @@ public final class ManticLib extends ManticPlugin {
     public void onInnerDisable() {
         for (Integration integration : Integration.INTEGRATIONS) {
             if (integration != null) {
-                try{
+                try {
                     integration.forceDisable();
                 } catch (Exception e) {
                     e.printStackTrace();
