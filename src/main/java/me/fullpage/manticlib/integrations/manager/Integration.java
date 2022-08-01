@@ -75,7 +75,7 @@ public abstract class Integration {
             this.onDisable();
         }
 
-        if (check()) {
+       /* if (check()) {
             if (!this.active) {
                 providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
                 this.onEnable();
@@ -83,7 +83,7 @@ public abstract class Integration {
             this.active = true;
         } else {
             this.forceDisable();
-        }
+        }*/
     }
 
     private boolean check() {
