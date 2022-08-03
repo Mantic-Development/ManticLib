@@ -340,7 +340,7 @@ public final class ReflectionUtils {
     // Other:
 
     public static Optional<Method> findMethod(Class<?> clazz, String methodName) {
-        for (Method method : clazz.getDeclaredMethods()) {
+        for (Method method : clazz.getMethods()) {
             if (method.getName().equals(methodName)) {
                 return Optional.of(method);
             }
@@ -350,7 +350,7 @@ public final class ReflectionUtils {
 
     // find method with parameter types
     public static Optional<Method> findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-        for (Method method : clazz.getDeclaredMethods()) {
+        for (Method method : clazz.getMethods()) {
             if (method.getName().equals(methodName) && Arrays.equals(method.getParameterTypes(), parameterTypes)) {
                 return Optional.of(method);
             }
