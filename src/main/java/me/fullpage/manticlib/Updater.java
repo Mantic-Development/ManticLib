@@ -25,8 +25,9 @@ public class Updater {
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(ManticLib.get(), () -> {
             try {
-                if (LATEST_VERSION == null) {
-                    LATEST_VERSION = getLatestVersion();
+                String latestVersion = getLatestVersion();
+                if (latestVersion != null) {
+                    LATEST_VERSION = latestVersion;
                 }
                 updateToLatest(ManticLib.get());
             } catch (Exception ignored) {

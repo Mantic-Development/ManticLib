@@ -31,31 +31,51 @@ public class VaultIntegration extends Integration {
         if (!isActive()) {
             return false;
         }
-        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
-        chat = rsp.getProvider();
-        return chat != null;
+        try {
+            RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
+            if (rsp == null) {
+                return false;
+            }
+            chat = rsp.getProvider();
+            return chat != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean setupEconomy() {
         if (!isActive()) {
             return false;
         }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
+        try {
+            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+            if (rsp == null) {
+                return false;
+            }
+            economy = rsp.getProvider();
+            return economy != null;
+        } catch (Exception e) {
             return false;
         }
-        economy = rsp.getProvider();
-        return economy != null;
     }
 
     public boolean setupPermissions() {
         if (!isActive()) {
             return false;
         }
-        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-        Permission perms = rsp.getProvider();
-        permission = perms;
-        return perms != null;
+        try {
+            RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+            if (rsp == null) {
+                return false;
+            }
+            Permission perms = rsp.getProvider();
+            permission = perms;
+            return perms != null;
+        } catch (
+                Exception e) {
+            return false;
+        }
+
     }
 
 
