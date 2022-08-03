@@ -9,6 +9,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.*;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -341,6 +342,16 @@ public final class ReflectionUtils {
     public static Optional<Method> findMethod(Class<?> clazz, String methodName) {
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.getName().equals(methodName)) {
+                return Optional.of(method);
+            }
+        }
+        return Optional.empty();
+    }
+
+    // find method with parameter types
+    public static Optional<Method> findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.getName().equals(methodName) && Arrays.equals(method.getParameterTypes(), parameterTypes)) {
                 return Optional.of(method);
             }
         }
