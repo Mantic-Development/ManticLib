@@ -95,15 +95,16 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         if (Utils.isNullOrEmpty(message)) {
             return;
         }
-        sender.sendMessage(Txt.parse(message));
+        String parse = Txt.parse(message);
+        if (parse.contains("<command>")) {
+            parse = parse.replace("<command>", label);
+        }
+        sender.sendMessage(parse);
     }
 
 
     public void sendMessage(String message) {
-        if (Utils.isNullOrEmpty(message)) {
-            return;
-        }
-        sender.sendMessage(Txt.parse(message));
+       this.sendMessage(sender, message);
     }
     public void sendMessage(String[] messages) {
        this.sendMessages(messages);
@@ -113,21 +114,33 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         if (Utils.isNullOrEmpty(message)) {
             return;
         }
-        sender.sendMessage(Txt.parse(message, args));
+        String parse = Txt.parse(message, args);
+        if (parse.contains("<command>")) {
+            parse = parse.replace("<command>", label);
+        }
+        sender.sendMessage(parse);
     }
 
     public void sendMessage(String message, Object... args) {
         if (Utils.isNullOrEmpty(message)) {
             return;
         }
-        sender.sendMessage(Txt.parse(message, args));
+        String parse = Txt.parse(message, args);
+        if (parse.contains("<command>")) {
+            parse = parse.replace("<command>", label);
+        }
+        sender.sendMessage(parse);
     }
 
     protected void sendMessages(String... messages) {
         Arrays.stream(messages)
                 .forEach(message -> {
                     if (Txt.isNullOrEmpty(message)) return;
-                    sender.sendMessage(Txt.parse(message));
+                    String parse = Txt.parse(message);
+                    if (parse.contains("<command>")) {
+                        parse = parse.replace("<command>", label);
+                    }
+                    sender.sendMessage(parse);
                 });
     }
 
