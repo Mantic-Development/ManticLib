@@ -152,6 +152,20 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
                 });
     }
 
+    public Optional<Player> getPlayer(String string) {
+        if (Utils.isNullOrEmpty(string)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(Bukkit.getPlayer(string));
+    }
+
+    public Optional<Player> getPlayer(int index) {
+        if (index < 0 || index >= args.length) {
+            return Optional.empty();
+        }
+        return getPlayer(args[index]);
+    }
+
 
     protected boolean isConsole() {
         return sender instanceof ConsoleCommandSender;
