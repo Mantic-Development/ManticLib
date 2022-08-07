@@ -19,4 +19,8 @@ public class MathUtils {
         return floor == num ? floor : floor - (int) (Double.doubleToRawLongBits(num) >>> 63);
     }
 
+    public static boolean isInRange(double num, double min, double max) {
+        return num >= min && num <= max;
+    }
+
 }

@@ -13,10 +13,10 @@ import java.net.URL;
 public class Updater {
 
     public static String LATEST_VERSION;
-    private static boolean CLEANED;
+    private static boolean NOT_CLEANED;
 
     static {
-        CLEANED = true;
+        NOT_CLEANED = true;
         try {
             LATEST_VERSION = getLatestVersion();
         } catch (Exception e) {
@@ -41,9 +41,9 @@ public class Updater {
             throw new IllegalArgumentException("Directory is null or not a directory");
         }
 
-        if (CLEANED) {
+        if (NOT_CLEANED) {
             cleanOldFiles(plugin);
-            CLEANED = false;
+            NOT_CLEANED = false;
         }
 
         if (LATEST_VERSION == null) {
