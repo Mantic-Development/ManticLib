@@ -2,6 +2,7 @@ package me.fullpage.manticlib.integrations.manager;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.fullpage.manticlib.Updater;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,6 +21,7 @@ public abstract class Integration {
     private final @NotNull String pluginName;
     private List<String> requiredClasses = new ArrayList<>();
     private List<String> requiredVersions = new ArrayList<>();
+    private String minimumVersion = null;
     protected JavaPlugin providingPlugin;
     private boolean active;
 
@@ -68,22 +70,22 @@ public abstract class Integration {
         if (active) {
             this.active = true;
             providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
-            this.onEnable();
+            try {
+                this.onEnable();
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.setActive(false);
+            }
         } else {
             this.active = false;
             providingPlugin.getLogger().info("Disabled integration for " + pluginName + ".");
-            this.onDisable();
+            try {
+                this.onDisable();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-       /* if (check()) {
-            if (!this.active) {
-                providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
-                this.onEnable();
-            }
-            this.active = true;
-        } else {
-            this.forceDisable();
-        }*/
     }
 
     private boolean check() {
@@ -125,18 +127,44 @@ public abstract class Integration {
             return false;
         }
 
+        Plugin plugin = null;
+
+        if (minimumVersion != null) {
+            plugin = Bukkit.getServer().getPluginManager().getPlugin(this.pluginName);
+            if (plugin == null) {
+                return false;
+            }
+
+            if (!this.isAtLeastMinimumVersion(plugin)) {
+                return false;
+            }
+
+        }
+
+
         if (requiredVersions != null && !requiredVersions.isEmpty()) {
-            Plugin plugin = Bukkit.getPluginManager().getPlugin(this.pluginName);
+            if (plugin == null) Bukkit.getPluginManager().getPlugin(this.pluginName);
             for (String requiredVersion : requiredVersions) {
                 if (requiredVersion != null && plugin != null && plugin.getDescription().getVersion().equals(requiredVersion)) {
                     return true;
                 }
             }
-        } else {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
+    }
+
+    public boolean isAtLeastMinimumVersion(@NotNull Plugin plugin) {
+        if (minimumVersion == null) return true;
+        return Updater.convertVersion(plugin.getDescription().getVersion()) >= Updater.convertVersion(minimumVersion);
+    }
+
+    /**
+     * the plugin version must contain numbers for this to work
+     */
+    public void setMinimumVersion(String minimumVersion) {
+        this.minimumVersion = minimumVersion;
     }
 
 }

@@ -160,7 +160,7 @@ public class Updater {
         }
     }
 
-    private static Integer convertVersion(String v) {
+    public static Integer convertVersion(String v) {
         v = v.replaceAll("[^\\d.]", "");
         int version = 0;
         if (v.contains(".")) {
