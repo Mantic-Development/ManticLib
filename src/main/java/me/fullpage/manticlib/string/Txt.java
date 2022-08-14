@@ -19,6 +19,9 @@ public class Txt {
 
     @SafeVarargs
     public static <T> List<T> list(T... items) {
+        if (items== null || items.length == 0) {
+            return new ArrayList<>();
+        }
         List<T> temp = new ArrayList<>(items.length);
         Collections.addAll(temp, items);
         return temp;
@@ -27,6 +30,9 @@ public class Txt {
 
     @SafeVarargs
     public static <T> Set<T> set(T... items) {
+        if (items== null || items.length == 0) {
+            return new HashSet<>();
+        }
         Set<T> temp = new HashSet<>(items.length);
         Collections.addAll(temp, items);
         return temp;

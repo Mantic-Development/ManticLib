@@ -4,6 +4,9 @@ import lombok.Getter;
 import me.fullpage.manticlib.data.Config;
 import me.fullpage.manticlib.integrations.*;
 import me.fullpage.manticlib.integrations.manager.Integration;
+import me.fullpage.manticlib.listeners.ArmourListener;
+import me.fullpage.manticlib.listeners.DispenserArmorListener;
+import me.fullpage.manticlib.listeners.PlayerMoveListener;
 import me.fullpage.nmslib.NMSHandler;
 import me.fullpage.nmslib_plugin.NMSLib;
 
@@ -31,6 +34,20 @@ public final class ManticLib extends ManticPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        try {
+
+            ArmourListener armourListener = new ArmourListener();
+            try {
+                Class.forName("org.bukkit.event.block.BlockDispenseArmorEvent");
+                DispenserArmorListener dispenserArmorListener = new DispenserArmorListener();
+            } catch (Exception e) {
+                // ignore
+            }
+
+            PlayerMoveListener playerMoveListener = new PlayerMoveListener();
+        } catch (Exception ignored) {
+        }
 
         try {
             configuration = new Config();

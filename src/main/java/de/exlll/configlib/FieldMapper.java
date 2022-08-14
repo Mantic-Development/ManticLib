@@ -19,6 +19,9 @@ enum FieldMapper {
         Configuration.Properties props = mappingInfo.getProperties();
         FieldFilter filter = props.getFilter();
         for (Field field : filter.filterDeclaredFieldsOf(inst.getClass())) {
+        //    System.out.println("Field: " + field.getName());
+        //    System.out.println("Class: " + inst.getClass().getName());
+        //    System.out.println(map);
             Object val = toConvertibleObject(field, inst, mappingInfo);
             FieldNameFormatter fnf = selectFormatter(mappingInfo);
             String fn = fnf.fromFieldName(field.getName());
