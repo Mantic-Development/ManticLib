@@ -19,3 +19,5 @@ Dependency:
     <scope>provided</scope>
 </dependency>
   ```
+
+Join our support discord at https://discord.gg/Mantic (https://discord.xmantic.dev)

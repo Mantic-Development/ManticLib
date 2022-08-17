@@ -5,5 +5,5 @@ prefix: ManticLib
 authors: [ Fullpage ]
 description: Libraries for Mantic Plugins
 api-version: 1.13
-website: https://discord.xmantic.dev
+website: https://github.com/Mantic-Development/ManticLib
 load: STARTUP
