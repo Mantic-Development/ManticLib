@@ -189,8 +189,9 @@ public class Utils {
                 if (count <= 0) {
                     break;
                 }
-                int toGive = Math.min(64, count);
                 ItemStack item = inventory.getItem(i);
+                int maxStackSize = item == null ? drop.getMaxStackSize():item.getMaxStackSize();
+                int toGive = Math.min(maxStackSize, count);
                 if (item == null) {
                     inventory.setItem(i, ItemBuilder.from(drop).amount(toGive));
                     count -= toGive;
@@ -206,8 +207,8 @@ public class Utils {
 
                 if (drop.isSimilar(item)) {
                     int amount = item.getAmount();
-                    if (amount < 64) {
-                        int toReplace = Math.min(64 - amount, toGive);
+                    if (amount < maxStackSize) {
+                        int toReplace = Math.min(maxStackSize - amount, toGive);
                         item.setAmount(amount + toReplace);
                         count -= toReplace;
                     }
