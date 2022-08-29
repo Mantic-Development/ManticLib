@@ -4,6 +4,7 @@ import me.fullpage.manticlib.string.Txt;
 import me.fullpage.manticlib.utils.ReflectionUtils;
 import me.fullpage.manticlib.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -104,10 +105,11 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
 
 
     public void sendMessage(String message) {
-       this.sendMessage(sender, message);
+        this.sendMessage(sender, message);
     }
+
     public void sendMessage(String[] messages) {
-       this.sendMessages(messages);
+        this.sendMessages(messages);
     }
 
     public void sendMessage(CommandSender sender, String message, Object... args) {
@@ -159,11 +161,47 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         return Optional.ofNullable(Bukkit.getPlayer(string));
     }
 
+    public Optional<OfflinePlayer> getOfflinePlayer(String name) {
+        return getOfflinePlayer(name, true);
+    }
+
+
+    public Optional<OfflinePlayer> getOfflinePlayer(int index) {
+        return getOfflinePlayer(index, true);
+    }
+
     public Optional<Player> getPlayer(int index) {
         if (index < 0 || index >= args.length) {
             return Optional.empty();
         }
         return getPlayer(args[index]);
+    }
+
+    public Optional<OfflinePlayer> getOfflinePlayer(int index, boolean hasBeenOnBefore) {
+        if (index < 0 || index >= args.length) {
+            return Optional.empty();
+        }
+        return getOfflinePlayer(args[index], hasBeenOnBefore);
+    }
+
+    public Optional<OfflinePlayer> getOfflinePlayer(String name, boolean hasBeenOnBefore) {
+        if (Utils.isNullOrEmpty(name)) {
+            return Optional.empty();
+        }
+
+        OfflinePlayer offlinePlayer;
+
+        if (Utils.isUuid(name)) {
+            offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(name));
+        } else {
+            offlinePlayer = Bukkit.getOfflinePlayer(name);
+        }
+
+        if (hasBeenOnBefore) {
+            return (offlinePlayer.hasPlayedBefore() || offlinePlayer.isOnline()) ? Optional.of(offlinePlayer): Optional.empty();
+        }
+
+        return Optional.of(offlinePlayer);
     }
 
 
@@ -221,7 +259,14 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
     }
 
     public String getArgs(int index) {
+        if (index < 0 || index >= args.length) {
+            return null;
+        }
         return args[index];
+    }
+
+    public Optional<String> getArg(int index) {
+        return Optional.ofNullable(this.getArgs(index));
     }
 
     private static final HashMap<Plugin, Set<ManticCommand>> registeredCommands = new HashMap<>();

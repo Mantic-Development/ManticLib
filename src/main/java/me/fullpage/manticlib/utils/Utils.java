@@ -73,6 +73,14 @@ public class Utils {
         return false;
     }
 
+    public static boolean isUuid(String input) {
+        if (Utils.isNullOrEmpty(input)) {
+            return false;
+        }
+
+        return input.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+    }
+
     public static boolean isInt(String input) {
         try {
             Integer.parseInt(input);
