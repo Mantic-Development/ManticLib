@@ -10,11 +10,10 @@ import java.util.Set;
 @Getter
 public class ManticPlugin extends JavaPlugin {
 
-    @Override
-    public void onEnable() {
-    }
 
-
+    /**
+     * Use ManticPlugin#onInnerDisable() instead.
+     */
     @Override
     public void onDisable() {
         super.onDisable();

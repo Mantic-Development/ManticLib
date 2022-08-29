@@ -295,17 +295,16 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         Iterator<Map.Entry<String, Command>> iter = knownCommands.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Command> entry = iter.next();
-            String name = entry.getKey();
             Command command = entry.getValue();
-            if (!command.getLabel().equals(label)) {
+            if (!command.getLabel().equals(this.getLabel())) {
                 continue;
             }
 
-            ManticCommand fc = getManticCommand(command);
-            if (fc == null) continue;
-            if (fc != fc) {
+            ManticCommand manticCommand = getManticCommand(command);
+            if (manticCommand == null) {
                 continue;
             }
+
             command.unregister(simpleCommandMap);
             iter.remove();
         }
