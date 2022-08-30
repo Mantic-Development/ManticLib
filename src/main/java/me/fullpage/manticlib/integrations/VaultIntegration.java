@@ -133,5 +133,12 @@ public class VaultIntegration extends Integration {
         getEconomy().withdrawPlayer(player, amount);
     }
 
+    public double getBalance(OfflinePlayer player) {
+        if (!isActive()) {
+            return 0;
+        }
+        return getEconomy().getBalance(player);
+    }
+
 
 }
