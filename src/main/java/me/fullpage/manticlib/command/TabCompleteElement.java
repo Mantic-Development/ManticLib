@@ -1,5 +1,6 @@
 package me.fullpage.manticlib.command;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -14,11 +15,14 @@ public class TabCompleteElement {
 
     private final int index;
     private final String[] results;
+    private Condition[] conditions;
     private String permission;
 
     public TabCompleteElement(int index, String... results) {
         this.index = index;
         this.results = results;
+        this.permission = null;
+        this.conditions = new Condition[0];
     }
 
     public TabCompleteElement setPermission(String permission) {
@@ -28,6 +32,24 @@ public class TabCompleteElement {
 
     public boolean hasPermission(CommandSender sender) {
         return this.permission == null || sender == null || sender.hasPermission(this.permission);
+    }
+
+    public TabCompleteElement addCondition(Condition condition) {
+        Condition[] newConditions = new Condition[this.conditions.length + 1];
+        System.arraycopy(this.conditions, 0, newConditions, 0, this.conditions.length);
+        newConditions[this.conditions.length] = condition;
+        this.conditions = newConditions;
+        return this;
+    }
+
+    public boolean meetsConditions(String[] args) {
+        if (this.conditions.length == 0) return true;
+        for (Condition condition : this.conditions) {
+            if (condition.meets(args)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static TabCompleteElement getOnlinePlayers(int index, CommandSender sender) {
@@ -49,6 +71,35 @@ public class TabCompleteElement {
         return new TabCompleteElement(index, Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).toArray(String[]::new));
     }
 
+    @AllArgsConstructor
+    @Getter
+    public static class Condition {
+
+        private final int index;
+        private final String[] matches;
+        private final boolean ignoreCase;
+
+        public boolean meets(String[] args) {
+            if (args.length <= this.index) {
+                return false;
+            }
+            for (String match : this.matches) {
+                if (this.ignoreCase) {
+                    if (args[this.index].equalsIgnoreCase(match)) {
+                        return true;
+                    }
+                } else {
+                    if (args[this.index].equals(match)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+
+    }
 
 
 }

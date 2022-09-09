@@ -48,7 +48,7 @@ public class TabCompleteBuilder {
     public List<String> build() {
         List<String> results = new ArrayList<>();
         for (TabCompleteElement element : this.elements) {
-            if (element.hasPermission(sender) && element.getIndex() == this.args.length-1) {
+            if (element.hasPermission(sender) && element.meetsConditions(args) && element.getIndex() == this.args.length-1) {
                 String arg = this.args[element.getIndex()].toLowerCase();
                 for (String result : element.getResults()) {
                     if (result!= null && result.toLowerCase().startsWith(arg)) {
