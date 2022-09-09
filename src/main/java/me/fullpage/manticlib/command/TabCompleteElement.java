@@ -1,6 +1,5 @@
 package me.fullpage.manticlib.command;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -71,13 +70,18 @@ public class TabCompleteElement {
         return new TabCompleteElement(index, Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).toArray(String[]::new));
     }
 
-    @AllArgsConstructor
     @Getter
     public static class Condition {
 
         private final int index;
-        private final String[] matches;
         private final boolean ignoreCase;
+        private final String[] matches;
+
+        public Condition(int index, boolean ignoreCase, String... matches) {
+            this.index = index;
+            this.ignoreCase = ignoreCase;
+            this.matches = matches;
+        }
 
         public boolean meets(String[] args) {
             if (args.length <= this.index) {
