@@ -55,7 +55,6 @@ public class TabCompleteBuilder {
                         results.add(result);
                     }
                 }
-                return results;
             }
         }
         return results;
