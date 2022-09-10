@@ -55,7 +55,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.17"
+version = "1.0.18"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 

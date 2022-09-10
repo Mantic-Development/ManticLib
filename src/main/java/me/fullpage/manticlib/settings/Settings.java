@@ -3,6 +3,7 @@ package me.fullpage.manticlib.settings;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
+import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.interfaces.Registrable;
 import me.fullpage.manticlib.interfaces.Reloadable;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,6 +19,8 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Settings<S extends Settings<S>> implements Registrable, Reloadable {
 
@@ -86,7 +89,9 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             this.instance = JsonConfig.GSON.fromJson(reader, this.getClass());
             this.checkOrAdd(this.getClass().getDeclaredFields(), jsonObject, reader);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger logger = ManticLib.get().getLogger();
+            JavaPlugin providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
+            logger.log(Level.WARNING, "\033[1;31mCould not load " + providingPlugin.getName() + " settings file: " + this.getFileString(), e);
             try {
                 Class<?>[] prams = this.getClass().getDeclaredConstructors()[0].getParameterTypes();
                 Constructor<S> constructor = (Constructor<S>) this.getClass().getDeclaredConstructor(prams);
