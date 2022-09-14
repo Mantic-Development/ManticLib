@@ -8,6 +8,6 @@ public final class Config extends BukkitYamlConfiguration {
         super(ManticLib.get(), "config");
     }
 
-   public boolean autoUpdate = true;
+    public boolean autoUpdate = true;
 
 }

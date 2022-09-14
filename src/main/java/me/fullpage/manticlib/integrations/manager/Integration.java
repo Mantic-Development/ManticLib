@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 @Getter
 @Setter
@@ -73,8 +74,8 @@ public abstract class Integration {
             try {
                 this.onEnable();
             } catch (Exception e) {
-                e.printStackTrace();
                 this.setActive(false);
+                providingPlugin.getLogger().log(Level.SEVERE, "Failed to enable integration for " + pluginName + ".", e);
             }
         } else {
             this.active = false;
@@ -82,7 +83,7 @@ public abstract class Integration {
             try {
                 this.onDisable();
             } catch (Exception e) {
-                e.printStackTrace();
+                providingPlugin.getLogger().log(Level.SEVERE, "An error occurred while disabling integration for " + pluginName + ".", e);
             }
         }
 
