@@ -6,7 +6,9 @@ import com.google.gson.annotations.SerializedName;
 import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.interfaces.Registrable;
 import me.fullpage.manticlib.interfaces.Reloadable;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
@@ -27,15 +29,38 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
     private transient Settings<S> instance = null;
     private transient JsonConfig config = null;
     private transient String prePath = null;
+    private transient Plugin plugin = null;
 
+    public Plugin getPlugin() {
+        if (plugin == null) {
+            try {
+                plugin = JavaPlugin.getProvidingPlugin(this.getClass());
+            } catch (IllegalStateException e) {
+                throw new IllegalStateException("\033[1;31mPlease do not use plugins like \"Plugman\" to load or unload a plugin during runtime. Instead use built-in reload commands in plugins or restart where possible.", e);
+            }
+        }
+        return plugin;
+    }
+
+    /**
+     * @see #register(Plugin) instead
+     */
+    @Deprecated
     @Override
     public void register() {
         this.reload();
     }
 
+    public void register(@NotNull Plugin plugin) {
+        this.plugin = plugin;
+        this.reload();
+    }
+
     @Override
     public void reload() {
-        config = new JsonConfig(getFileString(), JavaPlugin.getProvidingPlugin(getClass()));
+        Plugin plugin = getPlugin();
+        String fileString = getFileString();
+        config = new JsonConfig(fileString, plugin);
         applyFields();
     }
 
@@ -46,7 +71,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
         }
 
         instance = this;
-        apply((S)instance);
+        apply((S) instance);
 
         try (FileWriter writer = new FileWriter(file)) {
             JsonConfig.GSON.toJson(this, writer);
@@ -90,7 +115,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             this.checkOrAdd(this.getClass().getDeclaredFields(), jsonObject, reader);
         } catch (IOException e) {
             Logger logger = ManticLib.get().getLogger();
-            JavaPlugin providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
+            Plugin providingPlugin = this.getPlugin();
             logger.log(Level.WARNING, "\033[1;31mCould not load " + providingPlugin.getName() + " settings file: " + this.getFileString(), e);
             try {
                 Class<?>[] prams = this.getClass().getDeclaredConstructors()[0].getParameterTypes();
@@ -107,9 +132,9 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
                         } else if (clazz.equals(short.class)) {
                             inputPrams[i] = (short) 0;
                         } else if (clazz.equals(long.class)) {
-                            inputPrams[i] =  0L;
+                            inputPrams[i] = 0L;
                         } else if (clazz.equals(float.class)) {
-                            inputPrams[i] =  0.0f;
+                            inputPrams[i] = 0.0f;
                         } else if (clazz.equals(double.class)) {
                             inputPrams[i] = 0.0;
                         } else if (clazz.equals(boolean.class)) {
@@ -128,7 +153,8 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
                     declaredField.setAccessible(true);
                     declaredField.set(this, declaredField.get(instance));
                 }
-            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException ex) {
+            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
+                     IllegalAccessException ex) {
                 ex.printStackTrace();
             }
         } catch (JsonSyntaxException | NullPointerException e) {
@@ -136,7 +162,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             e.printStackTrace();
         }
         config.save();
-        apply((S)instance);
+        apply((S) instance);
     }
 
 
@@ -191,7 +217,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
                 try {
                     Files.move(file.toPath(), new File(file + ".backup-" + i).toPath());
                 } catch (IOException e) {
-                    JavaPlugin.getProvidingPlugin(getClass()).getLogger().severe("Unable to create backup file for " + file.getName());
+                    this.getPlugin().getLogger().severe("Unable to create backup file for " + file.getName());
                 }
                 return;
             }
