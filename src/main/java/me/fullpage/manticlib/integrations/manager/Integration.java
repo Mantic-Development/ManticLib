@@ -2,7 +2,7 @@ package me.fullpage.manticlib.integrations.manager;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.fullpage.manticlib.Updater;
+import me.fullpage.manticlib.Versionator;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -158,7 +158,7 @@ public abstract class Integration {
 
     public boolean isAtLeastMinimumVersion(@NotNull Plugin plugin) {
         if (minimumVersion == null) return true;
-        return Updater.convertVersion(plugin.getDescription().getVersion()) >= Updater.convertVersion(minimumVersion);
+        return Versionator.convertVersion(plugin.getDescription().getVersion()) >= Versionator.convertVersion(minimumVersion);
     }
 
     /**

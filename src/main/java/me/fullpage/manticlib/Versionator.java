@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class Updater {
+public class Versionator {
 
     public static String LATEST_VERSION;
     private static boolean NOT_CLEANED;

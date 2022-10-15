@@ -53,7 +53,7 @@ public final class ManticLib extends ManticPlugin {
             configuration = new Config();
             configuration.loadAndSave();
             if (configuration.autoUpdate) {
-                Updater.updateToLatest(this);
+                Versionator.updateToLatest(this);
             }
         } catch (Exception e) {
             e.printStackTrace();
