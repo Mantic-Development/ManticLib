@@ -3,6 +3,7 @@ package me.fullpage.manticlib.builders;
 import me.fullpage.manticlib.gui.GuiItem;
 import me.fullpage.manticlib.string.ManticString;
 import me.fullpage.manticlib.string.Txt;
+import me.fullpage.manticlib.utils.ReflectionUtils;
 import me.fullpage.manticlib.utils.SkullUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -22,6 +23,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -318,6 +320,7 @@ public class ItemBuilder extends ItemStack {
         }
         return from(itemStacks[0]);
     }
+
     private static ItemStack[] stacksFromBase64(String data) {
         if (data == null || Base64Coder.decodeLines(data) == null)
             return new ItemStack[]{};
@@ -351,6 +354,39 @@ public class ItemBuilder extends ItemStack {
         }
 
         return stacks;
+    }
+
+    private static Method SET_CUSTOM_MODEL_DATA = null;
+    private static boolean CUSTOM_MODEL_DATA_CHECKED = false;
+
+    /**
+     * Sets the custom model data.
+     * CustomModelData is an integer that may be associated client side with a custom item model.
+     * Params:
+     * data – the data to set, or null to clear
+     */
+    public ItemBuilder customModelData(Integer data) { // 1.14+
+        if (!ReflectionUtils.supports(14) || (SET_CUSTOM_MODEL_DATA == null && CUSTOM_MODEL_DATA_CHECKED)) {
+            return this;
+        }
+
+        if (SET_CUSTOM_MODEL_DATA == null) {
+            try {
+                SET_CUSTOM_MODEL_DATA = ReflectionUtils.getField(ItemMeta.class, "setCustomModelData", Integer.class);
+                CUSTOM_MODEL_DATA_CHECKED = true;
+                if (SET_CUSTOM_MODEL_DATA == null) {
+                    return this;
+                }
+            } catch (Exception e) {
+                CUSTOM_MODEL_DATA_CHECKED = true;
+                return this;
+            }
+        }
+
+        ItemMeta meta = getItemMeta();
+        meta.setCustomModelData(data);
+        setItemMeta(meta);
+        return this;
     }
 
 }
