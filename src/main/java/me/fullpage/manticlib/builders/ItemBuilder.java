@@ -384,7 +384,11 @@ public class ItemBuilder extends ItemStack {
         }
 
         ItemMeta meta = getItemMeta();
-        meta.setCustomModelData(data);
+        try {
+            SET_CUSTOM_MODEL_DATA.invoke(meta, data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         setItemMeta(meta);
         return this;
     }
