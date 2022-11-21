@@ -45,23 +45,26 @@ public class ManticPlugin extends JavaPlugin {
     @NotNull
     public static JavaPlugin getProvidingPlugin(@NotNull Class<?> clazz) {
         JavaPlugin plugin = null;
+        Exception exception = null;
         try {
             plugin = JavaPlugin.getProvidingPlugin(clazz);
             if (!providingPluginData.containsKey(clazz.getName())) {
                 providingPluginData.put(clazz.getName(), plugin.getName());
             }
         } catch (IllegalStateException e) {
+            exception = e;
             try {
                 String name = providingPluginData.get(clazz.getName());
                 if (name != null) {
                     plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(name);
                 }
             } catch (Exception ex) {
+                exception = ex;
                plugin = null;
             }
         }
         if (plugin == null) {
-            throw new IllegalStateException("\033[1;31mPlease do not use plugins like \"Plugman\" to load or unload a plugin during runtime. Instead use built-in reload commands in plugins or restart where possible.", e);
+            throw new IllegalStateException("\033[1;31mPlease do not use plugins like \"Plugman\" to load or unload a plugin during runtime. Instead use built-in reload commands in plugins or restart where possible.", exception);
         }
         return plugin;
     }
