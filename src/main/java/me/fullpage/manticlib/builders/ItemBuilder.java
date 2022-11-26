@@ -360,6 +360,7 @@ public class ItemBuilder extends ItemStack {
     private static boolean CUSTOM_MODEL_DATA_CHECKED = false;
 
     /**
+     * Needs 1.14+ to work.
      * Sets the custom model data.
      * CustomModelData is an integer that may be associated client side with a custom item model.
      * Params:

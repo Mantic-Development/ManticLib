@@ -62,13 +62,16 @@ public abstract class Integration {
 
         if (active == null) {
             active = this.check();
-        }
+          }
 
         if (active == this.active) {
             return;
         }
 
         if (active) {
+            if (!check()) {
+                return;
+            }
             this.active = true;
             providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
             try {

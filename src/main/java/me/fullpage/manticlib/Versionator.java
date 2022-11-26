@@ -74,7 +74,9 @@ public class Versionator {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
         } catch (IOException e) {
-            // handle exception
+            targetFile.delete();
+            plugin.getLogger().warning("An error occurred while downloading the latest version (" + LATEST_VERSION + ")");
+            return;
         }
 
         plugin.getLogger().info("Downloaded the latest version " + LATEST_VERSION);
