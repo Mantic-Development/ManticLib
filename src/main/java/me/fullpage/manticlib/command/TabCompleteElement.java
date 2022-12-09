@@ -76,11 +76,17 @@ public class TabCompleteElement {
         private final int index;
         private final boolean ignoreCase;
         private final String[] matches;
+        private boolean invert = false;
 
         public Condition(int index, boolean ignoreCase, String... matches) {
             this.index = index;
             this.ignoreCase = ignoreCase;
             this.matches = matches;
+        }
+
+        public Condition invert() {
+            this.invert = !this.invert;
+            return this;
         }
 
         public boolean meets(String[] args) {
@@ -90,15 +96,15 @@ public class TabCompleteElement {
             for (String match : this.matches) {
                 if (this.ignoreCase) {
                     if (args[this.index].equalsIgnoreCase(match)) {
-                        return true;
+                        return !this.invert;
                     }
                 } else {
                     if (args[this.index].equals(match)) {
-                        return true;
+                        return !this.invert;
                     }
                 }
             }
-            return false;
+            return this.invert;
         }
 
 

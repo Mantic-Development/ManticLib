@@ -65,7 +65,7 @@ public class Versionator {
         String url = String.format("https://github.com/Mantic-Development/ManticLib/releases/latest/download/ManticLib-%s.jar", LATEST_VERSION);
         File targetFile = new File(directory, String.format("ManticLib-%s.jar", LATEST_VERSION));
 
-
+        // TODO: 09/12/2022 SIZE CHECK
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
              FileOutputStream fileOutputStream = new FileOutputStream(targetFile)) {
             byte[] dataBuffer = new byte[1024];

@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import me.fullpage.manticlib.builders.ItemBuilder;
 import me.fullpage.manticlib.string.ManticString;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -181,8 +182,21 @@ public class Utils {
         return -1;
     }
 
+    public static void giveItems(Player player, Collection<ItemStack> items) {
+        giveItems(player, items.toArray(new ItemStack[0]));
+    }
+
     public static void giveItems(Player player, ItemStack... items) {
-        if (player == null || items == null || items.length == 0) {
+        giveItems(player, player.getLocation().add(0, 0.5, 0), items);
+    }
+
+
+    public static void giveItems(Player player, Location dropLocation, Collection<ItemStack> items) {
+        giveItems(player, dropLocation, items.toArray(new ItemStack[0]));
+    }
+
+    public static void giveItems(Player player, Location dropLocation, ItemStack... items) {
+        if (player == null || items == null || dropLocation == null || items.length == 0) {
             return;
         }
 
@@ -198,7 +212,7 @@ public class Utils {
                     break;
                 }
                 ItemStack item = inventory.getItem(i);
-                int maxStackSize = item == null ? drop.getMaxStackSize():item.getMaxStackSize();
+                int maxStackSize = item == null ? drop.getMaxStackSize() : item.getMaxStackSize();
                 int toGive = Math.min(maxStackSize, count);
                 if (item == null) {
                     inventory.setItem(i, ItemBuilder.from(drop).amount(toGive));
@@ -222,9 +236,11 @@ public class Utils {
                     }
                 }
             }
+
             if (count > 0) {
-                player.getWorld().dropItemNaturally(player.getLocation().add(0, 0.5,0), ItemBuilder.from(drop).amount(count));
+                player.getWorld().dropItemNaturally(dropLocation, ItemBuilder.from(drop).amount(count));
             }
+
         }
     }
 
@@ -393,7 +409,7 @@ public class Utils {
                 }
                 break;
             default:
-               return glassFromNumber(7);
+                return glassFromNumber(7);
         }
         return glass;
     }
