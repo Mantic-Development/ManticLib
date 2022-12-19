@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.tr7zw:item-nbt-api:2.11.0-SNAPSHOT")
+    implementation("de.tr7zw:item-nbt-api:2.11.1")
     implementation(files("lib/NMSLib_Plugin.jar"))
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
@@ -55,7 +55,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.22"
+version = "1.0.23"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
