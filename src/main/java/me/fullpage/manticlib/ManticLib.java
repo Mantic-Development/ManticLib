@@ -8,7 +8,7 @@ import me.fullpage.manticlib.listeners.ArmourListener;
 import me.fullpage.manticlib.listeners.DispenserArmorListener;
 import me.fullpage.manticlib.listeners.PlayerMoveListener;
 import me.fullpage.nmslib.NMSHandler;
-import me.fullpage.nmslib_plugin.NMSLib;
+import me.fullpage.nmslib.plugin.NMSLib;
 
 @Getter
 public final class ManticLib extends ManticPlugin {
