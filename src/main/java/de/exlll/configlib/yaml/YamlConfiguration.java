@@ -14,9 +14,7 @@ import org.yaml.snakeyaml.resolver.Resolver;
 
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class YamlConfiguration extends Configuration<YamlConfiguration> {
     private final YamlSource source;
@@ -210,4 +208,60 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
             }
         }
     }
+
+    /**
+     * @param list List of numbers
+     * @param type Type of the number
+     * @param <T>  Type of the number
+     * @return a list with the numbers converted to the given type
+     * @apiNote This method is intented to ensure translated numbers are of the right type
+     */
+    protected <T> List<T> fixNumberList(List<? extends Number> list, Class<T> type) {
+        List<T> fixedList = new ArrayList<>();
+        for (Number number : list) {
+            if (type == Integer.class || type == int.class) {
+                fixedList.add((T) Integer.valueOf(number.intValue()));
+            } else if (type == Long.class || type == long.class) {
+                fixedList.add((T) Long.valueOf(number.longValue()));
+            } else if (type == Double.class || type == double.class) {
+                fixedList.add((T) Double.valueOf(number.doubleValue()));
+            } else if (type == Float.class || type == float.class) {
+                fixedList.add((T) Float.valueOf(number.floatValue()));
+            } else if (type == Short.class || type == short.class) {
+                fixedList.add((T) Short.valueOf(number.shortValue()));
+            } else if (type == Byte.class || type == byte.class) {
+                fixedList.add((T) Byte.valueOf(number.byteValue()));
+            }
+        }
+        return fixedList;
+    }
+
+    /**
+     * @param map Map of numbers
+     * @param type Type of the number
+     * @param <T>  Type of the number
+     * @return a map with the numbers converted to the given type
+     * @apiNote This method is intented to ensure translated numbers are of the right type
+     */
+    protected <T> Map<?, T> fixNumberMap(Map<?, ? extends Number> map, Class<T> type) {
+        Map<Object, T> fixedMap = new HashMap<>();
+        for (Map.Entry<?, ? extends Number> entry : map.entrySet()) {
+            if (type == Integer.class || type == int.class) {
+                fixedMap.put(entry.getKey(), (T) Integer.valueOf(entry.getValue().intValue()));
+            } else if (type == Long.class || type == long.class) {
+                fixedMap.put(entry.getKey(), (T) Long.valueOf(entry.getValue().longValue()));
+            } else if (type == Double.class || type == double.class) {
+                fixedMap.put(entry.getKey(), (T) Double.valueOf(entry.getValue().doubleValue()));
+            } else if (type == Float.class || type == float.class) {
+                fixedMap.put(entry.getKey(), (T) Float.valueOf(entry.getValue().floatValue()));
+            } else if (type == Short.class || type == short.class) {
+                fixedMap.put(entry.getKey(), (T) Short.valueOf(entry.getValue().shortValue()));
+            } else if (type == Byte.class || type == byte.class) {
+                fixedMap.put(entry.getKey(), (T) Byte.valueOf(entry.getValue().byteValue()));
+            }
+        }
+        return fixedMap;
+
+    }
+
 }
