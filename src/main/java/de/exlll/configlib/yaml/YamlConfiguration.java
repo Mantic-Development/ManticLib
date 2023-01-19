@@ -243,9 +243,9 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
      * @return a map with the numbers converted to the given type
      * @apiNote This method is intented to ensure translated numbers are of the right type
      */
-    protected <T> Map<?, T> fixNumberMap(Map<?, ? extends Number> map, Class<T> type) {
-        Map<Object, T> fixedMap = new HashMap<>();
-        for (Map.Entry<?, ? extends Number> entry : map.entrySet()) {
+    protected <A,T> Map<A, T> fixNumberMap(Map<A, ? extends Number> map, Class<T> type) {
+        Map<A, T> fixedMap = new HashMap<>();
+        for (Map.Entry<A, ? extends Number> entry : map.entrySet()) {
             if (type == Integer.class || type == int.class) {
                 fixedMap.put(entry.getKey(), (T) Integer.valueOf(entry.getValue().intValue()));
             } else if (type == Long.class || type == long.class) {

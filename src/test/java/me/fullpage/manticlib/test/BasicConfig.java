@@ -10,6 +10,6 @@ public class BasicConfig extends BukkitYamlConfiguration {
     }
 
     public void nothing() {
-        List<Object> objects = fixList(null, null);
+        List<Object> objects = fixNumberList(null, null);
     }
 }

@@ -6,7 +6,7 @@ import org.codehaus.plexus.util.StringUtils.clean
 
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     `maven-publish`
 }
 
@@ -55,7 +55,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.26"
+version = "1.0.27"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -79,9 +79,14 @@ tasks.shadowJar {
   //  destinationDirectory.set(file("out"))
 
     relocate("me.fullpage.nmslib", "me.fullpage.manticlib.nmslib")
+    relocate("de.tr7zw.annotations", "me.fullpage.manticlib.nbtapi.annotations")
     relocate("de.tr7zw.changeme.nbtapi", "me.fullpage.manticlib.nbtapi")
 
 
+}
+
+tasks.withType<Jar> {
+    exclude("META-INF", "META-INF/**")
 }
 
 tasks.clean {
@@ -90,6 +95,10 @@ tasks.clean {
 
 tasks.compileJava {
     options.encoding = "UTF-8"
+}
+
+tasks.build {
+    dependsOn("shadowJar")
 }
 
 artifacts {
