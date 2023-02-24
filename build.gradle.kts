@@ -56,7 +56,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.27"
+version = "1.0.28"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -86,9 +86,9 @@ tasks.shadowJar {
 
 }
 
-tasks.withType<Jar> {
-    exclude("META-INF", "META-INF/**")
-}
+//tasks.withType<Jar> {
+  //  exclude("META-INF", "META-INF/**")
+//}
 
 tasks.clean {
     delete(file("out"))
