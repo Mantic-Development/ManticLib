@@ -21,7 +21,7 @@ public class RandomMaterials {
         Optional<Method> isInteractable = ReflectionUtils.findMethod(Material.class, "isInteractable");
         boolean stoneBricks = false;
         for (Material material : Material.values()) {
-            if (material == null || material.name().contains("AIR")) {
+            if (material == null || material.name().contains("AIR") || material.name().startsWith("LEGACY_")) {
                 continue;
             }
             if (material.name().endsWith("STONE_BRICKS")) {

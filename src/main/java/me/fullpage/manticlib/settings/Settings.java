@@ -65,6 +65,9 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
     }
 
     public void save() {
+        if (config == null) {
+            reload();
+        }
         final File file = config.getFile();
         if (file.getParentFile() != null && !file.getParentFile().exists()) {
             file.getParentFile().mkdirs();

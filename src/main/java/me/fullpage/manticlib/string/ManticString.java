@@ -3,6 +3,7 @@ package me.fullpage.manticlib.string;
 import me.fullpage.manticlib.utils.ReflectionUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -12,10 +13,15 @@ import java.util.regex.Pattern;
 
 public class ManticString {
 
+    @NotNull
     private String string;
 
-    public ManticString(String str) {
+    public ManticString(@NotNull String str) {
         this.string = str;
+    }
+
+    public static ManticString of(@NotNull String str) {
+        return new ManticString(str);
     }
 
     public ManticString replaceIgnoreCase(String value, String replacement) {

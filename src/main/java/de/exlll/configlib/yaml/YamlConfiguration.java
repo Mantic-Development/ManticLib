@@ -5,6 +5,7 @@ import de.exlll.configlib.Configuration;
 import de.exlll.configlib.ConfigurationSource;
 import de.exlll.configlib.ConfigurationStoreException;
 import de.exlll.configlib.format.FieldNameFormatters;
+import me.fullpage.manticlib.ManticLib;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
@@ -44,8 +45,15 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
             save();
         } catch (ConfigurationStoreException e) {
             if (e.getCause() instanceof NoSuchFileException) {
-                postLoad();
-                save();
+                try {
+                    postLoad();
+                    save();
+                } catch (Exception ex) {
+                    if (source != null) {
+                        ManticLib.get().getLogger().severe("Failed to load and save configuration file: " + source.getConfigPath());
+                    }
+                    throw ex;
+                }
             } else {
                 throw e;
             }
@@ -237,13 +245,13 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
     }
 
     /**
-     * @param map Map of numbers
+     * @param map  Map of numbers
      * @param type Type of the number
      * @param <T>  Type of the number
      * @return a map with the numbers converted to the given type
      * @apiNote This method is intented to ensure translated numbers are of the right type
      */
-    protected <A,T> Map<A, T> fixNumberMap(Map<A, ? extends Number> map, Class<T> type) {
+    protected <A, T> Map<A, T> fixNumberMap(Map<A, ? extends Number> map, Class<T> type) {
         Map<A, T> fixedMap = new HashMap<>();
         for (Map.Entry<A, ? extends Number> entry : map.entrySet()) {
             if (type == Integer.class || type == int.class) {

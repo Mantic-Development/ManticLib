@@ -2,6 +2,7 @@ package de.exlll.configlib.yaml;
 
 import de.exlll.configlib.Comments;
 import de.exlll.configlib.ConfigurationSource;
+import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.regex.Pattern;
 import static java.util.stream.Collectors.joining;
 
 final class YamlSource implements ConfigurationSource<YamlConfiguration> {
+    @Getter
     private final Path configPath;
     private final YamlConfiguration.YamlProperties props;
     private final Yaml yaml;

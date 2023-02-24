@@ -28,13 +28,15 @@ public class Utils {
         if (value instanceof Collection) {
             return isNullOrEmpty((Collection<?>) value);
         }
+        if (value instanceof Map) {
+            return ((Map<?, ?>) value).isEmpty();
+        }
         return value == null;
     }
 
     public static <T> boolean isNullOrEmpty(Collection<T> collection) {
         return (collection == null) || (collection.isEmpty());
     }
-
     public static boolean isNullOrEmpty(Number number) {
         return (number == null) || (!(number.doubleValue() > 0));
     }

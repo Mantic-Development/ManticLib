@@ -7,8 +7,12 @@ import me.fullpage.manticlib.integrations.manager.Integration;
 import me.fullpage.manticlib.listeners.ArmourListener;
 import me.fullpage.manticlib.listeners.DispenserArmorListener;
 import me.fullpage.manticlib.listeners.PlayerMoveListener;
+import me.fullpage.manticlib.utils.RandomMaterials;
 import me.fullpage.nmslib.NMSHandler;
 import me.fullpage.nmslib.plugin.NMSLib;
+import org.bukkit.Material;
+
+import java.util.List;
 
 @Getter
 public final class ManticLib extends ManticPlugin {
@@ -67,6 +71,8 @@ public final class ManticLib extends ManticPlugin {
         manticHoes = new ManticHoesIntegration();
         manticSwords = new ManticSwordsIntegration();
         manticRods = new ManticRodsIntegration();
+
+        List<Material> all = RandomMaterials.getAll();// init
 
     }
 

@@ -29,6 +29,7 @@ repositories {
     }
 
     maven {
+        name = "CodeMC"
         url = uri("https://repo.codemc.org/repository/maven-public/")
     }
 
@@ -55,7 +56,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.27"
+version = "1.0.28"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
