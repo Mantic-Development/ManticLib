@@ -1,5 +1,7 @@
 package me.fullpage.manticlib;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import me.fullpage.manticlib.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -94,14 +96,13 @@ public class Versionator {
 
     }
 
-
     private static String getLatestVersion() {
         try {
-            String link = "https://github.com/Mantic-Development/ManticLib/releases/latest";
-            URL url = new URL(link);
+            URL url = new URL("https://api.github.com/repos/Mantic-Development/ManticLib/releases/latest");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
 
 
@@ -114,11 +115,9 @@ public class Versionator {
             in.close();
             connection.disconnect();
 
-            String r = response.toString();
-
-            int i = r.indexOf("tag/");
-            int j = r.indexOf("\"", i + 4);
-            return r.substring(i + 4, j);
+            Gson gson = new Gson();
+            JsonObject jsonObject = gson.fromJson(response.toString(), JsonObject.class);
+            return jsonObject.get("tag_name").getAsString();
         } catch (Exception e) {
             return null;
         }
