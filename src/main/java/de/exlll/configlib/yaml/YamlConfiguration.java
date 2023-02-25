@@ -57,6 +57,11 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
             } else {
                 throw e;
             }
+        } catch (Exception e) {
+            if (source != null) {
+                ManticLib.get().getLogger().severe("Failed to load and save configuration file: " + source.getConfigPath());
+            }
+            throw e;
         }
     }
 

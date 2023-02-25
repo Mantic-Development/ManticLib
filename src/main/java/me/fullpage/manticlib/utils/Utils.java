@@ -176,7 +176,7 @@ public class Utils {
             }
         }
 
-        final Optional<Method> getPing = ReflectionUtils.findMethod(ReflectionUtils.CRAFT_PLAYER, "getPing");
+        final Optional<Method> getPing = ReflectionUtils.findMethod(ReflectionUtils.entityPlayer, "getPing");
         if (getPing.isPresent()) {
             return (int) getPing.get().invoke(p);
         }

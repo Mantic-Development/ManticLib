@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     }
 
     private String readConfig() throws IOException {
-        return Files.lines(configPath).collect(joining("\n"));
+        return Files.lines(configPath, StandardCharsets.UTF_8).collect(joining("\n"));
     }
 
     private static final class CommentAdder {
