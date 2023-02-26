@@ -39,7 +39,7 @@ public class ArmourListener implements Listener {
     //Event Priority is highest because other plugins might cancel the events before we check.
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public final void inventoryClick(final InventoryClickEvent e) {
+    public final void inventoryClick( InventoryClickEvent e) {
         boolean shift = false, numberkey = false;
         if (e.getAction() == InventoryAction.NOTHING) return;// Why does this get called if nothing happens??
         if (e.getClick().equals(ClickType.SHIFT_LEFT) || e.getClick().equals(ClickType.SHIFT_RIGHT)) {
@@ -109,6 +109,16 @@ public class ArmourListener implements Listener {
                 // e.getCursor() == Equip
                 // newArmorType = ArmourType.matchType(!isAirOrNull(e.getCurrentItem()) ? e.getCurrentItem() : e.getCursor());
             }
+
+            // fullpage start
+            ItemStack item; // this should fix the event not firing when a armour piece is being unequipped in the hotbar using the number key and going to a slot with another armour piece, but not an armour swap
+            if (numberkey && e.getClickedInventory().getType().equals(InventoryType.PLAYER) && newArmorType != null && (item = e.getClickedInventory().getItem(newArmorType.getSlot())) == null&& e.getRawSlot() != newArmorType.getSlot()) {
+                ArmourEquipEvent armorEquipEvent = new ArmourEquipEvent((Player) e.getWhoClicked(), ArmourEquipEvent.EquipMethod.HOTBAR_SWAP, newArmorType, oldArmorPiece, item);
+                Bukkit.getServer().getPluginManager().callEvent(armorEquipEvent);
+                if (armorEquipEvent.isCancelled()) {
+                    e.setCancelled(true);
+                }
+            } // fullpage end
 
             if (newArmorType != null && e.getRawSlot() == newArmorType.getSlot()) {
                 ArmourEquipEvent.EquipMethod method = ArmourEquipEvent.EquipMethod.PICK_DROP;
