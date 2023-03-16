@@ -20,4 +20,4 @@ Dependency:
 </dependency>
   ```
 
-Join our support discord at https://discord.gg/Mantic (https://discord.xmantic.dev)
+Join our support discord at https://discord.gg/Mantic (https://discord.mantic.dev)

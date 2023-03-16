@@ -118,6 +118,7 @@ public class ArmourListener implements Listener {
                 if (armorEquipEvent.isCancelled()) {
                     e.setCancelled(true);
                 }
+                return;
             } // fullpage end
 
             if (newArmorType != null && e.getRawSlot() == newArmorType.getSlot()) {

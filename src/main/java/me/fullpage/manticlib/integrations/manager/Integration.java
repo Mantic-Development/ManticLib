@@ -62,7 +62,7 @@ public abstract class Integration {
 
         if (active == null) {
             active = this.check();
-          }
+        }
 
         if (active == this.active) {
             return;
@@ -147,7 +147,7 @@ public abstract class Integration {
 
 
         if (requiredVersions != null && !requiredVersions.isEmpty()) {
-            if (plugin == null) Bukkit.getPluginManager().getPlugin(this.pluginName);
+            if (plugin == null) plugin = Bukkit.getPluginManager().getPlugin(this.pluginName);
             for (String requiredVersion : requiredVersions) {
                 if (requiredVersion != null && plugin != null && plugin.getDescription().getVersion().equals(requiredVersion)) {
                     return true;
