@@ -4,12 +4,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import me.fullpage.manticlib.collections.WeightedList;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -57,7 +59,7 @@ public class SoundEffect {
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
 
-    public void playSound(@NonNull  SimpleLocation simpleLocation) {
+    public void playSound(@NonNull SimpleLocation simpleLocation) {
         this.playSound(simpleLocation.asLocation());
     }
 
@@ -72,8 +74,49 @@ public class SoundEffect {
     }
 
     protected static Sound getSound(String sound) {
-        final String upperCase = sound.toUpperCase();
-        return Arrays.stream(Sound.values()).filter(s -> s.name().equals(upperCase)).findFirst().orElse(null);
+        String upperCase = sound.toUpperCase();
+
+        Set<Sound> possibilities = new HashSet<>();
+        Sound parsed;
+        try {
+            parsed = Sound.valueOf(upperCase);
+        } catch (IllegalArgumentException e) {
+            Sound found = null;
+            for (Sound s : Sound.values()) {
+                if (s.name().equals(upperCase)) {
+                    found = s;
+                    break;
+                } else if (s.name().endsWith(upperCase)) {
+                    possibilities.add(s);
+                }
+            }
+            parsed = found;
+        }
+
+        if (parsed == null && !possibilities.isEmpty()) {
+            if (possibilities.size() == 1) {
+                parsed = possibilities.iterator().next();
+            } else { // attempt to find the best match
+                String[] parts = upperCase.split("_");
+                WeightedList<Sound> weighted = new WeightedList<>();
+                for (Sound s : possibilities) {
+                    String[] sParts = s.name().split("_");
+                    int matches = 0;
+                    for (String part : parts) {
+                        for (String sPart : sParts) {
+                            if (part.equals(sPart)) {
+                                matches++;
+                            }
+                        }
+                    }
+                    weighted.add(s, matches);
+                }
+                parsed = weighted.getHighest();
+            }
+        }
+
+
+        return parsed;
     }
 
 }
