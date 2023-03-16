@@ -238,4 +238,44 @@ public class ArmourUtil {
         return isArmour(inventory.getHelmet(), material) && isArmour(inventory.getChestplate(), material) && isArmour(inventory.getLeggings(), material) && isArmour(inventory.getBoots(), material);
     }
 
+    public static Material getHelmet(@NotNull String material) {
+        String upperCase = material.toUpperCase();
+        for (Material helmet : helmets) {
+            if (helmet.name().contains(upperCase)) {
+                return helmet;
+            }
+        }
+        return null;
+    }
+
+    public static Material getChestplate(@NotNull String material) {
+        String upperCase = material.toUpperCase();
+        for (Material chestplate : chestplates) {
+            if (chestplate.name().contains(upperCase)) {
+                return chestplate;
+            }
+        }
+        return null;
+    }
+
+    public static Material getLeggings(@NotNull String material) {
+        String upperCase = material.toUpperCase();
+        for (Material leggings : leggings) {
+            if (leggings.name().contains(upperCase)) {
+                return leggings;
+            }
+        }
+        return null;
+    }
+
+    public static Material getBoots(@NotNull String material) {
+        String upperCase = material.toUpperCase();
+        for (Material boots : boots) {
+            if (boots.name().contains(upperCase)) {
+                return boots;
+            }
+        }
+        return null;
+    }
+
 }

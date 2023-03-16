@@ -42,7 +42,7 @@ dependencies {
     implementation("de.tr7zw:item-nbt-api:2.11.1")
     implementation(files("lib/NMSLib_Plugin.jar"))
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
-    compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
     compileOnly(files("lib/InfiniteKothAPI-1.0.jar"))
     compileOnly(files("lib/ManticHoes-stripped.jar"))
     compileOnly(files("lib/ManticSwords-stripped.jar"))
