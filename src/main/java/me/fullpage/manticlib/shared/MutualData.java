@@ -2,7 +2,7 @@ package me.fullpage.manticlib.shared;
 
 import java.util.HashMap;
 
-public class MutualData {
+public final class MutualData {
 
     private static MutualData i;
 

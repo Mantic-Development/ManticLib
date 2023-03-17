@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import me.fullpage.manticlib.collections.WeightedList;
+import me.fullpage.manticlib.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -74,6 +75,9 @@ public class SoundEffect {
     }
 
     protected static Sound getSound(String sound) {
+        if (Utils.isNullOrEmpty(sound)) {
+            return null;
+        }
         String upperCase = sound.toUpperCase();
 
         Set<Sound> possibilities = new HashSet<>();

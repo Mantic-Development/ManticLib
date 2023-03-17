@@ -45,7 +45,7 @@ public class ManticPlugin extends JavaPlugin {
     @NotNull
     public static JavaPlugin getProvidingPlugin(@NotNull Class<?> clazz) {
         JavaPlugin plugin = null;
-        Exception exception = null;
+        Throwable exception = null;
         try {
             plugin = JavaPlugin.getProvidingPlugin(clazz);
             if (!providingPluginData.containsKey(clazz.getName())) {
@@ -58,7 +58,7 @@ public class ManticPlugin extends JavaPlugin {
                 if (name != null) {
                     plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(name);
                 }
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 exception = ex;
                plugin = null;
             }

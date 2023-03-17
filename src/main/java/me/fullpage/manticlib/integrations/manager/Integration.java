@@ -70,13 +70,14 @@ public abstract class Integration {
 
         if (active) {
             if (!check()) {
+                this.active = false;
                 return;
             }
             this.active = true;
             providingPlugin.getLogger().info("Enabled integration for " + pluginName + ".");
             try {
                 this.onEnable();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 this.setActive(false);
                 providingPlugin.getLogger().log(Level.SEVERE, "Failed to enable integration for " + pluginName + ".", e);
             }
@@ -85,7 +86,7 @@ public abstract class Integration {
             providingPlugin.getLogger().info("Disabled integration for " + pluginName + ".");
             try {
                 this.onDisable();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 providingPlugin.getLogger().log(Level.SEVERE, "An error occurred while disabling integration for " + pluginName + ".", e);
             }
         }
@@ -121,7 +122,7 @@ public abstract class Integration {
         try {
             Class.forName(classPath);
             return true;
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             return false;
         }
     }
