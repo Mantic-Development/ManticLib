@@ -14,6 +14,9 @@ public class Txt {
     }
 
     public static boolean isNullOrEmpty(List<?> objects) {
+        return isNullOrEmpty((Collection<?>) objects);
+    }
+    public static boolean isNullOrEmpty(Collection<?> objects) {
         return objects == null || objects.isEmpty();
     }
 
@@ -79,5 +82,27 @@ public class Txt {
         }
         return Arrays.stream(str).map(s -> new ManticString(s).format(args).colourise()).toArray(String[]::new);
     }
+
+    public static String join(String separator, String... strings) {
+        if (isNullOrEmpty(strings)) {
+            return "";
+        }
+        return String.join(separator, strings);
+    }
+
+    public static String join (Collection<String> strings, String separator) {
+        if (isNullOrEmpty(strings)) {
+            return "";
+        }
+        return String.join(separator, strings);
+    }
+    
+    public static String join (String[] strings, String separator) {
+        if (isNullOrEmpty(strings)) {
+            return "";
+        }
+        return String.join(separator, strings);
+    }
+
 
 }

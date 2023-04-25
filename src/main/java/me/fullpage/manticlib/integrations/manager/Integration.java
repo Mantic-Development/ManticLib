@@ -122,7 +122,7 @@ public abstract class Integration {
         try {
             Class.forName(classPath);
             return true;
-        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+        } catch (Throwable e) {
             return false;
         }
     }

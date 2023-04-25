@@ -82,7 +82,7 @@ public final class ManticLib extends ManticPlugin {
             if (integration != null) {
                 try {
                     integration.forceDisable();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             }

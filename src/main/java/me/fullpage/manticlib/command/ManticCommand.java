@@ -1,5 +1,6 @@
 package me.fullpage.manticlib.command;
 
+import me.fullpage.manticlib.ManticPlugin;
 import me.fullpage.manticlib.string.Txt;
 import me.fullpage.manticlib.utils.ReflectionUtils;
 import me.fullpage.manticlib.utils.Utils;
@@ -9,7 +10,6 @@ import org.bukkit.Server;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,13 +32,13 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
     public ManticCommand(String commandName, String permission) {
         super(commandName);
         this.permission = permission;
-        this.providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
+        this.providingPlugin = ManticPlugin.getProvidingPlugin(this.getClass());
     }
 
     public ManticCommand(String commandName) {
         super(commandName);
         this.permission = null;
-        this.providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
+        this.providingPlugin = ManticPlugin.getProvidingPlugin(this.getClass());
     }
 
     public abstract void run();
