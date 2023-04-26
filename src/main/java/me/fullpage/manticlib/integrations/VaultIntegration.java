@@ -7,12 +7,15 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import java.util.HashMap;
+
 import static org.bukkit.Bukkit.getServer;
 
 public class VaultIntegration extends Integration {
 
     private Chat chat;
     private Economy economy;
+    private HashMap<String, Economy> economies;
     private Permission permission;
 
     public VaultIntegration() {
@@ -57,6 +60,38 @@ public class VaultIntegration extends Integration {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private boolean setupEconomy(String clazz) {
+        if (!isActive()) {
+            return false;
+        }
+        if (economies == null) {
+            economies = new HashMap<>();
+        }
+        try {
+            Class<?> aClass = Class.forName(clazz);
+            // check if the class is an instance of Economy
+            if (!Economy.class.isAssignableFrom(aClass)) {
+                return false;
+            }
+
+            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class.asSubclass(aClass));
+            if (rsp == null) {
+                return false;
+            }
+
+            Economy economy = rsp.getProvider();
+            if (economy == null) {
+                return false;
+            }
+
+            economies.put(clazz, economy);
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
+
     }
 
     public boolean setupPermissions() {
@@ -119,11 +154,39 @@ public class VaultIntegration extends Integration {
         return getEconomy().getBalance(player) >= amount;
     }
 
+    public boolean hasEnough(OfflinePlayer player, double amount, String economy) {
+        if (!isActive()) {
+            return false;
+        }
+        if (economies == null) {
+            return false;
+        }
+        Economy economy1 = economies.get(economy);
+        if (economy1 == null) {
+            return false;
+        }
+        return economy1.getBalance(player) >= amount;
+    }
+
     public void giveMoney(OfflinePlayer player, double amount) {
         if (!isActive()) {
             return;
         }
         getEconomy().depositPlayer(player, amount);
+    }
+
+    public void giveMoney(OfflinePlayer player, double amount, String economy) {
+        if (!isActive()) {
+            return;
+        }
+        if (economies == null) {
+            return;
+        }
+        Economy economy1 = economies.get(economy);
+        if (economy1 == null) {
+            return;
+        }
+        economy1.depositPlayer(player, amount);
     }
 
     public void takeMoney(OfflinePlayer player, double amount) {
@@ -133,11 +196,39 @@ public class VaultIntegration extends Integration {
         getEconomy().withdrawPlayer(player, amount);
     }
 
+    public void takeMoney(OfflinePlayer player, double amount, String economy) {
+        if (!isActive()) {
+            return;
+        }
+        if (economies == null) {
+            return;
+        }
+        Economy economy1 = economies.get(economy);
+        if (economy1 == null) {
+            return;
+        }
+        economy1.withdrawPlayer(player, amount);
+    }
+
     public double getBalance(OfflinePlayer player) {
         if (!isActive()) {
             return 0;
         }
         return getEconomy().getBalance(player);
+    }
+
+    public double getBalance(OfflinePlayer player, String economy) {
+        if (!isActive()) {
+            return 0;
+        }
+        if (economies == null) {
+            return 0;
+        }
+        Economy economy1 = economies.get(economy);
+        if (economy1 == null) {
+            return 0;
+        }
+        return economy1.getBalance(player);
     }
 
 
