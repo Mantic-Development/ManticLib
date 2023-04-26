@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.tr7zw:item-nbt-api:2.11.1")
+    implementation("de.tr7zw:item-nbt-api:2.11.2")
     implementation(files("lib/NMSLib_Plugin.jar"))
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
