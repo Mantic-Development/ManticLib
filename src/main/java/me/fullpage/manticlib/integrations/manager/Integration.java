@@ -2,6 +2,7 @@ package me.fullpage.manticlib.integrations.manager;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.fullpage.manticlib.ManticPlugin;
 import me.fullpage.manticlib.Versionator;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -29,7 +30,7 @@ public abstract class Integration {
     public Integration(@NotNull String pluginName) {
         this.pluginName = pluginName;
         this.active = false;
-        providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
+        providingPlugin = ManticPlugin.getProvidingPlugin(this.getClass());
         this.setActive();
         INTEGRATIONS.add(this);
         if (!isInitialized) {
