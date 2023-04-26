@@ -63,7 +63,7 @@ public class VaultIntegration extends Integration {
         }
     }
 
-    public boolean setupEconomy(String clazz) {
+    public boolean setupEconomy(String economy) {
         if (!isActive()) {
             return false;
         }
@@ -71,10 +71,6 @@ public class VaultIntegration extends Integration {
             economies = new HashMap<>();
         }
         try {
-            Class<?> aClass = Class.forName(clazz);
-            if (!Economy.class.isAssignableFrom(aClass)) {
-                return false;
-            }
 
             Collection<RegisteredServiceProvider<Economy>> registrations = getServer().getServicesManager().getRegistrations(Economy.class);
             Economy provider = null;
@@ -82,7 +78,7 @@ public class VaultIntegration extends Integration {
                 if (registration == null) {
                     continue;
                 }
-                if (registration.getPlugin().getName().equals(aClass.getName()) || registration.getProvider().getClass().getName().equals(aClass.getName())) {
+                if (registration.getPlugin().getName().equals(economy) || registration.getProvider().getClass().getName().equals(economy)) {
                     provider = registration.getProvider();
                     break;
                 }
@@ -93,7 +89,7 @@ public class VaultIntegration extends Integration {
                 return false;
             }
 
-            economies.put(clazz, provider);
+            economies.put(economy, provider);
             return true;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -162,10 +158,12 @@ public class VaultIntegration extends Integration {
             return false;
         }
         if (economies == null) {
+            setupEconomy(economy);
             return false;
         }
         Economy economy1 = economies.get(economy);
         if (economy1 == null) {
+            setupEconomy(economy);
             return false;
         }
         final boolean hasEnough = economy1.getBalance(player) >= amount;
@@ -192,10 +190,12 @@ public class VaultIntegration extends Integration {
             return false;
         }
         if (economies == null) {
+            setupEconomy(economy);
             return false;
         }
         Economy economy1 = economies.get(economy);
         if (economy1 == null) {
+            setupEconomy(economy);
             return false;
         }
         return economy1.getBalance(player) >= amount;
@@ -217,10 +217,12 @@ public class VaultIntegration extends Integration {
             return;
         }
         if (economies == null) {
+            setupEconomy(economy);
             return;
         }
         Economy economy1 = economies.get(economy);
         if (economy1 == null) {
+            setupEconomy(economy);
             return;
         }
         economy1.depositPlayer(player, amount);
@@ -242,10 +244,12 @@ public class VaultIntegration extends Integration {
             return;
         }
         if (economies == null) {
+            setupEconomy(economy);
             return;
         }
         Economy economy1 = economies.get(economy);
         if (economy1 == null) {
+            setupEconomy(economy);
             return;
         }
         economy1.withdrawPlayer(player, amount);
@@ -263,10 +267,12 @@ public class VaultIntegration extends Integration {
             return 0;
         }
         if (economies == null) {
+            setupEconomy(economy);
             return 0;
         }
         Economy economy1 = economies.get(economy);
         if (economy1 == null) {
+            setupEconomy(economy);
             return 0;
         }
         return economy1.getBalance(player);
