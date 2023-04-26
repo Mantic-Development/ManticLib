@@ -76,7 +76,8 @@ public class VaultIntegration extends Integration {
                 return false;
             }
 
-            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class.asSubclass(aClass));
+            Class<Economy> aClass1 = (Class<Economy>) Economy.class.asSubclass(aClass);
+            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(aClass1);
             if (rsp == null) {
                 return false;
             }
