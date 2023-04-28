@@ -1,10 +1,10 @@
 package me.fullpage.manticlib.integrations;
 
+import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.integrations.manager.Integration;
 import me.fullpage.manticrods.ManticRods;
 import me.fullpage.manticrods.data.MPlayers;
 import me.fullpage.manticrods.wrappers.MPlayer;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -20,7 +20,7 @@ public class ManticRodsIntegration extends Integration {
 
     @Override
     public void onEnable() {
-        manticRods = (ManticRods) JavaPlugin.getProvidingPlugin(ManticRods.class);
+        manticRods = (ManticRods) ManticLib.getProvidingPlugin(ManticRods.class);
     }
 
     public ManticRods getManticRods() {

@@ -16,13 +16,14 @@ public class Txt {
     public static boolean isNullOrEmpty(List<?> objects) {
         return isNullOrEmpty((Collection<?>) objects);
     }
+
     public static boolean isNullOrEmpty(Collection<?> objects) {
         return objects == null || objects.isEmpty();
     }
 
     @SafeVarargs
     public static <T> List<T> list(T... items) {
-        if (items== null || items.length == 0) {
+        if (items == null || items.length == 0) {
             return new ArrayList<>();
         }
         List<T> temp = new ArrayList<>(items.length);
@@ -33,7 +34,7 @@ public class Txt {
 
     @SafeVarargs
     public static <T> Set<T> set(T... items) {
-        if (items== null || items.length == 0) {
+        if (items == null || items.length == 0) {
             return new HashSet<>();
         }
         Set<T> temp = new HashSet<>(items.length);
@@ -90,18 +91,39 @@ public class Txt {
         return String.join(separator, strings);
     }
 
-    public static String join (Collection<String> strings, String separator) {
+    public static String join(Collection<String> strings, String separator) {
         if (isNullOrEmpty(strings)) {
             return "";
         }
         return String.join(separator, strings);
     }
-    
-    public static String join (String[] strings, String separator) {
+
+    public static String join(String[] strings, String separator) {
         if (isNullOrEmpty(strings)) {
             return "";
         }
         return String.join(separator, strings);
+    }
+
+    public static String joinParsed(String separator, String... strings) {
+        if (isNullOrEmpty(strings)) {
+            return "";
+        }
+        return join(separator, parse(strings));
+    }
+
+    public static String joinParsed(List<String> strings, String separator) {
+        if (isNullOrEmpty(strings)) {
+            return "";
+        }
+        return join(parse(strings), separator);
+    }
+
+    public static String joinParsed(String[] strings, String separator) {
+        if (isNullOrEmpty(strings)) {
+            return "";
+        }
+        return join(separator, parse(strings));
     }
 
 

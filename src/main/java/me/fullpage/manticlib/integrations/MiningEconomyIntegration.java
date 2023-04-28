@@ -1,10 +1,10 @@
 package me.fullpage.manticlib.integrations;
 
+import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.integrations.manager.Integration;
 import me.fullpage.miningeconomy.api.MiningEconomy;
 import me.fullpage.miningeconomy.api.interfaces.Economy;
 import me.fullpage.miningeconomy.api.interfaces.MPlayer;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -20,7 +20,7 @@ public class MiningEconomyIntegration extends Integration {
 
     @Override
     public void onEnable() {
-        miningEconomy = (MiningEconomy) JavaPlugin.getProvidingPlugin(MiningEconomy.class);
+        miningEconomy = (MiningEconomy) ManticLib.getProvidingPlugin(MiningEconomy.class);
     }
 
     public MiningEconomy getMiningEconomy() {

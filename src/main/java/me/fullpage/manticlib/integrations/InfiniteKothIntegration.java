@@ -1,8 +1,8 @@
 package me.fullpage.manticlib.integrations;
 
 import me.fullpage.infinitekoth.api.InfiniteKothAPI;
+import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.integrations.manager.Integration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class InfiniteKothIntegration extends Integration {
 
@@ -15,7 +15,7 @@ public class InfiniteKothIntegration extends Integration {
 
     @Override
     public void onEnable() {
-        infiniteKothAPI = (InfiniteKothAPI) JavaPlugin.getProvidingPlugin(InfiniteKothAPI.class);
+        infiniteKothAPI = (InfiniteKothAPI) ManticLib.getProvidingPlugin(InfiniteKothAPI.class);
     }
 
     public String getCapper() {

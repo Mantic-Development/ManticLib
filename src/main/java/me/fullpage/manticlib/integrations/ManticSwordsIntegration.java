@@ -1,10 +1,10 @@
 package me.fullpage.manticlib.integrations;
 
-import me.fullpage.manticsword.data.MPlayers;
-import me.fullpage.manticsword.wrappers.MPlayer;
+import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.integrations.manager.Integration;
 import me.fullpage.manticsword.ManticSwords;
-import org.bukkit.plugin.java.JavaPlugin;
+import me.fullpage.manticsword.data.MPlayers;
+import me.fullpage.manticsword.wrappers.MPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -20,7 +20,7 @@ public class ManticSwordsIntegration extends Integration {
 
     @Override
     public void onEnable() {
-        manticSwords = (ManticSwords) JavaPlugin.getProvidingPlugin(ManticSwords.class);
+        manticSwords = (ManticSwords) ManticLib.getProvidingPlugin(ManticSwords.class);
     }
 
     public ManticSwords getManticSwords() {

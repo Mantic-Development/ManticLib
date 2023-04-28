@@ -3,8 +3,8 @@ package me.fullpage.manticlib.integrations;
 import me.fullpage.mantichoes.ManticHoes;
 import me.fullpage.mantichoes.data.MPlayers;
 import me.fullpage.mantichoes.wrappers.MPlayer;
+import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.integrations.manager.Integration;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -20,7 +20,7 @@ public class ManticHoesIntegration extends Integration {
 
     @Override
     public void onEnable() {
-        manticHoes = (ManticHoes) JavaPlugin.getProvidingPlugin(ManticHoes.class);
+        manticHoes = (ManticHoes) ManticLib.getProvidingPlugin(ManticHoes.class);
     }
 
     public ManticHoes getManticHoes() {
