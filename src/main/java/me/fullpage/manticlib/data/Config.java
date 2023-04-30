@@ -1,6 +1,7 @@
 package me.fullpage.manticlib.data;
 
 import de.exlll.configlib.BukkitYamlConfiguration;
+import de.exlll.configlib.annotation.IgnoreIfEmpty;
 import me.fullpage.manticlib.ManticLib;
 
 public final class Config extends BukkitYamlConfiguration {
@@ -9,5 +10,10 @@ public final class Config extends BukkitYamlConfiguration {
     }
 
     public boolean autoUpdate = true;
+
+    public String test = "test";
+    public String testOne = "";
+    @IgnoreIfEmpty
+    public String testTwo = "";
 
 }
