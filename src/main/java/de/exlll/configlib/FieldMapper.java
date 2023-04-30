@@ -2,10 +2,12 @@ package de.exlll.configlib;
 
 import de.exlll.configlib.Converter.ConversionInfo;
 import de.exlll.configlib.annotation.Format;
+import de.exlll.configlib.annotation.IgnoreIfEmpty;
 import de.exlll.configlib.filter.FieldFilter;
 import de.exlll.configlib.format.FieldNameFormatter;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,15 +21,39 @@ enum FieldMapper {
         Configuration.Properties props = mappingInfo.getProperties();
         FieldFilter filter = props.getFilter();
         for (Field field : filter.filterDeclaredFieldsOf(inst.getClass())) {
-        //    System.out.println("Field: " + field.getName());
-        //    System.out.println("Class: " + inst.getClass().getName());
-        //    System.out.println(map);
             Object val = toConvertibleObject(field, inst, mappingInfo);
+            IgnoreIfEmpty annotation = field.getAnnotation(IgnoreIfEmpty.class);
+            if (annotation != null && isEmpty(val)) {
+                continue;
+            }
+
             FieldNameFormatter fnf = selectFormatter(mappingInfo);
             String fn = fnf.fromFieldName(field.getName());
             map.put(fn, val);
         }
         return map;
+    }
+
+    private static boolean isEmpty (Object obj) {
+        if (obj == null) {
+            return true;
+        }
+        if (obj instanceof String) {
+            return ((String) obj).isEmpty();
+        }
+        if (obj instanceof Map) {
+            return ((Map<?, ?>) obj).isEmpty();
+        }
+        if (obj instanceof Collection) {
+            return ((Collection<?>) obj).isEmpty();
+        }
+        if (obj instanceof Object[]) {
+            return ((Object[]) obj).length == 0;
+        }
+        if (obj instanceof Iterable) {
+            return !((Iterable<?>) obj).iterator().hasNext();
+        }
+        return false;
     }
 
     private static Object toConvertibleObject(
