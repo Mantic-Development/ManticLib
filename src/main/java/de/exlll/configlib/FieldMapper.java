@@ -23,7 +23,7 @@ enum FieldMapper {
         for (Field field : filter.filterDeclaredFieldsOf(inst.getClass())) {
             Object val = toConvertibleObject(field, inst, mappingInfo);
             IgnoreIfEmpty annotation = field.getAnnotation(IgnoreIfEmpty.class);
-            if (annotation != null && isEmpty(val)) {
+            if (annotation != null && annotation.orIsDefault() && val.equals(getDefaultValue(field, inst)) || annotation != null|| isEmpty(val)) {
                 continue;
             }
 
@@ -32,6 +32,14 @@ enum FieldMapper {
             map.put(fn, val);
         }
         return map;
+    }
+
+    private static Object getDefaultValue(Field field, Object inst) {
+        try {
+            return field.get(inst);
+        } catch (IllegalAccessException e) {
+            return null;
+        }
     }
 
     private static boolean isEmpty (Object obj) {

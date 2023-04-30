@@ -15,4 +15,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IgnoreIfEmpty {
 
+    // or if value equals default value
+    boolean orIsDefault() default false;
+
+
 }
