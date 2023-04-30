@@ -210,9 +210,11 @@ public class Utils {
             int count = drop.getAmount();
             PlayerInventory inventory = player.getInventory();
             for (int i = 0; i < inventory.getSize(); i++) {
-                if (count <= 0) {
+                if (count <= 0 || (ReflectionUtils.VER > 12&&  i >= 36)) { // don't fill armor slots
                     break;
                 }
+
+
                 ItemStack item = inventory.getItem(i);
                 int maxStackSize = item == null ? drop.getMaxStackSize() : item.getMaxStackSize();
                 int toGive = Math.min(maxStackSize, count);

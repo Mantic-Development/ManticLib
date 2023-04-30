@@ -25,6 +25,7 @@ public abstract class Integration {
     private List<String> requiredVersions = new ArrayList<>();
     private String minimumVersion = null;
     protected JavaPlugin providingPlugin;
+    protected Plugin integratedPlugin;
     private boolean active;
 
     public Integration(@NotNull String pluginName) {
@@ -133,15 +134,14 @@ public abstract class Integration {
             return false;
         }
 
-        Plugin plugin = null;
+        integratedPlugin = Bukkit.getServer().getPluginManager().getPlugin(this.pluginName);
 
         if (minimumVersion != null) {
-            plugin = Bukkit.getServer().getPluginManager().getPlugin(this.pluginName);
-            if (plugin == null) {
+            if (integratedPlugin == null) {
                 return false;
             }
 
-            if (!this.isAtLeastMinimumVersion(plugin)) {
+            if (!this.isAtLeastMinimumVersion(integratedPlugin)) {
                 return false;
             }
 
@@ -149,9 +149,8 @@ public abstract class Integration {
 
 
         if (requiredVersions != null && !requiredVersions.isEmpty()) {
-            if (plugin == null) plugin = Bukkit.getPluginManager().getPlugin(this.pluginName);
             for (String requiredVersion : requiredVersions) {
-                if (requiredVersion != null && plugin != null && plugin.getDescription().getVersion().equals(requiredVersion)) {
+                if (requiredVersion != null && integratedPlugin != null && integratedPlugin.getDescription().getVersion().equals(requiredVersion)) {
                     return true;
                 }
             }

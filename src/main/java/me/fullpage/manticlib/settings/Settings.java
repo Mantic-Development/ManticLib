@@ -7,7 +7,6 @@ import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.interfaces.Registrable;
 import me.fullpage.manticlib.interfaces.Reloadable;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -34,7 +33,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
     public Plugin getPlugin() {
         if (plugin == null) {
             try {
-                plugin = JavaPlugin.getProvidingPlugin(this.getClass());
+                plugin = ManticLib.getProvidingPlugin(this.getClass());
             } catch (IllegalStateException e) {
                 throw new IllegalStateException("\033[1;31mPlease do not use plugins like \"Plugman\" to load or unload a plugin during runtime. Instead use built-in reload commands in plugins or restart where possible.", e);
             }
