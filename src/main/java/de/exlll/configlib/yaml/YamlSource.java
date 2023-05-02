@@ -7,11 +7,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +51,12 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     @Override
     public Map<String, Object> loadConfiguration(YamlConfiguration config)
             throws IOException {
-        String cfg = readConfig();
+        String cfg;
+        try {
+            cfg = readConfig();
+        } catch (NoSuchFileException e) {
+            return new HashMap<>();
+        }
         return yaml.load(cfg);
     }
 
