@@ -48,11 +48,12 @@ public class Gui implements Listener, InventoryHolder {
     protected boolean cancelByDefault = true, canPickupDroppedItems = true;
     protected Plugin providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
 
-    protected static @Nullable SoundEffect CLOSE_SOUND = new SoundEffect("BLOCK_CHEST_CLOSE", 0.75f, 1.0f), openSound = new SoundEffect("BLOCK_CHEST_OPEN", 0.75f, 1.0f);
+    protected static @Nullable SoundEffect CLOSE_SOUND = new SoundEffect("BLOCK_CHEST_CLOSE", 0.75f, 1.0f), OPEN_SOUND = new SoundEffect("BLOCK_CHEST_OPEN", 0.75f, 1.0f);
 
     @Getter
     @Setter
-    protected @Nullable SoundEffect closeSound = CLOSE_SOUND;
+    protected @Nullable SoundEffect closeSound = CLOSE_SOUND, openSound = OPEN_SOUND;
+
 
     @Getter
     protected final int rows;
@@ -492,7 +493,7 @@ public class Gui implements Listener, InventoryHolder {
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onInventoryPickupItemEvent(PlayerPickupItemEvent event) {
-            final Player player =  event.getPlayer();
+            final Player player = event.getPlayer();
             final Pair<Inventory, Gui> inventoryGUIPair = getInventoryGUIPair(player);
 
             if (inventoryGUIPair == null) {
@@ -533,7 +534,7 @@ public class Gui implements Listener, InventoryHolder {
 
                     final boolean handleClose;
                     if (gui instanceof PaginatedGui) {
-                        PaginatedGui paginatedGUI= (PaginatedGui) gui;
+                        PaginatedGui paginatedGUI = (PaginatedGui) gui;
                         final PaginatedGui.Page page = paginatedGUI.getUuidPages().get(player.getUniqueId());
                         handleClose = page == null || !page.isTransitioningPage();
                         if (handleClose && page != null) {
