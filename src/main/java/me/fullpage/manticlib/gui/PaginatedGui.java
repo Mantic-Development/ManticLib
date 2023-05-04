@@ -2,6 +2,7 @@ package me.fullpage.manticlib.gui;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.fullpage.manticlib.builders.ItemBuilder;
 import me.fullpage.manticlib.utils.Utils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +11,12 @@ import java.util.*;
 
 @Getter
 public class PaginatedGui extends Gui {
+
+    protected static final KeyGuiItem PREVIOUS = new KeyGuiItem(ItemBuilder.fromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZhMjJjYzZkZGQ1NjlhNmNlODk0YWFiOTA2YjczZGI4YmE4OWY2YTJiYjA3MWJhYjIyZTU3YTRmMDg4NWFiZiJ9fX0=")
+            .name("&6&lPrevious"), click -> true, '<');
+
+    protected static final KeyGuiItem NEXT = new KeyGuiItem(ItemBuilder.fromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjYzMTRkMzFiMDk1ZTRkNDIxNzYwNDk3YmU2YTE1NmY0NTlkOGM5OTU3YjdlNmIxYzEyZGViNGU0Nzg2MGQ3MSJ9fX0=")
+            .name("&6&lNext"), click -> true, '>');
 
     private final char pageItemKey;
     private int nextPageItemSlot, previousPageItemSlot;
@@ -23,6 +30,11 @@ public class PaginatedGui extends Gui {
         this.pageItemKey = pageItemKey;
         this.initialiseGui();
     }
+
+    public PaginatedGui(@NotNull String title, @NotNull Collection<String> guiElements, char pageItemKey) {
+        this(title, guiElements.toArray(new String[0]), pageItemKey);
+    }
+
 
 
     protected PaginatedGui initialiseGui() {

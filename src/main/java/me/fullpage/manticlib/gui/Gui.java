@@ -69,6 +69,10 @@ public class Gui implements Listener, InventoryHolder {
         this.initialiseGui();
     }
 
+    public Gui(String title, Collection<String> guiElements) {
+        this(title, guiElements.toArray(new String[0]));
+    }
+
     @Deprecated
     @ApiStatus.ScheduledForRemoval
     public Gui(int size, String title) {

@@ -1,6 +1,7 @@
 package me.fullpage.manticlib.command;
 
 import me.fullpage.manticlib.ManticPlugin;
+import me.fullpage.manticlib.interfaces.Permission;
 import me.fullpage.manticlib.string.Txt;
 import me.fullpage.manticlib.utils.ReflectionUtils;
 import me.fullpage.manticlib.utils.Utils;
@@ -35,10 +36,12 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         this.providingPlugin = ManticPlugin.getProvidingPlugin(this.getClass());
     }
 
+    public ManticCommand(String commandName, Permission permission) {
+        this(commandName, permission.getPermission());
+    }
+
     public ManticCommand(String commandName) {
-        super(commandName);
-        this.permission = null;
-        this.providingPlugin = ManticPlugin.getProvidingPlugin(this.getClass());
+        this(commandName, (String) null);
     }
 
     public abstract void run();
@@ -198,7 +201,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         }
 
         if (hasBeenOnBefore) {
-            return (offlinePlayer.hasPlayedBefore() || offlinePlayer.isOnline()) ? Optional.of(offlinePlayer): Optional.empty();
+            return (offlinePlayer.hasPlayedBefore() || offlinePlayer.isOnline()) ? Optional.of(offlinePlayer) : Optional.empty();
         }
 
         return Optional.of(offlinePlayer);

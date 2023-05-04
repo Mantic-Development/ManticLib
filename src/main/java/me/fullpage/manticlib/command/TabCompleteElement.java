@@ -1,6 +1,7 @@
 package me.fullpage.manticlib.command;
 
 import lombok.Getter;
+import me.fullpage.manticlib.interfaces.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -27,6 +28,10 @@ public class TabCompleteElement {
     public TabCompleteElement setPermission(String permission) {
         this.permission = permission;
         return this;
+    }
+
+    public TabCompleteElement setPermission(Permission permission) {
+        return this.setPermission(permission.getPermission());
     }
 
     public boolean hasPermission(CommandSender sender) {
