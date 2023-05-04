@@ -48,9 +48,11 @@ public class Gui implements Listener, InventoryHolder {
     protected boolean cancelByDefault = true, canPickupDroppedItems = true;
     protected Plugin providingPlugin = JavaPlugin.getProvidingPlugin(this.getClass());
 
+    protected static @Nullable SoundEffect CLOSE_SOUND = new SoundEffect("BLOCK_CHEST_CLOSE", 0.75f, 1.0f), openSound = new SoundEffect("BLOCK_CHEST_OPEN", 0.75f, 1.0f);
+
     @Getter
     @Setter
-    protected @Nullable SoundEffect closeSound = new SoundEffect("BLOCK_CHEST_CLOSE", 0.75f, 1.0f), openSound = new SoundEffect("BLOCK_CHEST_OPEN", 0.75f, 1.0f);
+    protected @Nullable SoundEffect closeSound = CLOSE_SOUND;
 
     @Getter
     protected final int rows;

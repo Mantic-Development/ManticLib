@@ -1,7 +1,6 @@
 package me.fullpage.manticlib.command;
 
 import me.fullpage.manticlib.ManticPlugin;
-import me.fullpage.manticlib.interfaces.Permission;
 import me.fullpage.manticlib.string.Txt;
 import me.fullpage.manticlib.utils.ReflectionUtils;
 import me.fullpage.manticlib.utils.Utils;
@@ -35,11 +34,6 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         this.permission = permission;
         this.providingPlugin = ManticPlugin.getProvidingPlugin(this.getClass());
     }
-
-    public ManticCommand(String commandName, Permission permission) {
-        this(commandName, permission.getPermission());
-    }
-
     public ManticCommand(String commandName) {
         this(commandName, (String) null);
     }
