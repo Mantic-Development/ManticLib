@@ -599,6 +599,10 @@ public class Gui implements Listener, InventoryHolder {
                 return event.getPlayer();
             }
 
+            public Player getPlayer() {
+                return this.getWhoClosed() instanceof Player ? (Player) this.getWhoClosed() : null;
+            }
+
             public Gui getGui() {
                 return gui;
             }
@@ -635,6 +639,10 @@ public class Gui implements Listener, InventoryHolder {
 
             public HumanEntity getWhoClicked() {
                 return event.getWhoClicked();
+            }
+
+            public Player getPlayer() {
+                return this.getWhoClicked() instanceof Player ? (Player) this.getWhoClicked() : null;
             }
 
             public Gui getGui() {

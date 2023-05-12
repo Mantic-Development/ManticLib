@@ -6,14 +6,13 @@ import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.util.stream.Collectors.joining;
 
 final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     @Getter
@@ -38,7 +37,8 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
                 yaml.dump(map), config.getComments(), props
         );
         String commentedDump = adder.getCommentedDump();
-        Files.write(configPath, commentedDump.getBytes());
+        Files.write(configPath, commentedDump.getBytes(StandardCharsets.UTF_8));
+        //Files.write(configPath, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
     }
 
     private void createParentDirectories() throws IOException {
@@ -61,7 +61,8 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     }
 
     private String readConfig() throws IOException {
-        return Files.lines(configPath/*, StandardCharsets.UTF_8*/).collect(joining("\n"));
+        List<String> lines = Files.readAllLines(configPath, StandardCharsets.UTF_8);
+        return String.join("\n", lines);
     }
 
     private static final class CommentAdder {
