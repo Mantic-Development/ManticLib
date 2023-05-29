@@ -58,7 +58,6 @@ public class Utils {
     }
 
     public static boolean isNull(Object value) {
-
         return value == null;
     }
 
@@ -308,6 +307,58 @@ public class Utils {
 
         }
     }
+
+    public static void dropItemAt(Location location, ItemStack item) {
+        if (location == null || item == null) {
+            return;
+        }
+
+        location.getWorld().dropItemNaturally(location, item);
+    }
+
+    public static void dropItemAt(Location location, ItemStack item, int amount) {
+        if (location == null || item == null) {
+            return;
+        }
+
+        location.getWorld().dropItemNaturally(location, ItemBuilder.from(item).amount(amount));
+    }
+
+    public static void dropItemAt(Location location, Material material) {
+        if (location == null || material == null) {
+            return;
+        }
+
+        location.getWorld().dropItemNaturally(location, new ItemStack(material));
+    }
+
+    public static void dropItemAt(Location location, Material material, int amount) {
+        if (location == null || material == null) {
+            return;
+        }
+
+        location.getWorld().dropItemNaturally(location, ItemBuilder.from(material).amount(amount));
+    }
+
+    public static void dropItemsAt(Location location, Collection<ItemStack> items) {
+        dropItemsAt(location, items.toArray(new ItemStack[0]));
+    }
+
+    public static void dropItemsAt(Location location, ItemStack... items) {
+        if (location == null || items == null || items.length == 0) {
+            return;
+        }
+
+        for (ItemStack item : items) {
+            if (item == null) {
+                continue;
+            }
+
+            location.getWorld().dropItemNaturally(location, item);
+        }
+    }
+
+
 
     public static ItemStack glassFromNumber(int i) {
         Material glassPane = Material.matchMaterial("STAINED_GLASS_PANE");

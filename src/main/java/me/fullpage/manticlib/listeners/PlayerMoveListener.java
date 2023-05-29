@@ -48,12 +48,11 @@ public class PlayerMoveListener implements Listener {
             return;
         }
 
-        final Chunk toFChunk = world.getChunkAt(toChunkX, toChunkZ);
-        final Chunk fromFChunk = world.getChunkAt(fromChunkX, fromChunkZ);
+         Chunk toFChunk = world.getChunkAt(toChunkX, toChunkZ);
+         Chunk fromFChunk = world.getChunkAt(fromChunkX, fromChunkZ);
 
-        final PlayerChunkMoveEvent playerChunkMoveEvent = new PlayerChunkMoveEvent(player, toFChunk, fromFChunk, to, from);
-
-        ManticLib.get().getServer().getPluginManager().callEvent(playerChunkMoveEvent);
+        PlayerChunkMoveEvent playerChunkMoveEvent = new PlayerChunkMoveEvent(player, toFChunk, fromFChunk, to, from);
+        playerChunkMoveEvent.call();
 
         if (playerChunkMoveEvent.isCancelled()) {
             event.setCancelled(true);

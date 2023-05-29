@@ -50,7 +50,7 @@ public final class UUIDFetcher {
             String output = callURL(UUID_URL + name);
             Matcher m = UUID_PATTERN.matcher(output);
             if (m.find()) {
-                final UUID fromString = UUID.fromString(insertDashes(m.group(1)));
+                 UUID fromString = UUID.fromString(insertDashes(m.group(1)));
                 realUuids.put(name, fromString);
                 return fromString;
             }

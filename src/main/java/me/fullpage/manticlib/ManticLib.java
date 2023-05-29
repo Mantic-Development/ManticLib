@@ -4,8 +4,8 @@ import lombok.Getter;
 import me.fullpage.manticlib.data.Config;
 import me.fullpage.manticlib.integrations.*;
 import me.fullpage.manticlib.integrations.manager.Integration;
-import me.fullpage.manticlib.listeners.ArmourListener;
-import me.fullpage.manticlib.listeners.DispenserArmorListener;
+import me.fullpage.manticlib.listeners.armour.ArmourListener;
+import me.fullpage.manticlib.listeners.armour.DispenserArmorListener;
 import me.fullpage.manticlib.listeners.PlayerMoveListener;
 import me.fullpage.manticlib.utils.RandomMaterials;
 import me.fullpage.nmslib.NMSHandler;
@@ -40,6 +40,16 @@ public final class ManticLib extends ManticPlugin {
         instance = this;
 
         try {
+
+            Class<?> PlayerArmorChangeEvent = null;
+            try {
+                PlayerArmorChangeEvent = Class.forName("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent");
+            } catch (Throwable ignored) {
+            }
+
+            if (PlayerArmorChangeEvent != null) {
+
+            }
 
             ArmourListener armourListener = new ArmourListener();
             try {

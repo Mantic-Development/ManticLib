@@ -34,8 +34,9 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         this.permission = permission;
         this.providingPlugin = ManticPlugin.getProvidingPlugin(this.getClass());
     }
+
     public ManticCommand(String commandName) {
-        this(commandName, (String) null);
+        this(commandName, null);
     }
 
     public abstract void run();
@@ -224,7 +225,8 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
 
     public void sendUsageMessage() {
         sendMessage("&cIncorrect usage, please try:");
-        String usage = (this.getUsage() == null ? "&7<Cannot get usage>" : this.getUsage());
+        String internal = this.getUsage();
+        String usage = (internal == null ? "&7<Cannot get usage>" : internal);
         sendMessage("&e" + usage.replace("<command>", label));
     }
 
@@ -270,7 +272,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
 
     public void register() {
         getSimpleCommandMap().register(providingPlugin.getDescription().getName(), this);
-        final Set<ManticCommand> manticCommandSet = registeredCommands.getOrDefault(providingPlugin, null);
+        Set<ManticCommand> manticCommandSet = registeredCommands.getOrDefault(providingPlugin, null);
         if (manticCommandSet == null) {
             registeredCommands.put(providingPlugin, Txt.set(this));
         } else {
@@ -286,19 +288,20 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
     }
 
     public void unregister() {
-        final SimpleCommandMap simpleCommandMap = getSimpleCommandMap();
+        SimpleCommandMap simpleCommandMap = getSimpleCommandMap();
         this.unregister(simpleCommandMap);
-        final Map<String, Command> knownCommands = getSimpleCommandMapDotKnownCommands(simpleCommandMap);
+        Map<String, Command> knownCommands = getSimpleCommandMapDotKnownCommands(simpleCommandMap);
         Iterator<Map.Entry<String, Command>> iter = knownCommands.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Command> entry = iter.next();
             Command command = entry.getValue();
-            if (!command.getLabel().equals(this.getLabel())) {
-                continue;
-            }
 
             ManticCommand manticCommand = getManticCommand(command);
             if (manticCommand == null) {
+                continue;
+            }
+
+            if (!command.getLabel().equals(this.getLabel())) {
                 continue;
             }
 
@@ -306,6 +309,22 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
             iter.remove();
         }
 
+    }
+
+    public void reload() {
+        try {
+            this.unregister();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            this.register();
+        }
+    }
+
+    public ManticCommand updateCommandLabel(String label) {
+        this.label = label;
+        super.setLabel(label);
+        return this;
     }
 
     public static ManticCommand getManticCommand(Command command) {

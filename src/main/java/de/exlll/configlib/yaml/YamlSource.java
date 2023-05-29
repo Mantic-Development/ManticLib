@@ -37,8 +37,7 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
                 yaml.dump(map), config.getComments(), props
         );
         String commentedDump = adder.getCommentedDump();
-        Files.write(configPath, commentedDump.getBytes(StandardCharsets.UTF_8));
-        //Files.write(configPath, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
+        Files.write(configPath, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
     }
 
     private void createParentDirectories() throws IOException {

@@ -1,4 +1,4 @@
-package me.fullpage.manticlib.listeners;
+package me.fullpage.manticlib.listeners.armour;
 
 import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.events.armourequipevent.ArmourEquipEvent;
