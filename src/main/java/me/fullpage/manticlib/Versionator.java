@@ -74,12 +74,13 @@ public class Versionator {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
             targetFile.delete();
             plugin.getLogger().warning("An error occurred while downloading the latest version (" + LATEST_VERSION + ")");
             return;
         }
 
+        NOT_CLEANED = true;
         plugin.getLogger().info("Downloaded the latest version " + LATEST_VERSION);
         plugin.getLogger().warning("Please restart the server to use the new version");
 
