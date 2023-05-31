@@ -1,6 +1,8 @@
 package me.fullpage.manticlib;
 
 import lombok.Getter;
+import me.fullpage.manticlib.command.ManticCommand;
+import me.fullpage.manticlib.command.impl.ManticLibCmd;
 import me.fullpage.manticlib.data.Config;
 import me.fullpage.manticlib.integrations.*;
 import me.fullpage.manticlib.integrations.manager.Integration;
@@ -33,23 +35,11 @@ public final class ManticLib extends ManticPlugin {
 
     private Config configuration;
 
-    // TODO: 01/08/2022 implement update checker task
-
     @Override
     public void onEnable() {
         instance = this;
 
         try {
-
-            Class<?> PlayerArmorChangeEvent = null;
-            try {
-                PlayerArmorChangeEvent = Class.forName("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent");
-            } catch (Throwable ignored) {
-            }
-
-            if (PlayerArmorChangeEvent != null) {
-
-            }
 
             ArmourListener armourListener = new ArmourListener();
             try {
@@ -73,7 +63,6 @@ public final class ManticLib extends ManticPlugin {
             e.printStackTrace();
         }
 
-        // TODO: 22/07/2022 fix block setting
         nmsHandler = NMSLib.init(this);
         infiniteKoth = new InfiniteKothIntegration();
         vault = new VaultIntegration();
@@ -83,6 +72,8 @@ public final class ManticLib extends ManticPlugin {
         manticRods = new ManticRodsIntegration();
 
         List<Material> all = RandomMaterials.getAll();// init
+
+        ManticCommand.register(new ManticLibCmd());
 
     }
 

@@ -131,7 +131,7 @@ public class Versionator {
         final Integer current = convertVersion(plugin.getDescription().getVersion());
         for (File f : folder.listFiles()) {
             if (f.isFile()) {
-                String lowerCase = f.getName().toLowerCase();
+                String lowerCase = f.getName().toLowerCase().trim();
 
                 if (lowerCase.startsWith("manticlib")) {
                     if (lowerCase.endsWith(".jar")) {
