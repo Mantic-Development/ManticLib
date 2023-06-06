@@ -21,8 +21,8 @@ public class ManticLibCmd extends ManticCommand {
 
 
     public ManticLibCmd() {
-        super("manticlib", "manticlib.command.manticlib");
-        Permission permission = new Permission("manticlib.command.manticlib", "ManticLib command permission", PermissionDefault.OP);
+        super("manticlib", "manticlib.command");
+        Permission permission = new Permission("manticlib.command", "ManticLib command permission", PermissionDefault.OP);
         Bukkit.getServer().getPluginManager().addPermission(permission);
         this.setUsage("/<command> integrations [page]");
         this.setMinimumArgs(1);
