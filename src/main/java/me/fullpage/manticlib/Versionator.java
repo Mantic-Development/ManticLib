@@ -38,62 +38,63 @@ public class Versionator {
     }
 
     public static void updateToLatest(Plugin plugin) {
-        final File directory = new File("plugins");
-        if (directory == null || !directory.isDirectory()) {
-            throw new IllegalArgumentException("Directory is null or not a directory");
-        }
-
-        if (NOT_CLEANED) {
-            cleanOldFiles(plugin);
-            NOT_CLEANED = false;
-        }
-
-        if (LATEST_VERSION == null) {
-            return;
-        }
-
-
-        final Integer current = convertVersion(plugin.getDescription().getVersion());
-        if (current >= convertVersion(LATEST_VERSION)) {
-            return;
-        }
-
-        if (new File(directory, "ManticLib-" + LATEST_VERSION + ".jar").exists()) {
-            return;
-        }
-
-        plugin.getLogger().info("Downloading the latest version " + LATEST_VERSION);
-
-        String url = String.format("https://github.com/Mantic-Development/ManticLib/releases/latest/download/ManticLib-%s.jar", LATEST_VERSION);
-        File targetFile = new File(directory, String.format("ManticLib-%s.jar", LATEST_VERSION));
-
-        try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream(targetFile)) {
-            byte[] dataBuffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                fileOutputStream.write(dataBuffer, 0, bytesRead);
+        Bukkit.getScheduler().runTaskAsynchronously(ManticLib.get(), () -> {
+            final File directory = new File("plugins");
+            if (directory == null || !directory.isDirectory()) {
+                throw new IllegalArgumentException("Directory is null or not a directory");
             }
-        } catch (Throwable e) {
-            targetFile.delete();
-            plugin.getLogger().warning("An error occurred while downloading the latest version (" + LATEST_VERSION + ")");
-            return;
-        }
 
-        NOT_CLEANED = true;
-        plugin.getLogger().info("Downloaded the latest version " + LATEST_VERSION);
-        plugin.getLogger().warning("Please restart the server to use the new version");
-
-        try {
-            Method getFileMethod = JavaPlugin.class.getDeclaredMethod("getFile");
-            getFileMethod.setAccessible(true);
-            File file = (File) getFileMethod.invoke(plugin);
-            if (file != null) {
-                file.renameTo(new File(file.getAbsolutePath() + ".old"));
+            if (NOT_CLEANED) {
+                cleanOldFiles(plugin);
+                NOT_CLEANED = false;
             }
-        } catch (Throwable ignored) {
-        }
 
+            if (LATEST_VERSION == null) {
+                return;
+            }
+
+
+            final Integer current = convertVersion(plugin.getDescription().getVersion());
+            if (current >= convertVersion(LATEST_VERSION)) {
+                return;
+            }
+
+            if (new File(directory, "ManticLib-" + LATEST_VERSION + ".jar").exists()) {
+                return;
+            }
+
+            plugin.getLogger().info("Downloading the latest version " + LATEST_VERSION);
+
+            String url = String.format("https://github.com/Mantic-Development/ManticLib/releases/latest/download/ManticLib-%s.jar", LATEST_VERSION);
+            File targetFile = new File(directory, String.format("ManticLib-%s.jar", LATEST_VERSION));
+
+            try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+                 FileOutputStream fileOutputStream = new FileOutputStream(targetFile)) {
+                byte[] dataBuffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                    fileOutputStream.write(dataBuffer, 0, bytesRead);
+                }
+            } catch (Throwable e) {
+                targetFile.delete();
+                plugin.getLogger().warning("An error occurred while downloading the latest version (" + LATEST_VERSION + ")");
+                return;
+            }
+
+            NOT_CLEANED = true;
+            plugin.getLogger().info("Downloaded the latest version " + LATEST_VERSION);
+            plugin.getLogger().warning("Please restart the server to use the new version");
+
+            try {
+                Method getFileMethod = JavaPlugin.class.getDeclaredMethod("getFile");
+                getFileMethod.setAccessible(true);
+                File file = (File) getFileMethod.invoke(plugin);
+                if (file != null) {
+                    file.renameTo(new File(file.getAbsolutePath() + ".old"));
+                }
+            } catch (Throwable ignored) {
+            }
+        });
     }
 
     private static String getLatestVersion() {
