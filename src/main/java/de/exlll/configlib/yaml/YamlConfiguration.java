@@ -6,8 +6,10 @@ import de.exlll.configlib.ConfigurationSource;
 import de.exlll.configlib.ConfigurationStoreException;
 import de.exlll.configlib.format.FieldNameFormatters;
 import me.fullpage.manticlib.ManticLib;
+import me.fullpage.manticlib.utils.ReflectionUtils;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -125,8 +127,24 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
                 extends Properties.Builder<B> {
             private List<String> prependedComments = Collections.emptyList();
             private List<String> appendedComments = Collections.emptyList();
-            private BaseConstructor constructor = new Constructor();
-            private Representer representer = new Representer();
+            private BaseConstructor constructor = this.newConstructor();
+
+            private Constructor newConstructor() {
+                if (ReflectionUtils.hasNoArgConstructor(Constructor.class)) {
+                    return ReflectionUtils.newInstance(Constructor.class);
+                }
+                return ReflectionUtils.newInstance(Constructor.class, new LoaderOptions());
+            }
+
+            private Representer representer = this.newRepresenter();
+
+            private Representer newRepresenter() {
+                if (ReflectionUtils.hasNoArgConstructor(Representer.class)) {
+                    return ReflectionUtils.newInstance(Representer.class);
+                }
+                return ReflectionUtils.newInstance(Representer.class, new DumperOptions());
+            }
+
             private DumperOptions options = new DumperOptions();
             private Resolver resolver = new Resolver();
 

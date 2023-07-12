@@ -42,7 +42,7 @@ public final class ReflectionUtils {
         MethodHandle sendPacket = null, getHandle = null, connection = null;
 
         try {
-            connection = lookup.findGetter(entityPlayer, v(17, "b").orElse("playerConnection"), playerConnection);
+            connection = lookup.findGetter(entityPlayer, v(20, "c").orElse(v(17, "b").orElse("playerConnection")), playerConnection);
             getHandle = lookup.findVirtual(craftPlayer, "getHandle", MethodType.methodType(entityPlayer));
             sendPacket = lookup.findVirtual(playerConnection, v(18, "a").orElse("sendPacket"), MethodType.methodType(void.class, getNMSClass("network.protocol", "Packet")));
         } catch (NoSuchMethodException | NoSuchFieldException | IllegalAccessException ex) {
@@ -365,6 +365,66 @@ public final class ReflectionUtils {
             }
         }
         return Optional.empty();
+    }
+
+    public static boolean hasNoArgConstructor(Class<?> cls) {
+        return Arrays.stream(cls.getDeclaredConstructors())
+                .anyMatch(c -> c.getParameterCount() == 0);
+    }
+
+    public static <T> T newInstance(Class<T> cls) {
+        try {
+            Constructor<T> constructor = cls.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (NoSuchMethodException e) {
+            String msg = "Class " + cls.getSimpleName() + " doesn't have a " +
+                    "no-args constructor.";
+            throw new RuntimeException(msg, e);
+        } catch (IllegalAccessException e) {
+            /* This exception should not be thrown because
+             * we set the field to be accessible. */
+            String msg = "No-args constructor of class " + cls.getSimpleName() +
+                    " not accessible.";
+            throw new RuntimeException(msg, e);
+        } catch (InstantiationException e) {
+            String msg = "Class " + cls.getSimpleName() + " not instantiable.";
+            throw new RuntimeException(msg, e);
+        } catch (InvocationTargetException e) {
+            String msg = "Constructor of class " + cls.getSimpleName() +
+                    " has thrown an exception.";
+            throw new RuntimeException(msg, e);
+        }
+    }
+
+    public static <T> T newInstance(Class<T> cls, Object... instances) {
+        try {
+            Class<?>[] classes = Arrays.stream(instances)
+                    .map(Object::getClass)
+                    .toArray(Class<?>[]::new);
+            Constructor<T> constructor = cls.getDeclaredConstructor(classes);
+            constructor.setAccessible(true);
+            return constructor.newInstance(instances);
+        } catch (NoSuchMethodException e) {
+            String msg = "Class " + cls.getSimpleName() + " doesn't have a " +
+                    "constructor with the specified parameter types.";
+            throw new RuntimeException(msg, e);
+        } catch (IllegalAccessException e) {
+            /* This exception should not be thrown because
+             * we set the field to be accessible. */
+            String msg = "Constructor of class " + cls.getSimpleName() +
+                    " not accessible.";
+            throw new RuntimeException(msg, e);
+        } catch (InstantiationException e) {
+            String msg = "Class " + cls.getSimpleName() + " not instantiable.";
+            throw new RuntimeException(msg, e);
+        } catch (InvocationTargetException e) {
+            String msg = "Constructor of class " + cls.getSimpleName() +
+                    " has thrown an exception.";
+            throw new RuntimeException(msg, e);
+        }
+
+
     }
 
 }
