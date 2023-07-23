@@ -1,6 +1,7 @@
 package me.fullpage.manticlib.integrations;
 
 import me.fullpage.manticlib.integrations.manager.Integration;
+import me.fullpage.manticlib.utils.Utils;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -276,6 +277,13 @@ public class VaultIntegration extends Integration {
             return 0;
         }
         return economy1.getBalance(player);
+    }
+
+    public String format(double amount) {
+        if (!isActive() || getEconomy() == null) {
+            return Utils.formatNumber(amount);
+        }
+        return getEconomy().format(amount);
     }
 
 

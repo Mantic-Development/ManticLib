@@ -19,7 +19,7 @@ import java.util.Set;
 @EqualsAndHashCode
 public class SoundEffect {
 
-    private final Sound sound;
+    private Sound sound;
     private final float volume, pitch;
 
     public SoundEffect(Sound sound, float volume, float pitch) {
@@ -121,6 +121,14 @@ public class SoundEffect {
 
 
         return parsed;
+    }
+
+    public SoundEffect orElse(@NonNull String sound) {
+        if (this.sound != null) {
+            return this;
+        }
+        this.sound = getSound(sound);
+        return this;
     }
 
 }
