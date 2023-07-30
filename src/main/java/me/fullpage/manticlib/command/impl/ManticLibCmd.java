@@ -60,7 +60,7 @@ public class ManticLibCmd extends ManticCommand {
             this.sendMessage("&7--- &nNBT INFO&r&7 ---" );
             try {
                 NBTItem nbtItem = new NBTItem(player.getItemInHand());
-                sender.sendMessage("&7NBT: " + nbtItem.toString());
+                sender.sendMessage("§7NBT: §r" + nbtItem.toString());
             } catch (Throwable e) {
                 this.sendMessage("&4Error: &c" + e.getMessage());
             }

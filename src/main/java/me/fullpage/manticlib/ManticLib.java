@@ -40,7 +40,6 @@ public final class ManticLib extends ManticPlugin {
         instance = this;
 
         try {
-
             ArmourListener armourListener = new ArmourListener();
             try {
                 Class.forName("org.bukkit.event.block.BlockDispenseArmorEvent");
