@@ -99,6 +99,44 @@ public class VaultIntegration extends Integration {
 
     }
 
+    public boolean doesEconomyExist(String name) {
+        if (!isActive()) {
+            return false;
+        }
+        if (economies == null) {
+            economies = new HashMap<>();
+        }
+        try {
+
+            Collection<RegisteredServiceProvider<Economy>> registrations = getServer().getServicesManager().getRegistrations(Economy.class);
+            Economy provider = null;
+            for (RegisteredServiceProvider<Economy> registration : registrations) {
+                if (registration == null) {
+                    continue;
+                }
+                Economy eco = registration.getProvider();
+                String currencyNameSingular = null;
+                if (eco.currencyNameSingular() != null) {
+                    currencyNameSingular = eco.currencyNameSingular();
+                }
+                if ((currencyNameSingular != null && currencyNameSingular.equals(name)) || registration.getPlugin().getName().equals(name) || registration.getProvider().getClass().getName().equals(name)) {
+                    provider = registration.getProvider();
+                    break;
+                }
+
+            }
+
+            if (provider == null) {
+                return false;
+            }
+
+            economies.put(name, provider);
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
     public boolean setupPermissions() {
         if (!isActive()) {
             return false;
@@ -277,6 +315,20 @@ public class VaultIntegration extends Integration {
             return 0;
         }
         return economy1.getBalance(player);
+    }
+
+    public boolean setBalance(OfflinePlayer player, double amount) {
+        if (!isActive()) {
+            return false;
+        }
+
+        double balance = getBalance(player);
+        if (balance > amount) {
+            takeMoney(player, balance - amount);
+        } else if (balance < amount) {
+            giveMoney(player, amount - balance);
+        }
+        return true;
     }
 
     public String format(double amount) {
