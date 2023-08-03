@@ -82,4 +82,21 @@ public class MiningEconomyIntegration extends Integration {
         return true;
     }
 
+    public boolean setMoney(@NotNull UUID uuid, long amount) {
+        if (!isActive()) return false;
+
+        MPlayer mPlayer = this.getMiningEconomy().getMPlayer(uuid.toString());
+        if (mPlayer == null) {
+            return false;
+        }
+
+        Economy economy = mPlayer.getPlayerEconomy();
+        if (economy == null) {
+            return false;
+        }
+
+        economy.setBalance(amount);
+        return true;
+    }
+
 }

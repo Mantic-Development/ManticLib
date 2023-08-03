@@ -55,4 +55,11 @@ public class ManticSwordsIntegration extends Integration {
         return true;
     }
 
+    public boolean setMoney(@NotNull UUID uuid, long amount) {
+        if (!isActive()) return false;
+        MPlayer mPlayer = MPlayers.get(uuid);
+        mPlayer.setCrystals(amount);
+        return true;
+    }
+
 }

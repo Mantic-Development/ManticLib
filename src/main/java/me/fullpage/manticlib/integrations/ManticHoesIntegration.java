@@ -54,4 +54,12 @@ public class ManticHoesIntegration extends Integration {
         return true;
     }
 
+    public boolean setMoney(@NotNull UUID uuid, long amount) {
+        if (!isActive()) return false;
+        MPlayer mPlayer = MPlayers.get(uuid);
+
+        mPlayer.setTokens(amount);
+        return true;
+    }
+
 }

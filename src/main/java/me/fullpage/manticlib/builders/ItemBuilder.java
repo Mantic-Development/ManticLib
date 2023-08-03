@@ -375,9 +375,6 @@ public class ItemBuilder extends ItemStack {
             try {
                 SET_CUSTOM_MODEL_DATA = ItemMeta.class.getMethod("setCustomModelData", Integer.class);
                 CUSTOM_MODEL_DATA_CHECKED = true;
-                if (SET_CUSTOM_MODEL_DATA == null) {
-                    return this;
-                }
             } catch (Exception e) {
                 CUSTOM_MODEL_DATA_CHECKED = true;
                 return this;
