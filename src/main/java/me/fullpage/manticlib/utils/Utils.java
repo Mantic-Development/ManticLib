@@ -2,7 +2,6 @@ package me.fullpage.manticlib.utils;
 
 import lombok.SneakyThrows;
 import me.fullpage.manticlib.builders.ItemBuilder;
-import me.fullpage.manticlib.string.ManticString;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,6 +36,7 @@ public class Utils {
     public static <T> boolean isNullOrEmpty(Collection<T> collection) {
         return (collection == null) || (collection.isEmpty());
     }
+
     public static boolean isNullOrEmpty(Number number) {
         return (number == null) || (!(number.doubleValue() > 0));
     }
@@ -128,18 +128,26 @@ public class Utils {
     public static String formatBalance(double balance) {
         DOLLAR_BALANCE_FORMAT.setNegativePrefix("-$");
         DOLLAR_BALANCE_FORMAT.setNegativeSuffix("");
-        final String format = DOLLAR_BALANCE_FORMAT.format(balance);
-        return format == null ? format : new ManticString(format).replaceLast(".00", "").toString();
+        return removeLastZeros(DOLLAR_BALANCE_FORMAT.format(balance));
     }
 
     public static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance();
 
     public static String formatNumber(Number number) {
-        final String format = NUMBER_FORMAT.format(number);
-        if (format.endsWith(".00")) {
-            return new ManticString(format).replaceLast(".00", "").get();
+        return removeLastZeros(NUMBER_FORMAT.format(number));
+    }
+
+    private static String removeLastZeros(String str) {
+        if (isNullOrEmpty(str)) {
+            return str;
         }
-        return format;
+
+        int endIndex = str.length() - 1;
+        while (endIndex >= 0 && (str.charAt(endIndex) == '0' || str.charAt(endIndex) == '.')) {
+            endIndex--;
+        }
+
+        return endIndex == -1 ? "0" : str.substring(0, endIndex + 1);
     }
 
     public static final DecimalFormat VALUE_FORMAT = new DecimalFormat("#.##");
@@ -270,7 +278,7 @@ public class Utils {
             int count = drop.getAmount();
             PlayerInventory inventory = player.getInventory();
             for (int i = 0; i < inventory.getSize(); i++) {
-                if (count <= 0 || (ReflectionUtils.VER > 12&&  i >= 36)) { // don't fill armor slots
+                if (count <= 0 || (ReflectionUtils.VER > 12 && i >= 36)) { // don't fill armor slots
                     break;
                 }
 
@@ -357,7 +365,6 @@ public class Utils {
             location.getWorld().dropItemNaturally(location, item);
         }
     }
-
 
 
     public static ItemStack glassFromNumber(int i) {
