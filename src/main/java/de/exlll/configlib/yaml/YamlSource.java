@@ -1,14 +1,11 @@
 package de.exlll.configlib.yaml;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import de.exlll.configlib.Comments;
 import de.exlll.configlib.ConfigurationSource;
 import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -37,22 +34,11 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
             throws IOException {
         createParentDirectories();
         CommentAdder adder = new CommentAdder(
-                yaml.dump(removeAnchors(map)), config.getComments(), props
+                yaml.dump(map), config.getComments(), props
         );
         String commentedDump = adder.getCommentedDump();
-        Files.write(configPath, commentedDump.getBytes());
         Files.write(configPath, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
     }
-
-    private Map<String, Object> removeAnchors(Map<String, Object> originalMap) {
-        // Conew map without anchors and aliases
-        Gson gson = new Gson();
-        String json = gson.toJson(originalMap);
-        Type type = new TypeToken<Map<String, Object>>() {
-        }.getType();
-        return gson.fromJson(json, type);
-    }
-
 
     private void createParentDirectories() throws IOException {
         Path parentDir = configPath.getParent();

@@ -4,6 +4,8 @@ import de.exlll.configlib.Converter.ConversionInfo;
 import de.exlll.configlib.annotation.Convert;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 
@@ -181,6 +183,13 @@ final class Converters {
             implements Converter<List<?>, List<?>> {
         @Override
         public List<?> convertTo(List<?> element, ConversionInfo info) {
+         /*   Field field = info.getField();
+            Class<?> type = getValueClassFromField(field);
+
+            if (type != null && Number.class.isAssignableFrom(type)) {
+                element = fixNumberList(element, type);
+            }
+*/
             return element;
         }
 
@@ -200,9 +209,15 @@ final class Converters {
             implements Converter<Set<?>, Set<?>> {
         @Override
         public Set<?> convertTo(Set<?> element, ConversionInfo info) {
+          /*  Field field = info.getField();
+            Class<?> type = getValueClassFromField(field);
+
+            if (type != null && Number.class.isAssignableFrom(type)) {
+                element = fixNumberSet(element, type);
+            }
+*/
             return element;
         }
-
         @Override
         public void preConvertTo(ConversionInfo info) {
             checkContainerValuesNotNull(info);
@@ -214,13 +229,93 @@ final class Converters {
             return element;
         }
     }
+    protected static <T> Set<T> fixNumberSet(Set<?> list, Class<T> type) {
+        Set<T> fixedList = new HashSet<>();
+        for (Object element : list) {
+            if (!(element instanceof Number)) {
+                continue;
+            }
+            Number value = (Number) element;
+            if (type == Integer.class || type == int.class) {
+                fixedList.add((T) Integer.valueOf(value.intValue()));
+            } else if (type == Long.class || type == long.class) {
+                fixedList.add((T) Long.valueOf(value.longValue()));
+            } else if (type == Float.class || type == float.class) {
+                fixedList.add((T) Float.valueOf(value.floatValue()));
+            } else if (type == Double.class || type == double.class) {
+                fixedList.add((T) Double.valueOf(value.doubleValue()));
+            } else if (type == Byte.class || type == byte.class) {
+                fixedList.add((T) Byte.valueOf(value.byteValue()));
+            } else if (type == Short.class || type == short.class) {
+                fixedList.add((T) Short.valueOf(value.shortValue()));
+            }
+        }
+        return fixedList;
+    }
 
+    private static <T> List<T> fixNumberList(List<?> list, Class<T> type) {
+        List<T> fixedList = new ArrayList<>();
+        for (Object element : list) {
+            if (!(element instanceof Number)) {
+                continue;
+            }
+            Number value = (Number) element;
+            if (type == Integer.class || type == int.class) {
+                fixedList.add((T) Integer.valueOf(value.intValue()));
+            } else if (type == Long.class || type == long.class) {
+                fixedList.add((T) Long.valueOf(value.longValue()));
+            } else if (type == Float.class || type == float.class) {
+                fixedList.add((T) Float.valueOf(value.floatValue()));
+            } else if (type == Double.class || type == double.class) {
+                fixedList.add((T) Double.valueOf(value.doubleValue()));
+            } else if (type == Byte.class || type == byte.class) {
+                fixedList.add((T) Byte.valueOf(value.byteValue()));
+            } else if (type == Short.class || type == short.class) {
+                fixedList.add((T) Short.valueOf(value.shortValue()));
+            }
+        }
+        return fixedList;
+    }
+
+
+    protected static <A, T> Map<A, T> fixNumberMap(Map<A, ?> map, Class<T> type) {
+        Map<A, T> fixedMap = new HashMap<>();
+        for (Map.Entry<A, ?> entry : map.entrySet()) {
+            if (!(entry.getValue() instanceof Number)) {
+                continue;
+            }
+            Number value = (Number) entry.getValue();
+            if (type == Integer.class || type == int.class) {
+                fixedMap.put(entry.getKey(), (T) Integer.valueOf(value.intValue()));
+            } else if (type == Long.class || type == long.class) {
+                fixedMap.put(entry.getKey(), (T) Long.valueOf(value.longValue()));
+            } else if (type == Double.class || type == double.class) {
+                fixedMap.put(entry.getKey(), (T) Double.valueOf(value.doubleValue()));
+            } else if (type == Float.class || type == float.class) {
+                fixedMap.put(entry.getKey(), (T) Float.valueOf(value.floatValue()));
+            } else if (type == Short.class || type == short.class) {
+                fixedMap.put(entry.getKey(), (T) Short.valueOf(value.shortValue()));
+            } else if (type == Byte.class || type == byte.class) {
+                fixedMap.put(entry.getKey(), (T) Byte.valueOf(value.byteValue()));
+            }
+        }
+        return fixedMap;
+
+    }
     private static final class SimpleMapConverter
             implements Converter<Map<?, ?>, Map<?, ?>> {
         @Override
         public Map<?, ?> convertTo(Map<?, ?> element, ConversionInfo info) {
+          /*  Field field = info.getField();
+            Class<?> type = getValueClassFromField(field);
+
+            if (type != null && Number.class.isAssignableFrom(type)) {
+                element = fixNumberMap(element, type);
+            }
+*/
             return element;
         }
+
 
         @Override
         public void preConvertTo(ConversionInfo info) {
@@ -232,6 +327,17 @@ final class Converters {
         public Map<?, ?> convertFrom(Map<?, ?> element, ConversionInfo info) {
             return element;
         }
+    }
+    public static Class<?> getValueClassFromField(Field field) {
+        Type fieldType = field.getGenericType();
+        if (fieldType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) fieldType;
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+            if (typeArguments.length == 2 && typeArguments[1] instanceof Class) {
+                return (Class<?>) typeArguments[1];
+            }
+        }
+        return null;
     }
 
     private static final class ListConverter
