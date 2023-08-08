@@ -141,13 +141,10 @@ public class Utils {
         if (isNullOrEmpty(str)) {
             return str;
         }
-
-        int endIndex = str.length() - 1;
-        while (endIndex >= 0 && (str.charAt(endIndex) == '0' || str.charAt(endIndex) == '.')) {
-            endIndex--;
+        if (str.indexOf('.') != -1) {
+            str = str.replaceAll("0*$", "").replaceAll("\\.$", "");
         }
-
-        return endIndex == -1 ? "0" : str.substring(0, endIndex + 1);
+        return str;
     }
 
     public static final DecimalFormat VALUE_FORMAT = new DecimalFormat("#.##");
