@@ -183,13 +183,13 @@ final class Converters {
             implements Converter<List<?>, List<?>> {
         @Override
         public List<?> convertTo(List<?> element, ConversionInfo info) {
-         /*   Field field = info.getField();
-            Class<?> type = getValueClassFromField(field);
+            Field field = info.getField();
+            Class<?> type = getElementClassFromCollectionField(field);
 
             if (type != null && Number.class.isAssignableFrom(type)) {
                 element = fixNumberList(element, type);
             }
-*/
+
             return element;
         }
 
@@ -209,13 +209,13 @@ final class Converters {
             implements Converter<Set<?>, Set<?>> {
         @Override
         public Set<?> convertTo(Set<?> element, ConversionInfo info) {
-          /*  Field field = info.getField();
-            Class<?> type = getValueClassFromField(field);
+            Field field = info.getField();
+            Class<?> type = getElementClassFromCollectionField(field);
 
             if (type != null && Number.class.isAssignableFrom(type)) {
                 element = fixNumberSet(element, type);
             }
-*/
+
             return element;
         }
         @Override
@@ -233,6 +233,7 @@ final class Converters {
         Set<T> fixedList = new HashSet<>();
         for (Object element : list) {
             if (!(element instanceof Number)) {
+                fixedList.add((T) element);
                 continue;
             }
             Number value = (Number) element;
@@ -248,6 +249,8 @@ final class Converters {
                 fixedList.add((T) Byte.valueOf(value.byteValue()));
             } else if (type == Short.class || type == short.class) {
                 fixedList.add((T) Short.valueOf(value.shortValue()));
+            } else {
+                fixedList.add((T) element);
             }
         }
         return fixedList;
@@ -257,6 +260,7 @@ final class Converters {
         List<T> fixedList = new ArrayList<>();
         for (Object element : list) {
             if (!(element instanceof Number)) {
+                fixedList.add((T) element);
                 continue;
             }
             Number value = (Number) element;
@@ -272,6 +276,8 @@ final class Converters {
                 fixedList.add((T) Byte.valueOf(value.byteValue()));
             } else if (type == Short.class || type == short.class) {
                 fixedList.add((T) Short.valueOf(value.shortValue()));
+            } else {
+                fixedList.add((T) element);
             }
         }
         return fixedList;
@@ -282,6 +288,7 @@ final class Converters {
         Map<A, T> fixedMap = new HashMap<>();
         for (Map.Entry<A, ?> entry : map.entrySet()) {
             if (!(entry.getValue() instanceof Number)) {
+                fixedMap.put(entry.getKey(), (T) entry.getValue());
                 continue;
             }
             Number value = (Number) entry.getValue();
@@ -297,6 +304,8 @@ final class Converters {
                 fixedMap.put(entry.getKey(), (T) Short.valueOf(value.shortValue()));
             } else if (type == Byte.class || type == byte.class) {
                 fixedMap.put(entry.getKey(), (T) Byte.valueOf(value.byteValue()));
+            } else {
+                fixedMap.put(entry.getKey(), (T) entry.getValue());
             }
         }
         return fixedMap;
@@ -306,13 +315,13 @@ final class Converters {
             implements Converter<Map<?, ?>, Map<?, ?>> {
         @Override
         public Map<?, ?> convertTo(Map<?, ?> element, ConversionInfo info) {
-          /*  Field field = info.getField();
-            Class<?> type = getValueClassFromField(field);
+            Field field = info.getField();
+            Class<?> type = getValueClassFromMapField(field);
 
             if (type != null && Number.class.isAssignableFrom(type)) {
                 element = fixNumberMap(element, type);
             }
-*/
+
             return element;
         }
 
@@ -328,13 +337,25 @@ final class Converters {
             return element;
         }
     }
-    public static Class<?> getValueClassFromField(Field field) {
+    public static Class<?> getValueClassFromMapField(Field field) {
         Type fieldType = field.getGenericType();
         if (fieldType instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) fieldType;
             Type[] typeArguments = parameterizedType.getActualTypeArguments();
             if (typeArguments.length == 2 && typeArguments[1] instanceof Class) {
                 return (Class<?>) typeArguments[1];
+            }
+        }
+        return null;
+    }
+
+    public static Class<?> getElementClassFromCollectionField(Field field) {
+        Type fieldType = field.getGenericType();
+        if (fieldType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) fieldType;
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+            if (typeArguments.length == 1 && typeArguments[0] instanceof Class) {
+                return (Class<?>) typeArguments[0];
             }
         }
         return null;
