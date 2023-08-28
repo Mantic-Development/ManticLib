@@ -372,6 +372,11 @@ public final class ReflectionUtils {
                 .anyMatch(c -> c.getParameterCount() == 0);
     }
 
+    public static boolean hasArgConstructor(Class<?> cls, Class<?>... parameterTypes) {
+        return Arrays.stream(cls.getDeclaredConstructors())
+                .anyMatch(c -> Arrays.equals(c.getParameterTypes(), parameterTypes));
+    }
+
     public static <T> T newInstance(Class<T> cls) {
         try {
             Constructor<T> constructor = cls.getDeclaredConstructor();

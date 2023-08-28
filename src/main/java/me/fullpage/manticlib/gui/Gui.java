@@ -62,13 +62,13 @@ public class Gui implements Listener, InventoryHolder {
     public Gui(String title, int size) {
         this.inventory = Bukkit.createInventory(null, size, title);
         this.title = title;
-        this.rows = size / 9;
+        this.rows = Math.min(6, size / 9);
         this.initialiseGui();
     }
 
     public Gui(String title, String[] guiElements) {
         this(guiElements.length * 9, title);
-        this.guiElements = guiElements;
+        this.guiElements = guiElements.length > 6 ? Arrays.copyOfRange(guiElements, 0, 6) : guiElements;
         this.initialiseGui();
     }
 

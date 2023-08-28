@@ -10,8 +10,4 @@ public final class Config extends BukkitYamlConfiguration {
 
     public boolean autoUpdate = true;
 
-    public String test = "test";
-    public String testOne = "";
-    public String testTwo = "";
-
 }

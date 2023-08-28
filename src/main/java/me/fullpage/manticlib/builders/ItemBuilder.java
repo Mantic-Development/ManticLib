@@ -3,6 +3,7 @@ package me.fullpage.manticlib.builders;
 import me.fullpage.manticlib.gui.GuiItem;
 import me.fullpage.manticlib.string.ManticString;
 import me.fullpage.manticlib.string.Txt;
+import me.fullpage.manticlib.utils.GlowEnchant;
 import me.fullpage.manticlib.utils.ReflectionUtils;
 import me.fullpage.manticlib.utils.SkullUtils;
 import org.bukkit.Bukkit;
@@ -238,12 +239,17 @@ public class ItemBuilder extends ItemStack {
     }
 
     public ItemBuilder glow(boolean hide) {
-        final ItemMeta itemMeta = getItemMeta();
+        /*final ItemMeta itemMeta = getItemMeta();
         itemMeta.addEnchant(Enchantment.OXYGEN, 1, true);
         setItemMeta(itemMeta);
         if (hide) {
             addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
+        }*/;
+        return this.glow();
+    }
+
+    public ItemBuilder glow() {
+        enchantment(GlowEnchant.get());
         return this;
     }
 

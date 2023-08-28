@@ -7,11 +7,12 @@ import de.exlll.configlib.ConfigurationStoreException;
 import de.exlll.configlib.format.FieldNameFormatters;
 import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.utils.ReflectionUtils;
+import org.bukkit.configuration.file.YamlConstructor;
+import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
-import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
 import org.yaml.snakeyaml.resolver.Resolver;
 
@@ -52,7 +53,7 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
                     save();
                 } catch (Exception ex) {
                     if (source != null) {
-                        ManticLib.get().getLogger().severe("Failed to load and save configuration file: " + source.getConfigPath());
+                        ManticLib.get().getLogger().severe("Failed to load and save configuration file '" + source.getConfigPath() + "'. Please check the file for errors, use a YAML validator like https://codebeautify.org/yaml-validator");
                     }
                     throw ex;
                 }
@@ -61,7 +62,7 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
             }
         } catch (Exception e) {
             if (source != null) {
-                ManticLib.get().getLogger().severe("Failed to load and save configuration file: " + source.getConfigPath());
+                ManticLib.get().getLogger().severe("Failed to load and save configuration file '" + source.getConfigPath() + "'. Please check the file for errors, use a YAML validator like https://codebeautify.org/yaml-validator");
             }
             throw e;
         }
@@ -129,20 +130,21 @@ public abstract class YamlConfiguration extends Configuration<YamlConfiguration>
             private List<String> appendedComments = Collections.emptyList();
             private BaseConstructor constructor = this.newConstructor();
 
-            private Constructor newConstructor() {
-                if (ReflectionUtils.hasNoArgConstructor(Constructor.class)) {
-                    return ReflectionUtils.newInstance(Constructor.class);
+            protected YamlConstructor newConstructor() {
+                if (ReflectionUtils.hasNoArgConstructor(YamlConstructor.class)) {
+                    return ReflectionUtils.newInstance(YamlConstructor.class);
                 }
-                return ReflectionUtils.newInstance(Constructor.class, new LoaderOptions());
+
+                return ReflectionUtils.newInstance(YamlConstructor.class, new LoaderOptions());
             }
 
             private Representer representer = this.newRepresenter();
 
-            private Representer newRepresenter() {
-                if (ReflectionUtils.hasNoArgConstructor(Representer.class)) {
-                    return ReflectionUtils.newInstance(Representer.class);
+            protected Representer newRepresenter() {
+                if (ReflectionUtils.hasNoArgConstructor(YamlRepresenter.class)) {
+                    return ReflectionUtils.newInstance(YamlRepresenter.class);
                 }
-                return ReflectionUtils.newInstance(Representer.class, new DumperOptions());
+                return ReflectionUtils.newInstance(YamlRepresenter.class, new DumperOptions());
             }
 
             private DumperOptions options = new DumperOptions();

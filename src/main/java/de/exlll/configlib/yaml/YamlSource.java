@@ -33,9 +33,11 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     public void saveConfiguration(YamlConfiguration config, Map<String, Object> map)
             throws IOException {
         createParentDirectories();
+
         CommentAdder adder = new CommentAdder(
                 yaml.dump(map), config.getComments(), props
         );
+
         String commentedDump = adder.getCommentedDump();
         Files.write(configPath, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
     }
