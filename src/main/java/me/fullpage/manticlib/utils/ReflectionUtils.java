@@ -274,10 +274,12 @@ public final class ReflectionUtils {
                 });
     }
 
+    @Deprecated
     public static boolean isOrAbove(int version) {
         return version >= VER;
     }
 
+    @Deprecated
     public static boolean isAbove(int version) {
         return version > VER;
     }

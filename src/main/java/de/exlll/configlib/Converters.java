@@ -279,29 +279,7 @@ final class Converters {
         }
     }
 
-    public static Class<?> getValueClassFromMapField(Field field) {
-        Type fieldType = field.getGenericType();
-        if (fieldType instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) fieldType;
-            Type[] typeArguments = parameterizedType.getActualTypeArguments();
-            if (typeArguments.length == 2 && typeArguments[1] instanceof Class) {
-                return (Class<?>) typeArguments[1];
-            }
-        }
-        return null;
-    }
 
-    public static Class<?> getElementClassFromCollectionField(Field field) {
-        Type fieldType = field.getGenericType();
-        if (fieldType instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) fieldType;
-            Type[] typeArguments = parameterizedType.getActualTypeArguments();
-            if (typeArguments.length == 1 && typeArguments[0] instanceof Class) {
-                return (Class<?>) typeArguments[0];
-            }
-        }
-        return null;
-    }
 
     private static final class ListConverter
             implements Converter<List<?>, List<?>> {
@@ -619,7 +597,7 @@ final class Converters {
         }
     }
 
-    protected static <T> Set<T> fixNumberSet(Set<?> list, Class<T> type) {
+    private static <T> Set<T> fixNumberSet(Set<?> list, Class<T> type) {
         Set<T> fixedList = new HashSet<>();
         for (Object element : list) {
             if (!(element instanceof Number)) {
@@ -701,6 +679,28 @@ final class Converters {
         return fixedMap;
 
     }
+    private static Class<?> getValueClassFromMapField(Field field) {
+        Type fieldType = field.getGenericType();
+        if (fieldType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) fieldType;
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+            if (typeArguments.length == 2 && typeArguments[1] instanceof Class) {
+                return (Class<?>) typeArguments[1];
+            }
+        }
+        return null;
+    }
 
+    private static Class<?> getElementClassFromCollectionField(Field field) {
+        Type fieldType = field.getGenericType();
+        if (fieldType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) fieldType;
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+            if (typeArguments.length == 1 && typeArguments[0] instanceof Class) {
+                return (Class<?>) typeArguments[0];
+            }
+        }
+        return null;
+    }
 
 }
