@@ -10,6 +10,8 @@ import me.fullpage.manticlib.integrations.manager.Integration;
 import me.fullpage.manticlib.string.Txt;
 import me.fullpage.manticlib.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class ManticLibCmd extends ManticCommand {
 
-    private static final String[] subCommands = {"integrations", "version", "nbtinfo"};
+    private static final String[] subCommands = {"integrations", "version", "nbtinfo", "lookingat"};
 
 
     public ManticLibCmd() {
@@ -64,6 +66,23 @@ public class ManticLibCmd extends ManticCommand {
             } catch (Throwable e) {
                 this.sendMessage("&4Error: &c" + e.getMessage());
             }
+            return;
+        } else if (args[0].equalsIgnoreCase("lookingat")) {
+            if (isConsole()) {
+                return;
+            }
+
+            Block targetBlock = player.getTargetBlock(null, 16);
+            Material material = targetBlock.getType();
+            this.sendMessage("&7--- &nLooking At&r&7 ---" );
+            this.sendMessage("&7Material: &r" + material.name());
+
+            try {
+                // send block data if it exists
+                this.sendMessage("&7Block Data: &r" + targetBlock.getBlockData().getAsString());
+            } catch (Throwable ignored) {
+            }
+
             return;
         }
 

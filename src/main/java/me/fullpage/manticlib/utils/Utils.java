@@ -11,7 +11,6 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
@@ -241,10 +240,10 @@ public class Utils {
             }
         }
 
-        final Optional<Method> getPing = ReflectionUtils.findMethod(ReflectionUtils.entityPlayer, "getPing");
+   /*     final Optional<Method> getPing = ReflectionUtils.findMethod(ReflectionUtils.entityPlayer, "getPing");
         if (getPing.isPresent()) {
             return (int) getPing.get().invoke(p);
-        }
+        }*/
 
         return -1;
     }
