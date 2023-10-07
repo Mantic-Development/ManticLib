@@ -1,8 +1,6 @@
 package me.fullpage.manticlib.utils;
 
-import lombok.SneakyThrows;
 import me.fullpage.manticlib.builders.ItemBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -10,10 +8,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
 
 public class Utils {
 
@@ -220,32 +220,8 @@ public class Utils {
         return s.toString();
     }
 
-    @SneakyThrows
     public static int getPing(Player p) {
-        final String version = ReflectionUtils.VERSION;
-        final Class<? extends Player> playerClass = p.getClass();
-        if (!playerClass.getName().equals("org.bukkit.craftbukkit." + version + ".entity.CraftPlayer")) { //compatibility with some plugins
-            p = Bukkit.getPlayer(p.getUniqueId()); //cast to org.bukkit.entity.Player
-        }
-
-        if (p == null) {
-            return -1;
-        }
-
-        final Object handle = ReflectionUtils.getHandle(p);
-        if (handle != null) {
-            final Optional<Field> ping = ReflectionUtils.findField(handle.getClass(), "ping");
-            if (ping.isPresent()) {
-                return ping.get().getInt(handle);
-            }
-        }
-
-   /*     final Optional<Method> getPing = ReflectionUtils.findMethod(ReflectionUtils.entityPlayer, "getPing");
-        if (getPing.isPresent()) {
-            return (int) getPing.get().invoke(p);
-        }*/
-
-        return -1;
+        return ReflectionUtils.getPing(p);
     }
 
     public static void giveItems(Player player, Collection<ItemStack> items) {

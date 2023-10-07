@@ -1,5 +1,6 @@
 package me.fullpage.manticlib.utils;
 
+import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -197,9 +198,10 @@ public final class ReflectionUtils {
      * is where {@code ProtocolLib} controls packets by injecting channels!
      */
     private static final MethodHandle SEND_PACKET;
+    private static final Class<?> entityPlayer;
 
     static {
-        Class<?> entityPlayer = getNMSClass("server.level", "EntityPlayer");
+        entityPlayer = getNMSClass("server.level", "EntityPlayer");
         Class<?> craftPlayer = getCraftClass("entity.CraftPlayer");
         Class<?> playerConnection = getNMSClass("server.network", "PlayerConnection");
         Class<?> playerCommonConnection;
@@ -491,6 +493,7 @@ public final class ReflectionUtils {
             }
         }
     }
+
     @Deprecated
     public static boolean isOrAbove(int version) {
         return version >= MINOR_NUMBER;
@@ -649,6 +652,33 @@ public final class ReflectionUtils {
         }
 
 
+    }
+
+    @SneakyThrows
+    public static int getPing(Player p) {
+        Class<? extends Player> playerClass = p.getClass();
+        if (!playerClass.getName().equals("org.bukkit.craftbukkit." + VERSION + ".entity.CraftPlayer")) { //compatibility with some plugins
+            p = Bukkit.getPlayer(p.getUniqueId()); //cast to org.bukkit.entity.Player
+        }
+
+        if (p == null) {
+            return -1;
+        }
+
+        Object handle = ReflectionUtils.getHandle(p);
+        if (handle != null) {
+             Optional<Field> ping = ReflectionUtils.findField(handle.getClass(), "ping");
+            if (ping.isPresent()) {
+                return ping.get().getInt(handle);
+            }
+        }
+
+        Optional<Method> getPing = ReflectionUtils.findMethod(ReflectionUtils.entityPlayer, "getPing");
+        if (getPing.isPresent()) {
+            return (int) getPing.get().invoke(p);
+        }
+
+        return -1;
     }
 
 }

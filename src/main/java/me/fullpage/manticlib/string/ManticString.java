@@ -352,5 +352,20 @@ public class ManticString {
     public static boolean isNullOrEmpty(ManticString manticString) {
         return manticString == null || isNullOrEmpty(manticString.string);
     }
+
+    private static final Pattern HEX_PATTERN = Pattern.compile("§#[0-9A-Fa-f]+");
+    public ManticString stripHexColourCodes() {
+        if (!ReflectionUtils.supports(16) || string == null) {
+            return this;
+        }
+
+        string =  HEX_PATTERN.matcher(string).replaceAll("");
+        return this;
+    }
+
+    public ManticString stripColour() {
+        string = ChatColor.stripColor(this.stripHexColourCodes().string);
+        return this;
+    }
 }
 
