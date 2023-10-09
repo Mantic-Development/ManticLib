@@ -1,6 +1,7 @@
 package me.fullpage.manticlib;
 
 import lombok.Getter;
+import me.fullpage.manticlib.bstats.Metrics;
 import me.fullpage.manticlib.command.ManticCommand;
 import me.fullpage.manticlib.command.impl.ManticLibCmd;
 import me.fullpage.manticlib.data.Config;
@@ -38,6 +39,11 @@ public final class ManticLib extends ManticPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        try {
+            new Metrics(this, 20018);
+        } catch (Throwable ignored) {
+        }
 
         try {
             ArmourListener armourListener = new ArmourListener();
