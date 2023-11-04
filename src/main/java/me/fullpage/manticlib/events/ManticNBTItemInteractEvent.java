@@ -1,7 +1,6 @@
-package me.fullpage.manticlib.events.armourequipevent;
+package me.fullpage.manticlib.events;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import me.fullpage.manticlib.events.ManticPlayerEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;

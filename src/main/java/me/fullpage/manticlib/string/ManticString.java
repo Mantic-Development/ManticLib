@@ -367,5 +367,15 @@ public class ManticString {
         string = ChatColor.stripColor(this.stripHexColourCodes().string);
         return this;
     }
+
+    public ManticString trim() {
+        string = string.trim();
+        return this;
+    }
+
+    public boolean isEmpty() {
+        return string.isEmpty();
+    }
+    
 }
 

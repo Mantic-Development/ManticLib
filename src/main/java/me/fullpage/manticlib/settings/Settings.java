@@ -160,8 +160,8 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
                 ex.printStackTrace();
             }
         } catch (JsonSyntaxException | NullPointerException e) {
-            createBackupFile();
             e.printStackTrace();
+            createBackupFile();
         }
         config.save();
         apply((S) instance);

@@ -3,6 +3,7 @@ package me.fullpage.manticlib.builders;
 import lombok.Getter;
 import lombok.Setter;
 import me.fullpage.manticlib.string.Txt;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -17,11 +18,20 @@ public class Page<T> {
     private String title;
     private Collection<? extends T> collection;
     private ToString<T> toString;
+    private ToTextComponent<T> toTextComponent;
 
     public Page(String title, Collection<? extends T> collection, ToString<T> toString) {
         this.title = title;
         this.collection = collection;
         this.toString = toString;
+        this.toTextComponent = null;
+    }
+
+    public Page(String title, Collection<? extends T> collection, ToTextComponent<T> toTextComponent) {
+        this.title = title;
+        this.collection = collection;
+        this.toTextComponent = toTextComponent;
+        this.toString = null;
     }
 
     public boolean isValid(int number) {
@@ -62,19 +72,54 @@ public class Page<T> {
         final List<T> ts = get(page);
         for (Iterator<T> var4 = ts.iterator(); var4.hasNext(); ++index) {
             T pageItem = var4.next();
-            items.add(toString.toString(pageItem, index));
+            if (toString != null) {
+                items.add(toString.toString(pageItem, index));
+            } else {
+                items.add(TextComponent.toLegacyText(toTextComponent.toTextComponent(pageItem, index)));
+            }
         }
         return items;
     }
 
+    public List<TextComponent> getTextComponentPage(int page) {
+        if (!isValid(page)) return new ArrayList<>();
+        List<TextComponent> items = new ArrayList<>();
+        int index = (page - 1) * 9;
+        final List<T> ts = get(page);
+        for (Iterator<T> var4 = ts.iterator(); var4.hasNext(); ++index) {
+            T pageItem = var4.next();
+            if (toTextComponent != null) {
+                items.add(toTextComponent.toTextComponent(pageItem, index));
+            } else {
+                items.add(new TextComponent(toString.toString(pageItem, index)));
+            }
+        }
+        return items;
+    }
+
+    public boolean isTextComponent() {
+        return toTextComponent != null;
+    }
+
     public void send(CommandSender sender, int page) {
         sender.sendMessage(Txt.parse(title.replace("{page}", "" + page).replace("{max_page}", "" + getMaxPage())));
-        final List<String> page1 = getPage(page);
-        if (page1.isEmpty()) {
-            sender.sendMessage("§7None");
+        if (isTextComponent()) {
+            final List<TextComponent> page1 = getTextComponentPage(page);
+            if (page1.isEmpty()) {
+                sender.sendMessage("§7None");
+            } else {
+                for (TextComponent t : page1) {
+                    sender.spigot().sendMessage(t);
+                }
+            }
         } else {
-            for (String t : page1) {
-                sender.sendMessage(t);
+            final List<String> page1 = getPage(page);
+            if (page1.isEmpty()) {
+                sender.sendMessage("§7None");
+            } else {
+                for (String t : page1) {
+                    sender.sendMessage(t);
+                }
             }
         }
     }
@@ -83,6 +128,13 @@ public class Page<T> {
     public interface ToString<T> {
 
         String toString(T entry, int index);
+
+    }
+
+
+    public interface ToTextComponent<T> {
+
+        TextComponent toTextComponent(T entry, int index);
 
     }
 
