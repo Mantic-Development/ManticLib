@@ -42,6 +42,7 @@ public class ManticLibCmd extends ManticCommand {
 
 
             this.sendMessage("§7 ");
+
             Page<Integration> page = new Page<>(Txt.parse("&a&lACTIVE &8&l| &b&lManticLib Integrations &7{page}/{max_page}"), Integration.INTEGRATIONS.stream().filter(new Predicate<Integration>() {
                 @Override
                 public boolean test(Integration integration) {

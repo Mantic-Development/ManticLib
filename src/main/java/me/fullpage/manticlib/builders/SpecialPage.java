@@ -3,6 +3,7 @@ package me.fullpage.manticlib.builders;
 import lombok.Getter;
 import lombok.Setter;
 import me.fullpage.manticlib.string.Txt;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -12,16 +13,17 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Page<T> {
+public class SpecialPage<T> {
 
     private String title;
     private Collection<? extends T> collection;
-    private ToString<T> toString;
+    private ToTextComponent<T> toTextComponent;
 
-    public Page(String title, Collection<? extends T> collection, ToString<T> toString) {
+
+    public SpecialPage(String title, Collection<? extends T> collection, ToTextComponent<T> toTextComponent) {
         this.title = title;
         this.collection = collection;
-        this.toString = toString;
+        this.toTextComponent = toTextComponent;
     }
 
     public boolean isValid(int number) {
@@ -62,27 +64,39 @@ public class Page<T> {
         final List<T> ts = get(page);
         for (Iterator<T> var4 = ts.iterator(); var4.hasNext(); ++index) {
             T pageItem = var4.next();
-            items.add(toString.toString(pageItem, index));
+            items.add(TextComponent.toLegacyText(toTextComponent.toTextComponent(pageItem, index)));
+        }
+        return items;
+    }
+
+    public List<TextComponent> getTextComponentPage(int page) {
+        if (!isValid(page)) return new ArrayList<>();
+        List<TextComponent> items = new ArrayList<>();
+        int index = (page - 1) * 9;
+        final List<T> ts = get(page);
+        for (Iterator<T> var4 = ts.iterator(); var4.hasNext(); ++index) {
+            T pageItem = var4.next();
+            items.add(toTextComponent.toTextComponent(pageItem, index));
         }
         return items;
     }
 
     public void send(CommandSender sender, int page) {
         sender.sendMessage(Txt.parse(title.replace("{page}", "" + page).replace("{max_page}", "" + getMaxPage())));
-        final List<String> page1 = getPage(page);
+        final List<TextComponent> page1 = getTextComponentPage(page);
         if (page1.isEmpty()) {
             sender.sendMessage("§7None");
         } else {
-            for (String t : page1) {
-                sender.sendMessage(t);
+            for (TextComponent t : page1) {
+                sender.spigot().sendMessage(t);
             }
         }
     }
 
 
-    public interface ToString<T> {
+    public interface ToTextComponent<T> {
 
-        String toString(T entry, int index);
+        TextComponent toTextComponent(T entry, int index);
 
     }
 
