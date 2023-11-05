@@ -5,6 +5,7 @@ import lombok.Setter;
 import me.fullpage.manticlib.string.Txt;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +89,11 @@ public class SpecialPage<T> {
             sender.sendMessage("§7None");
         } else {
             for (TextComponent t : page1) {
-                sender.spigot().sendMessage(t);
+                if (sender instanceof Player) {
+                    ((Player)sender).spigot().sendMessage(t);
+                } else {
+                    sender.sendMessage(TextComponent.toLegacyText(t));
+                }
             }
         }
     }
