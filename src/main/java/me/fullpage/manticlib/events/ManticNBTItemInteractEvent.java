@@ -1,6 +1,7 @@
 package me.fullpage.manticlib.events;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import me.fullpage.manticlib.ManticLib;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -42,5 +43,9 @@ public class ManticNBTItemInteractEvent extends ManticPlayerEvent {
 
     public PlayerInteractEvent getPlayerInteractEvent() {
         return playerInteractEvent;
+    }
+
+    public boolean isMainHand() {
+        return ManticLib.get().getNmsHandler().isMainHand(playerInteractEvent);
     }
 }
