@@ -10,12 +10,15 @@ import me.fullpage.manticlib.integrations.manager.Integration;
 import me.fullpage.manticlib.listeners.PlayerMoveListener;
 import me.fullpage.manticlib.listeners.armour.ArmourListener;
 import me.fullpage.manticlib.listeners.armour.DispenserArmorListener;
+import me.fullpage.manticlib.utils.GlowEnchant;
 import me.fullpage.manticlib.utils.RandomMaterials;
 import me.fullpage.nmslib.NMSHandler;
 import me.fullpage.nmslib.plugin.NMSLib;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 
 import java.util.List;
+import java.util.logging.Level;
 
 @Getter
 public final class ManticLib extends ManticPlugin {
@@ -35,7 +38,6 @@ public final class ManticLib extends ManticPlugin {
     private ManticRodsIntegration manticRods;
 
     private Config configuration;
-
     @Override
     public void onEnable() {
         instance = this;
@@ -43,6 +45,13 @@ public final class ManticLib extends ManticPlugin {
         try {
             new Metrics(this, 20018);
         } catch (Throwable ignored) {
+        }
+
+        nmsHandler = NMSLib.init(this);
+        try {
+            Enchantment enchantment = GlowEnchant.get();
+        } catch (Throwable e) {
+            getLogger().log(Level.SEVERE, "Failed to register glow enchantment", e);
         }
 
         try {
@@ -68,7 +77,6 @@ public final class ManticLib extends ManticPlugin {
             e.printStackTrace();
         }
 
-        nmsHandler = NMSLib.init(this);
         infiniteKoth = new InfiniteKothIntegration();
         vault = new VaultIntegration();
         miningEconomy = new MiningEconomyIntegration();

@@ -3,6 +3,7 @@ package me.fullpage.manticlib.utils;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MathUtils {
@@ -159,5 +160,55 @@ public class MathUtils {
         }
         return angle;
     }
+
+    public Optional<Integer> getInteger(String input) {
+        try {
+            return Optional.of(Integer.parseInt(input));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Double> getDouble(String input) {
+        try {
+            return Optional.of(Double.parseDouble(input));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Float> getFloat(String input) {
+        try {
+            return Optional.of(Float.parseFloat(input));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Long> getLong(String input) {
+        try {
+            return Optional.of(Long.parseLong(input));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Short> getShort(String input) {
+        try {
+            return Optional.of(Short.parseShort(input));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Byte> getByte(String input) {
+        try {
+            return Optional.of(Byte.parseByte(input));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+
 
 }

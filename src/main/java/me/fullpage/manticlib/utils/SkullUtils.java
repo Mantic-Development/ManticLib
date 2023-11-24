@@ -55,9 +55,9 @@ public class SkullUtils {
     private static final HashMap<UUID, ItemStack> headCache = new HashMap<>();
 
     public static ItemStack getHead(UUID id, String name) {
-        final ItemStack head = new ItemBuilder(skull).durability(3);
+        ItemStack head = new ItemBuilder(skull).durability(3);
 
-        final ItemStack itemStack = headCache.get(id);
+        ItemStack itemStack = headCache.get(id);
         if (itemStack != null) {
             return itemStack;
         }
@@ -70,7 +70,6 @@ public class SkullUtils {
         }
         head.setItemMeta(meta);
         headCache.put(id, head);
-
         return head;
     }
 
