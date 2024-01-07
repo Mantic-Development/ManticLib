@@ -8,6 +8,7 @@ import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.builders.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -142,7 +143,15 @@ public class SkullUtils {
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         try {
-            meta.setOwningPlayer(Bukkit.getOfflinePlayer(id));
+            try {
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(id);
+                if (offlinePlayer != null) {
+                    meta.setOwningPlayer(offlinePlayer);
+                }
+            } catch (NullPointerException e) {
+                // from not resetting player data
+                return head;
+            }
         } catch (NoSuchMethodError e) {
             meta.setOwner(name);
         }

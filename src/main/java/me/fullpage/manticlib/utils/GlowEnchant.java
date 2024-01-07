@@ -25,12 +25,12 @@ public final class GlowEnchant extends EnchantInfo {
 
 
         try {
-            glow = NMSLib.getNmsHandler().buildEnchantment(i, ManticLib.get());
-            NMSLib.getNmsHandler().registerEnchantment(glow);
+            glow = NMSLib.getNmsHandler().registerEnchantment(i, ManticLib.get());
+         //   NMSLib.getNmsHandler().registerEnchantment(glow);
             return glow;
         } catch (Throwable t) {
             glow = null;
-            throw new RuntimeException("Failed to register glow enchantment", t);
+            throw t;
         }
     }
 
@@ -43,7 +43,7 @@ public final class GlowEnchant extends EnchantInfo {
     }
 
     public EnchantmentTarget getItemTarget() {
-        return null;
+        return EnchantmentTarget.ALL;
     }
 
     public boolean canEnchantItem(ItemStack item) {

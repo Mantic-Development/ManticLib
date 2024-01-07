@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import me.fullpage.manticlib.collections.WeightedList;
+import me.fullpage.manticlib.utils.ReflectionUtils;
 import me.fullpage.manticlib.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -20,6 +21,7 @@ import java.util.Set;
 public class SoundEffect {
 
     private Sound sound;
+    private String customSound;
     private final float volume, pitch;
 
     public SoundEffect(Sound sound, float volume, float pitch) {
@@ -29,7 +31,10 @@ public class SoundEffect {
     }
 
     public SoundEffect(String sound, float volume, float pitch) {
-        this(getSound(sound), volume, pitch);
+        this(sound != null && sound.startsWith("CUSTOM:") ? null : getSound(sound), volume, pitch);
+        if (sound != null && this.sound == null) { 
+            customSound = sound.substring(7);
+        }
     }
 
     public SoundEffect(Sound sound) {
@@ -54,6 +59,11 @@ public class SoundEffect {
     }
 
     public void playSound(@NonNull Player player) {
+        if (customSound != null) {
+            player.playSound(player.getLocation(), customSound, volume, pitch);
+            return;
+
+        }
         if (sound == null) {
             return;
         }
@@ -65,10 +75,19 @@ public class SoundEffect {
     }
 
     public void playSound(@NonNull Location location) {
+        if (customSound != null && ReflectionUtils.supports(12)) {
+            World world = location.getWorld();
+            if (world != null) {
+                world.playSound(location, customSound, volume, pitch);
+            }
+            return;
+
+        }
         if (sound == null) {
             return;
         }
-        final World world = location.getWorld();
+
+        World world = location.getWorld();
         if (world != null) {
             world.playSound(location, sound, volume, pitch);
         }

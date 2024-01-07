@@ -1,17 +1,16 @@
 package me.fullpage.manticlib.command;
 
 import lombok.Getter;
+import me.fullpage.manticlib.command.impl.OnlinePlayersTabCompleteElement;
 import me.fullpage.manticlib.interfaces.Permission;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
-
-import java.util.Arrays;
+import org.jetbrains.annotations.Unmodifiable;
 
 @Getter
 public class TabCompleteElement {
+
+    @Unmodifiable
+    private static final String[] EMPTY = new String[0];
 
     private final int index;
     private final String[] results;
@@ -21,6 +20,13 @@ public class TabCompleteElement {
     public TabCompleteElement(int index, String... results) {
         this.index = index;
         this.results = results;
+        this.permission = null;
+        this.conditions = new Condition[0];
+    }
+
+    public TabCompleteElement(int index) {
+        this.index = index;
+        this.results = EMPTY;
         this.permission = null;
         this.conditions = new Condition[0];
     }
@@ -55,24 +61,17 @@ public class TabCompleteElement {
         }
         return false;
     }
-
     public static TabCompleteElement getOnlinePlayers(int index, CommandSender sender) {
-        if (sender instanceof Player) {
-            return new TabCompleteElement(index, Bukkit.getOnlinePlayers().stream().filter(s -> ((Player) sender).canSee(s)).map(HumanEntity::getName).toArray(String[]::new));
-        }
-        return new TabCompleteElement(index, Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).toArray(String[]::new));
+// TODO check if player is vanished effectively
+        return new OnlinePlayersTabCompleteElement(index, sender);
     }
 
+    /**
+     * @apiNote This method is deprecated due to inefficiency. Use {@link #getOnlinePlayers(int, CommandSender)} instead.
+     */
+    @Deprecated
     public static TabCompleteElement getAllPlayers(int index, CommandSender sender) {
-        if (sender instanceof Player) {
-            return new TabCompleteElement(index, Arrays.stream(Bukkit.getOfflinePlayers()).filter(s -> {
-                if (s instanceof Player) {
-                    return ((Player) sender).canSee((Player) s);
-                }
-                return true;
-            }).map(OfflinePlayer::getName).toArray(String[]::new));
-        }
-        return new TabCompleteElement(index, Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).toArray(String[]::new));
+        return new TabCompleteElement(index, EMPTY);
     }
 
     @Getter
@@ -111,7 +110,6 @@ public class TabCompleteElement {
             }
             return this.invert;
         }
-
 
 
     }
