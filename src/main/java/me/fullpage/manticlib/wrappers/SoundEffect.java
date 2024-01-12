@@ -30,19 +30,22 @@ public class SoundEffect {
         this.pitch = pitch;
     }
 
-    public SoundEffect(String sound, float volume, float pitch) {
-        this(sound != null && sound.startsWith("CUSTOM:") ? null : getSound(sound), volume, pitch);
-        if (sound != null && this.sound == null) { 
-            customSound = sound.substring(7);
-        }
-    }
-
     public SoundEffect(Sound sound) {
         this(sound, 1.0f, 1.0f);
     }
 
+    public SoundEffect(String sound, float volume, float pitch) {
+        this(sound != null && sound.toUpperCase().startsWith("CUSTOM:") ? null : getSound(sound), volume, pitch);
+        if (sound != null && this.sound == null && sound.toUpperCase().startsWith("CUSTOM:")) {
+            customSound = sound.substring(7);
+        }
+    }
+
     public SoundEffect(String sound) {
-        this(getSound(sound));
+        this(sound != null && sound.toUpperCase().startsWith("CUSTOM:") ? null : getSound(sound));
+        if (sound != null && this.sound == null && sound.toUpperCase().startsWith("CUSTOM:")) {
+            customSound = sound.substring(7);
+        }
     }
 
 
@@ -67,6 +70,7 @@ public class SoundEffect {
         if (sound == null) {
             return;
         }
+
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
 
