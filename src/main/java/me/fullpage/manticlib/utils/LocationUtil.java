@@ -6,6 +6,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
+
 public class LocationUtil {
 
     public static boolean isBlockAboveAir(Block block) {
@@ -29,6 +31,20 @@ public class LocationUtil {
         loc.setZ(loc.getZ() + l * Math.sin(a) + 0.8D * Math.cos(a));
 
         return loc;
+    }
+
+    public boolean inRegion(Location playerLoc, Location point1, Location point2) {
+        if (playerLoc == null || point1 == null  || point2 == null) {
+            return false;
+        }
+        if (Objects.requireNonNull(point1.getWorld()).getName().equalsIgnoreCase(Objects.requireNonNull(playerLoc.getWorld()).getName())
+                && Objects.requireNonNull(point2.getWorld()).getName().equalsIgnoreCase(playerLoc.getWorld().getName())) {
+            double highestX = Math.max(point1.getX(), point2.getX()), highestY = Math.max(point1.getY(), point2.getY()), highestZ = Math.max(point1.getZ(), point2.getZ()),
+                    lowestX = Math.min(point1.getX(), point2.getX()), lowestY = Math.min(point1.getY(), point2.getY()), lowestZ = Math.min(point1.getZ(), point2.getZ());
+            return (highestX >= playerLoc.getBlockX() && lowestX <= playerLoc.getBlockX()) && (highestY >= playerLoc.getBlockY()
+                    && lowestY <= playerLoc.getBlockY()) && (highestZ >= playerLoc.getBlockZ() && lowestZ <= playerLoc.getBlockZ());
+        }
+        return false;
     }
 
 }

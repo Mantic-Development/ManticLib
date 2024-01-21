@@ -1,5 +1,6 @@
 package me.fullpage.manticlib.wrappers;
 
+import de.exlll.configlib.annotation.ConfigurationElement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -15,14 +16,15 @@ import java.util.Objects;
 @Getter
 @Setter
 @EqualsAndHashCode
+@ConfigurationElement
 public class SimpleLocation implements Serializable {
 
-    private final String worldName;
-    private final double x;
-    private final double y;
-    private final double z;
-    private final float pitch;
-    private final float yaw;
+    private String worldName;
+    private double x;
+    private double y;
+    private double z;
+    private float pitch;
+    private float yaw;
 
     public SimpleLocation(String worldName, double x, double y, double z, float yaw, float pitch) {
         this.worldName = worldName;
@@ -39,6 +41,18 @@ public class SimpleLocation implements Serializable {
 
     public SimpleLocation(@NonNull Location location) {
         this(Objects.requireNonNull(location.getWorld(), "world cannot be null").getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
+
+    private SimpleLocation() {
+        this("world", 0, 0, 0, 0, 0);
+    }
+
+    public static SimpleLocation getDefault() {
+        return new SimpleLocation();
+    }
+
+    public boolean isDefault() {
+        return worldName.equals("world") && x == 0 && y == 0 && z == 0 && pitch == 0 && yaw == 0;
     }
 
     public Location asLocation() {
