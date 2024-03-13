@@ -27,7 +27,6 @@ repositories {
     }
 
     maven {
-        name = "CodeMC"
         url = uri("https://repo.codemc.org/repository/maven-public/")
     }
 
@@ -54,7 +53,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.44.2"
+version = "1.0.45.0"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -80,7 +79,6 @@ tasks.shadowJar {
     relocate("me.fullpage.nmslib", "me.fullpage.manticlib.nmslib")
     relocate("de.tr7zw.annotations", "me.fullpage.manticlib.nbtapi.annotations")
     relocate("de.tr7zw.changeme.nbtapi", "me.fullpage.manticlib.nbtapi")
-    mergeServiceFiles()
 }
 
 //tasks.withType<Jar> {

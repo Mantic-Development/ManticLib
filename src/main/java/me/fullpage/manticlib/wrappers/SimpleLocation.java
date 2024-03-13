@@ -1,10 +1,7 @@
 package me.fullpage.manticlib.wrappers;
 
 import de.exlll.configlib.annotation.ConfigurationElement;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import me.fullpage.manticlib.utils.MathUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,6 +14,7 @@ import java.util.Objects;
 @Setter
 @EqualsAndHashCode
 @ConfigurationElement
+@ToString
 public class SimpleLocation implements Serializable {
 
     private String worldName;

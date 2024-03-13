@@ -136,6 +136,10 @@ public class Utils {
         return removeLastZeros(NUMBER_FORMAT.format(number));
     }
 
+    public static void main(String[] args) {
+        System.out.println(removeLastZeros(formatNumber(0.0)));
+    }
+
     private static String removeLastZeros(String str) {
         if (isNullOrEmpty(str)) {
             return str;

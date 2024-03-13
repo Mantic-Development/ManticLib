@@ -1,5 +1,6 @@
 package me.fullpage.manticlib.command;
 
+import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.ManticPlugin;
 import me.fullpage.manticlib.string.Txt;
 import me.fullpage.manticlib.utils.ReflectionUtils;
@@ -58,12 +59,15 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
             return true;
         }
 
-        if (!isConsole()) {
+        if (isConsole()) {
+            player = null;
+            uuid = null;
+        } else {
             player = (Player) sender;
             uuid = player.getUniqueId();
         }
 
-        if (permission == null || sender.hasPermission(permission)/* || sender.isOp()*/) {
+        if (permission == null || sender.hasPermission(permission)) {
             if ((minimumArgs != null && args.length < minimumArgs) || (maximumArgs != null && args.length > maximumArgs)) {
                 sendUsageMessage();
                 return true;
@@ -79,7 +83,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
     @Nullable
     @Override
     public String getPermissionMessage() {
-        return "&cYou do not have permission to use this command.";
+        return ManticLib.get().getConfiguration().defaultNoPermissionCommand;
     }
 
     protected void sendNoPermissionMessage() {
@@ -87,7 +91,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
     }
 
     protected void sendOnlyPlayersMessage() {
-        sender.sendMessage(Txt.parse("&cOnly players can run this command."));
+        sender.sendMessage(Txt.parse(ManticLib.get().getConfiguration().defaultOnlyPlayersCommand));
     }
 
     public void sendMessage(CommandSender sender, String message) {
@@ -166,6 +170,14 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
 
     public Optional<OfflinePlayer> getOfflinePlayer(int index) {
         return getOfflinePlayer(index, true);
+    }
+
+    public Player getArgAsPlayer(int index) {
+        return getPlayer(index).orElse(null);
+    }
+
+    public OfflinePlayer getArgAsOfflinePlayer(int index) {
+        return getOfflinePlayer(index).orElse(null);
     }
 
     public Optional<Player> getPlayer(int index) {

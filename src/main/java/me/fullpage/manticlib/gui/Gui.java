@@ -282,7 +282,11 @@ public class Gui implements Listener, InventoryHolder {
     }
 
     public void show(Player player) {
-        final Inventory inventory = getInventory();
+        Inventory inventory = getInventory();
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(JavaPlugin.getProvidingPlugin(getClass()), () -> show(player));
+            return;
+        }
         player.openInventory(inventory);
         if (openSound != null) {
             openSound.playSound(player);
