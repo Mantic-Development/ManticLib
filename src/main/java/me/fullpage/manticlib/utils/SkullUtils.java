@@ -69,7 +69,11 @@ public class SkullUtils {
         if (skullCache.containsKey(base64)) {
             return skullCache.get(base64);
         }
+
         ItemStack head = new ItemBuilder(skull).durability(3);
+        if (base64 == null || base64.trim().isEmpty()) {
+            return head;
+        }
         SkullMeta meta = (SkullMeta) head.getItemMeta();
 
         Field profileField;

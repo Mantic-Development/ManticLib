@@ -33,14 +33,15 @@ import java.util.*;
 public class Gui implements Listener, InventoryHolder {
 
     protected final static HashMap<UUID, Pair<Inventory, Gui>> inventories = new HashMap<>();
-    public static List<Gui> guis = new ArrayList<>();
+    public static HashSet<Gui> guis = new HashSet<>();
     public static Listener listener = null;
 
     protected String key = "";
     protected final Inventory inventory;
     protected final HashMap<Integer, GuiItem> guiItems = new HashMap<>();
     protected final String title;
-    protected final HashSet<HumanEntity> viewers = new HashSet<>();
+    @Getter
+    protected final HashSet<UUID> viewers = new HashSet<>();
     protected boolean destroyOnClose = false;
     protected boolean closeOnClick = false;
     protected @Nullable String[] guiElements = null;
@@ -291,8 +292,9 @@ public class Gui implements Listener, InventoryHolder {
         if (openSound != null) {
             openSound.playSound(player);
         }
-        viewers.add(player);
-        inventories.put(player.getUniqueId(), new Pair<>(inventory, this));
+        UUID uniqueId = player.getUniqueId();
+        viewers.add(uniqueId);
+        inventories.put(uniqueId, new Pair<>(inventory, this));
     }
 
     public static Pair<Inventory, Gui> getInventoryGUIPair(Player player) {
@@ -305,10 +307,6 @@ public class Gui implements Listener, InventoryHolder {
             return null;
         }
         return inventoryGUIPair.getLeft();
-    }
-
-    public HashSet<HumanEntity> getViewers() {
-        return viewers;
     }
 
     public List<ItemStack> getItemsAtKey(char key) {
@@ -398,22 +396,22 @@ public class Gui implements Listener, InventoryHolder {
             if (!(event.getWhoClicked() instanceof Player)) {
                 return;
             }
-            final Player player = (Player) event.getWhoClicked();
-            final Pair<Inventory, Gui> inventoryGUIPair = getInventoryGUIPair(player);
+            Player player = (Player) event.getWhoClicked();
+            Pair<Inventory, Gui> inventoryGUIPair = getInventoryGUIPair(player);
 
             if (inventoryGUIPair == null) {
                 return;
             }
 
-            final Inventory storedInventory = inventoryGUIPair.getLeft();
-            final InventoryView view = event.getView();
-            final Inventory inventory = view.getTopInventory();
+            Inventory storedInventory = inventoryGUIPair.getLeft();
+            InventoryView view = event.getView();
+            Inventory inventory = view.getTopInventory();
 
             if (!inventory.equals(storedInventory)) {
                 return;
             }
 
-            final Gui gui = inventoryGUIPair.getRight();
+            Gui gui = inventoryGUIPair.getRight();
 
             if ((gui == null) || (!view.getTitle().equals(gui.title))
                     || (inventory.getType() != gui.getInventory().getType()) || (inventory.getSize() != gui.getInventory().getSize())) {
@@ -424,6 +422,7 @@ public class Gui implements Listener, InventoryHolder {
             if (gui.isCancelByDefault()) {
                 event.setCancelled(true);
             }
+
             int slot = -1;
             if (event.getRawSlot() < view.getTopInventory().getSize()) {
                 slot = event.getRawSlot();
@@ -460,7 +459,7 @@ public class Gui implements Listener, InventoryHolder {
 
             // todo ? if slot is equal to or above 0 it's inside action otherwise outside action
 
-            final GuiItem guiItem = gui.guiItems.get(slot);
+            GuiItem guiItem = gui.guiItems.get(slot);
             if (guiItem == null) {
                 return;
             }
@@ -469,7 +468,7 @@ public class Gui implements Listener, InventoryHolder {
                 guiItem.getSoundEffect().playSound(player);
             }
 
-            final ClickAction action = guiItem.getAction();
+            ClickAction action = guiItem.getAction();
             if (action == null) {
                 return;
             }
@@ -497,22 +496,22 @@ public class Gui implements Listener, InventoryHolder {
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onInventoryPickupItemEvent(PlayerPickupItemEvent event) {
-            final Player player = event.getPlayer();
-            final Pair<Inventory, Gui> inventoryGUIPair = getInventoryGUIPair(player);
+            Player player = event.getPlayer();
+            Pair<Inventory, Gui> inventoryGUIPair = getInventoryGUIPair(player);
 
             if (inventoryGUIPair == null) {
                 return;
             }
 
-            final Inventory storedInventory = inventoryGUIPair.getLeft();
-            final InventoryView openInventory = event.getPlayer().getOpenInventory();
-            final Inventory inventory = openInventory.getTopInventory();
+            Inventory storedInventory = inventoryGUIPair.getLeft();
+            InventoryView openInventory = event.getPlayer().getOpenInventory();
+            Inventory inventory = openInventory.getTopInventory();
 
             if (!inventory.equals(storedInventory)) {
                 return;
             }
 
-            final Gui gui = inventoryGUIPair.getRight();
+            Gui gui = inventoryGUIPair.getRight();
 
             if ((gui == null) || (!openInventory.getTitle().equals(gui.title))
                     || (inventory.getType() != gui.getInventory().getType()) || (inventory.getSize() != gui.getInventory().getSize())) {
@@ -529,20 +528,21 @@ public class Gui implements Listener, InventoryHolder {
         @EventHandler(priority = EventPriority.MONITOR)
         public void onInventoryClose(InventoryCloseEvent event) {
             if (!(event.getPlayer() instanceof Player)) return;
-            final Player player = (Player) event.getPlayer();
+            Player player = (Player) event.getPlayer();
+
             for (Gui gui : guis) {
                 if (event.getInventory().equals(gui.getInventory())) {
                     if (gui.getCloseAction() != null) {
                         gui.getCloseAction().onClose(new CloseAction.Close(gui, event));
                     }
 
-                    final boolean handleClose;
+                    boolean handleClose;
                     if (gui instanceof PaginatedGui) {
                         PaginatedGui paginatedGUI = (PaginatedGui) gui;
-                        final PaginatedGui.Page page = paginatedGUI.getUuidPages().get(player.getUniqueId());
+                        PaginatedGui.Page page = paginatedGUI.getUuidPages().get(player.getUniqueId());
                         handleClose = page == null || !page.isTransitioningPage();
                         if (handleClose && page != null) {
-                            paginatedGUI.getUuidPages().remove(player.getUniqueId());
+                            paginatedGUI.removeFromUUIDPages(player);
                         }
                     } else {
                         handleClose = true;
@@ -552,10 +552,10 @@ public class Gui implements Listener, InventoryHolder {
                     }
 
                     if (handleClose) {
-                        gui.viewers.remove(player);
-                        inventories.remove(player.getUniqueId());
+                        removeFromViewing(gui, player);
+                        removeFromInventories(player);
                         if (gui.destroyOnClose && gui.viewers.isEmpty()) {
-                            guis.remove(gui);
+                            removeGui(gui);
                             return;
                         }
                     }
@@ -565,14 +565,29 @@ public class Gui implements Listener, InventoryHolder {
             }
         }
 
+        private void removeGui(Gui gui) {
+            guis.remove(gui);
+        }
+
+        private void removeFromViewing(Gui gui, Player player) {
+            gui.viewers.remove(player.getUniqueId());
+        }
+
+        private void removeFromInventories(HumanEntity player) {
+            inventories.remove(player.getUniqueId());
+        }
+
         @EventHandler(priority = EventPriority.MONITOR)
         public void onPluginDisable(PluginDisableEvent event) {
             if (event.getPlugin().equals(JavaPlugin.getProvidingPlugin(getClass())))
-                for (Gui gui : guis) {
+                for (Gui gui : new ArrayList<>(guis)) {
                     if (gui != null && !gui.viewers.isEmpty()) {
-                        for (HumanEntity viewer : gui.viewers) {
-                            if (viewer.getOpenInventory().getType() != InventoryType.CRAFTING) {
-                                viewer.closeInventory();
+                        for (UUID viewer : new ArrayList<>(gui.viewers)) {
+                            Player player = Bukkit.getPlayer(viewer);
+                            if (player != null) {
+                                if (player.getOpenInventory().getType() != InventoryType.CRAFTING) {
+                                    player.closeInventory();
+                                }
                             }
                         }
                     }
@@ -685,7 +700,7 @@ public class Gui implements Listener, InventoryHolder {
         return ((PaginatedGui) this).initialiseGui();
     }
 
-    public static List<Gui> getGuis() {
+    public static Collection<Gui> getGuis() {
         return guis;
     }
 

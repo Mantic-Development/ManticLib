@@ -119,7 +119,7 @@ public final class JsonConfig {
     }
 
     public JsonArray getJsonArray(String index) {
-        return this.jsonObject.get(index).getAsJsonArray();
+        return  this.jsonObject.has(index) ? this.jsonObject.get(index).getAsJsonArray() : new JsonArray();
     }
 
     public void setJsonArray(String index, JsonArray jsonArray) {

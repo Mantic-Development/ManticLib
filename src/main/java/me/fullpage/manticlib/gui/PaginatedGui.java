@@ -203,6 +203,10 @@ public class PaginatedGui extends Gui {
 
     }
 
+    public void removeFromUUIDPages(Player player) {
+        uuidPages.remove(player.getUniqueId());
+    }
+
     private int[] getRange(int amount, int maxPerPage, int targetPage) {
         if (amount <= maxPerPage) {
             return new int[]{0, amount};
