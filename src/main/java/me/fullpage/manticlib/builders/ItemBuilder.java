@@ -1,5 +1,6 @@
 package me.fullpage.manticlib.builders;
 
+import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.gui.GuiItem;
 import me.fullpage.manticlib.string.ManticString;
 import me.fullpage.manticlib.string.Txt;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * This is a chainable builder for {@link ItemStack}s in {@link Bukkit}
@@ -49,6 +51,16 @@ public class ItemBuilder extends ItemStack {
 
     public static ItemBuilder fromBase64(@NotNull String base64) {
         return new ItemBuilder(SkullUtils.getSkull(base64));
+    }
+
+    private static Method setEnchantmentGlintOverride = null;
+
+    static {
+        try {
+            setEnchantmentGlintOverride = ItemMeta.class.getDeclaredMethod("setEnchantmentGlintOverride", Boolean.class);
+        } catch (Throwable e) {
+            setEnchantmentGlintOverride = null;
+        }
     }
 
     /**
@@ -244,12 +256,24 @@ public class ItemBuilder extends ItemStack {
         setItemMeta(itemMeta);
         if (hide) {
             addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }*/;
+        }*/
+        ;
         return this.glow();
     }
 
     public ItemBuilder glow() {
-        enchantment(GlowEnchant.get());
+        if (setEnchantmentGlintOverride == null) {
+            enchantment(GlowEnchant.get());
+        } else {
+            final ItemMeta itemMeta = getItemMeta();
+            try {
+                setEnchantmentGlintOverride.invoke(itemMeta, true);
+            } catch (Throwable e) {
+                ManticLib.get().getLogger().log(Level.WARNING, "Failed to set enchantment glint override", e);
+                enchantment(GlowEnchant.get());
+            }
+            setItemMeta(itemMeta);
+        }
         return this;
     }
 
