@@ -37,7 +37,7 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("org.spigotmc:spigot-api:1.20.2-R0.1-SNAPSHOT") // 1.8.8-R0.1-SNAPSHOT 1.19.4-R0.1-SNAPSHOT 1.20.1-R0.1-SNAPSHOT
     compileOnly(files("lib/InfiniteKothAPI-1.0.jar"))
-    compileOnly(files("lib/ManticHoes-stripped.jar"))
+    compileOnly(files("lib/ManticHoes-2.0.5-strippedforapi.jar"))
     compileOnly(files("lib/ManticSwords-stripped.jar"))
     compileOnly(files("lib/ManticRods-stripped.jar"))
     compileOnly(files("lib/MiningEconomy-API.jar"))
