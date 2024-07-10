@@ -1,14 +1,18 @@
 package me.fullpage.manticlib.utils;
 
 import lombok.SneakyThrows;
+import me.fullpage.manticlib.ManticLib;
+import me.fullpage.manticlib.utils.despical.jvm.classes.DynamicClassHandle;
+import me.fullpage.manticlib.utils.despical.jvm.classes.StaticClassHandle;
+import me.fullpage.manticlib.utils.despical.minecraft.MinecraftClassHandle;
+import me.fullpage.manticlib.utils.despical.minecraft.MinecraftConnection;
+import me.fullpage.manticlib.utils.despical.minecraft.MinecraftMapping;
+import me.fullpage.manticlib.utils.despical.minecraft.MinecraftPackage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Objects;
@@ -34,9 +38,12 @@ public final class ReflectionUtils {
      * <p>
      * <a href="https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-legacy/">Versions Legacy</a>
      */
-    public static final String NMS_VERSION;
+    @Nullable
+    public static final String NMS_VERSION = findNMSVersionString();
 
-    static { // This needs to be right below VERSION because of initialization order.
+    @Nullable
+    public static String findNMSVersionString() {
+        // This needs to be right below VERSION because of initialization order.
         // This package loop is used to avoid implementation-dependant strings like Bukkit.getVersion() or Bukkit.getBukkitVersion()
         // which allows easier testing as well.
         String found = null;
@@ -60,12 +67,11 @@ public final class ReflectionUtils {
                 }
             }
         }
-        if (found == null)
-            throw new IllegalArgumentException("Failed to parse server version. Could not find any package starting with name: 'org.bukkit.craftbukkit.v'");
-        NMS_VERSION = found;
-        VERSION = NMS_VERSION;
+
+        return found;
     }
 
+    public static final int MAJOR_NUMBER;
     /**
      * The raw minor version number.
      * E.g. {@code v1_17_R1} to {@code 17}
@@ -75,7 +81,7 @@ public final class ReflectionUtils {
      */
     public static final int MINOR_NUMBER;
     public static final int VER;
-    public static final String VERSION;
+    public static final String VERSION = NMS_VERSION;
     /**
      * The raw patch version number.
      * E.g. {@code v1_17_R1} to {@code 1}
@@ -90,7 +96,9 @@ public final class ReflectionUtils {
      */
     public static final int PATCH_NUMBER;
 
+
     static {
+        /* Old way of doing this.
         String[] split = NMS_VERSION.substring(1).split("_");
         if (split.length < 1) {
             throw new IllegalStateException("Version number division error: " + Arrays.toString(split) + ' ' + getVersionInformation());
@@ -99,35 +107,47 @@ public final class ReflectionUtils {
         String minorVer = split[1];
         try {
             MINOR_NUMBER = Integer.parseInt(minorVer);
-            VER = MINOR_NUMBER;
             if (MINOR_NUMBER < 0)
                 throw new IllegalStateException("Negative minor number? " + minorVer + ' ' + getVersionInformation());
         } catch (Throwable ex) {
             throw new RuntimeException("Failed to parse minor number: " + minorVer + ' ' + getVersionInformation(), ex);
         }
+         */
 
-        // Bukkit.getBukkitVersion() = "1.12.2-R0.1-SNAPSHOT"
-        Matcher bukkitVer = Pattern.compile("^\\d+\\.\\d+\\.(\\d+)").matcher(Bukkit.getBukkitVersion());
+        // NMS_VERSION               = v1_20_R3
+        // Bukkit.getBukkitVersion() = 1.20.4-R0.1-SNAPSHOT
+        // Bukkit.getVersion()       = git-Paper-364 (MC: 1.20.4)
+        Matcher bukkitVer = Pattern
+                // <patch> is optional for first releases like "1.8-R0.1-SNAPSHOT"
+                .compile("^(?<major>\\d+)\\.(?<minor>\\d+)(?:\\.(?<patch>\\d+))?")
+                .matcher(Bukkit.getBukkitVersion());
         if (bukkitVer.find()) { // matches() won't work, we just want to match the start using "^"
             try {
                 // group(0) gives the whole matched string, we just want the captured group.
-                PATCH_NUMBER = Integer.parseInt(bukkitVer.group(1));
+                String patch = bukkitVer.group("patch");
+                MAJOR_NUMBER = Integer.parseInt(bukkitVer.group("major"));
+                MINOR_NUMBER = Integer.parseInt(bukkitVer.group("minor"));
+                VER= MINOR_NUMBER;
+                PATCH_NUMBER = Integer.parseInt((patch == null || patch.isEmpty()) ? "0" : patch);
             } catch (Throwable ex) {
                 throw new RuntimeException("Failed to parse minor number: " + bukkitVer + ' ' + getVersionInformation(), ex);
             }
         } else {
-            // 1.8-R0.1-SNAPSHOT
-            PATCH_NUMBER = 0;
+            throw new IllegalStateException("Cannot parse server version: \"" + Bukkit.getBukkitVersion() + '"');
         }
     }
-
     /**
      * Gets the full version information of the server. Useful for including in errors.
      *
      * @since 7.0.0
      */
+    /**
+     * Gets the full version information of the server. Useful for including in errors.
+     */
     public static String getVersionInformation() {
+        // Bukkit.getServer().getMinecraftVersion() is for Paper
         return "(NMS: " + NMS_VERSION + " | " +
+                "Parsed: " + MAJOR_NUMBER + '.' + MINOR_NUMBER + '.' + PATCH_NUMBER + " | " +
                 "Minecraft: " + Bukkit.getVersion() + " | " +
                 "Bukkit: " + Bukkit.getBukkitVersion() + ')';
     }
@@ -139,7 +159,6 @@ public final class ReflectionUtils {
      *
      * @param minorVersion the minor version to get the patch number of.
      * @return the patch number of the given minor version if recognized, otherwise null.
-     * @since 7.0.0
      */
     public static Integer getLatestPatchNumberOf(int minorVersion) {
         if (minorVersion <= 0) throw new IllegalArgumentException("Minor version must be positive: " + minorVersion);
@@ -167,7 +186,7 @@ public final class ReflectionUtils {
                 /* 17 */ 1,//            \_!_/
                 /* 18 */ 2,
                 /* 19 */ 4,
-                /* 20 */ 2,
+                /* 20 */ 6,
         };
 
         if (minorVersion > patches.length) return null;
@@ -178,57 +197,29 @@ public final class ReflectionUtils {
      * Mojang remapped their NMS in 1.17: <a href="https://www.spigotmc.org/threads/spigot-bungeecord-1-17.510208/#post-4184317">Spigot Thread</a>
      */
     public static final String
-            CRAFTBUKKIT_PACKAGE = "org.bukkit.craftbukkit." + NMS_VERSION + '.',
-            NMS_PACKAGE = v(17, "net.minecraft.").orElse("net.minecraft.server." + NMS_VERSION + '.');
-    /**
-     * A nullable public accessible field only available in {@code EntityPlayer}.
-     * This can be null if the player is offline.
-     */
-    private static final MethodHandle PLAYER_CONNECTION;
-    /**
-     * Responsible for getting the NMS handler {@code EntityPlayer} object for the player.
-     * {@code CraftPlayer} is simply a wrapper for {@code EntityPlayer}.
-     * Used mainly for handling packet related operations.
-     * <p>
-     * This is also where the famous player {@code ping} field comes from!
-     */
-    private static final MethodHandle GET_HANDLE;
-    /**
-     * Sends a packet to the player's client through a {@code NetworkManager} which
-     * is where {@code ProtocolLib} controls packets by injecting channels!
-     */
-    private static final MethodHandle SEND_PACKET;
-    private static final Class<?> entityPlayer;
+            CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackage().getName(),
+            NMS_PACKAGE = v(17, "net.minecraft").orElse("net.minecraft.server." + NMS_VERSION);
+    public static final MinecraftMapping SUPPORTED_MAPPING;
 
     static {
-        entityPlayer = getNMSClass("server.level", "EntityPlayer");
-        Class<?> craftPlayer = getCraftClass("entity.CraftPlayer");
-        Class<?> playerConnection = getNMSClass("server.network", "PlayerConnection");
-        Class<?> playerCommonConnection;
-        if (supports(20) && supportsPatch(2)) {
-            // The packet send method has been abstracted from ServerGamePacketListenerImpl to ServerCommonPacketListenerImpl in 1.20.2
-            playerCommonConnection = getNMSClass("server.network", "ServerCommonPacketListenerImpl");
+        MinecraftClassHandle entityPlayer = ofMinecraft()
+                .inPackage(MinecraftPackage.NMS, "server.level")
+                .map(MinecraftMapping.MOJANG, "ServerPlayer")
+                .map(MinecraftMapping.SPIGOT, "EntityPlayer");
+
+        if (ofMinecraft()
+                .inPackage(MinecraftPackage.NMS, "server.level")
+                .map(MinecraftMapping.MOJANG, "ServerPlayer")
+                .exists()) {
+            SUPPORTED_MAPPING = MinecraftMapping.MOJANG;
+        } else if (ofMinecraft()
+                .inPackage(MinecraftPackage.NMS, "server.level")
+                .map(MinecraftMapping.MOJANG, "EntityPlayer")
+                .exists()) {
+            SUPPORTED_MAPPING = MinecraftMapping.SPIGOT;
         } else {
-            playerCommonConnection = playerConnection;
+            throw new RuntimeException("Unknown Minecraft mapping " + getVersionInformation(), entityPlayer.catchError());
         }
-
-        MethodHandles.Lookup lookup = MethodHandles.lookup();
-        MethodHandle sendPacket = null, getHandle = null, connection = null;
-
-        try {
-            connection = lookup.findGetter(entityPlayer,
-                    v(20, "c").v(17, "b").orElse("playerConnection"), playerConnection);
-            getHandle = lookup.findVirtual(craftPlayer, "getHandle", MethodType.methodType(entityPlayer));
-            sendPacket = lookup.findVirtual(playerCommonConnection,
-                    v(20, 2, "b").v(18, "a").orElse("sendPacket"),
-                    MethodType.methodType(void.class, getNMSClass("network.protocol", "Packet")));
-        } catch (NoSuchMethodException | NoSuchFieldException | IllegalAccessException ex) {
-            ex.printStackTrace();
-        }
-
-        PLAYER_CONNECTION = connection;
-        SEND_PACKET = sendPacket;
-        GET_HANDLE = getHandle;
     }
 
     private ReflectionUtils() {
@@ -270,6 +261,14 @@ public final class ReflectionUtils {
     }
 
     /**
+     * A more friendly version of {@link #supports(int, int)} for people with OCD.
+     */
+    public static boolean supports(int majorNumber, int minorNumber, int patchNumber) {
+        if (majorNumber != 1) throw new IllegalArgumentException("Invalid major number: " + majorNumber);
+        return supports(minorNumber, patchNumber);
+    }
+
+    /**
      * Checks whether the server version is equal or greater than the given version.
      *
      * @param minorNumber the minor version to compare the server version with.
@@ -298,33 +297,40 @@ public final class ReflectionUtils {
     /**
      * Get a NMS (net.minecraft.server) class which accepts a package for 1.17 compatibility.
      *
-     * @param newPackage the 1.17 package name.
-     * @param name       the name of the class.
+     * @param packageName the 1.17+ package name of this class.
+     * @param name        the name of the class.
      * @return the NMS class or null if not found.
-     * @since 4.0.0
+     * @throws RuntimeException if the class could not be found.
+     * @deprecated use {@link #ofMinecraft()} instead.
+     * @see #getNMSClass(String)
      */
-    @Nullable
-    public static Class<?> getNMSClass(@Nonnull String newPackage, @Nonnull String name) {
-        if (supports(17)) name = newPackage + '.' + name;
-        return getNMSClass(name);
+    @Nonnull
+    @Deprecated
+    public static Class<?> getNMSClass(@Nullable String packageName, @Nonnull String name) {
+        if (packageName != null && supports(17)) name = packageName + '.' + name;
+
+        try {
+            return Class.forName(NMS_PACKAGE + '.' + name);
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
-     * Get a NMS (net.minecraft.server) class.
+     * Get a NMS {@link #NMS_PACKAGE} class.
      *
      * @param name the name of the class.
      * @return the NMS class or null if not found.
-     * @since 1.0.0
+     * @throws RuntimeException if the class could not be found.
+     * @see #getNMSClass(String, String)
+     * @deprecated use {@link #ofMinecraft()}
      */
-    @Nullable
+    @Nonnull
+    @Deprecated
     public static Class<?> getNMSClass(@Nonnull String name) {
-        try {
-            return Class.forName(NMS_PACKAGE + name);
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+        return getNMSClass(null, name);
     }
+
 
     /**
      * Sends a packet to the player asynchronously if they're online.
@@ -354,56 +360,39 @@ public final class ReflectionUtils {
      * @since 2.0.0
      */
     public static void sendPacketSync(@Nonnull Player player, @Nonnull Object... packets) {
-        try {
-            Object handle = GET_HANDLE.invoke(player);
-            Object connection = PLAYER_CONNECTION.invoke(handle);
-
-            // Checking if the connection is not null is enough. There is no need to check if the player is online.
-            if (connection != null) {
-                for (Object packet : packets) SEND_PACKET.invoke(connection, packet);
-            }
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(ManticLib.get(), () -> sendPacketSync(player, packets));
+            return;
         }
+        MinecraftConnection.sendPacket(player, packets);
     }
 
     @Nullable
     public static Object getHandle(@Nonnull Player player) {
-        Objects.requireNonNull(player, "Cannot get handle of null player");
-        try {
-            return GET_HANDLE.invoke(player);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
+        return MinecraftConnection.getHandle(player);
     }
 
     @Nullable
     public static Object getConnection(@Nonnull Player player) {
-        Objects.requireNonNull(player, "Cannot get connection of null player");
-        try {
-            Object handle = GET_HANDLE.invoke(player);
-            return PLAYER_CONNECTION.invoke(handle);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
+        return MinecraftConnection.getConnection(player);
     }
+
 
     /**
      * Get a CraftBukkit (org.bukkit.craftbukkit) class.
      *
      * @param name the name of the class to load.
      * @return the CraftBukkit class or null if not found.
-     * @since 1.0.0
+     * @throws RuntimeException if the class could not be found.
+     * @deprecated use {@link #ofMinecraft()} instead.
      */
-    @Nullable
+    @Nonnull
+    @Deprecated
     public static Class<?> getCraftClass(@Nonnull String name) {
         try {
-            return Class.forName(CRAFTBUKKIT_PACKAGE + name);
+            return Class.forName(CRAFTBUKKIT_PACKAGE + '.' + name);
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            return null;
+            throw new RuntimeException(ex);
         }
     }
 
@@ -417,14 +406,17 @@ public final class ReflectionUtils {
         }
     }
 
+
+
+    @Nonnull
     public static Class<?> toArrayClass(Class<?> clazz) {
         try {
             return Class.forName("[L" + clazz.getName() + ';');
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            return null;
+            throw new RuntimeException("Cannot find array class for class: " + clazz, ex);
         }
     }
+
 
     public static final class VersionHandler<T> {
         private int version;
@@ -503,6 +495,19 @@ public final class ReflectionUtils {
     public static boolean isAbove(int version) {
         return version > MINOR_NUMBER;
     }
+
+    public static MinecraftClassHandle ofMinecraft() {
+        return new MinecraftClassHandle();
+    }
+
+    public static DynamicClassHandle classHandle() {
+        return new DynamicClassHandle();
+    }
+
+    public static StaticClassHandle of(Class<?> clazz) {
+        return new StaticClassHandle(clazz);
+    }
+
 
     public static Field getField(Class<?> clazz, String name) {
         if (clazz == null) throw new NullPointerException("clazz");
@@ -673,7 +678,7 @@ public final class ReflectionUtils {
             }
         }
 
-        Optional<Method> getPing = ReflectionUtils.findMethod(ReflectionUtils.entityPlayer, "getPing");
+        Optional<Method> getPing = ReflectionUtils.findMethod(MinecraftConnection.ServerPlayer.reflect(), "getPing");
         if (getPing.isPresent()) {
             return (int) getPing.get().invoke(p);
         }

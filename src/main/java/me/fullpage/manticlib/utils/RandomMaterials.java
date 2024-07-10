@@ -52,7 +52,7 @@ public class RandomMaterials {
                 if (!canSpawn(material)) {
                     continue;
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
 
@@ -71,12 +71,18 @@ public class RandomMaterials {
     }
 
     private static boolean canSpawn(Material material) {
+        if (material == null) {
+            return false;
+        }
+        if (ReflectionUtils.supports(21)) {
+            return true;
+        }
         try {
             Bukkit.getServer().getUnsafe().modifyItemStack(new ItemStack(material), "{}");
             return true;
-        } catch (final NoSuchMethodError nsme) {
+        } catch (NoSuchMethodError nsme) {
             return true;
-        } catch (final Throwable npe) {
+        } catch (Throwable npe) {
             return false;
         }
     }

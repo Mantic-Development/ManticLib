@@ -2,6 +2,7 @@ package me.fullpage.manticlib;
 
 import lombok.Getter;
 import me.fullpage.manticlib.bstats.Metrics;
+import me.fullpage.manticlib.builders.ItemBuilder;
 import me.fullpage.manticlib.command.ManticCommand;
 import me.fullpage.manticlib.command.impl.ManticLibCmd;
 import me.fullpage.manticlib.data.Config;
@@ -49,7 +50,9 @@ public final class ManticLib extends ManticPlugin {
 
         nmsHandler = NMSLib.init(this);
         try {
-            Enchantment enchantment = GlowEnchant.get();
+            if (!ItemBuilder.hasGlintOverride()) {
+                Enchantment enchantment = GlowEnchant.get();
+            }
         } catch (Throwable e) {
             getLogger().log(Level.SEVERE, "Failed to register glow enchantment", e);
         }

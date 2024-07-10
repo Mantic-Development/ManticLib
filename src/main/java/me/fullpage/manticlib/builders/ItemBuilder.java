@@ -55,6 +55,10 @@ public class ItemBuilder extends ItemStack {
 
     private static Method setEnchantmentGlintOverride = null;
 
+    public static boolean hasGlintOverride() {
+        return setEnchantmentGlintOverride != null;
+    }
+
     static {
         try {
             setEnchantmentGlintOverride = ItemMeta.class.getDeclaredMethod("setEnchantmentGlintOverride", Boolean.class);

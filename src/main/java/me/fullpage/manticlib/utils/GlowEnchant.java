@@ -1,6 +1,7 @@
 package me.fullpage.manticlib.utils;
 
 import me.fullpage.manticlib.ManticLib;
+import me.fullpage.manticlib.builders.ItemBuilder;
 import me.fullpage.nmslib.EnchantInfo;
 import me.fullpage.nmslib.plugin.NMSLib;
 import org.bukkit.enchantments.Enchantment;
@@ -17,6 +18,9 @@ public final class GlowEnchant extends EnchantInfo {
     }
 
     public static Enchantment get() {
+        if (ItemBuilder.hasGlintOverride()) {
+            throw new IllegalStateException("Use ItemBuilder#glow() instead of this method.");
+        }
         if (glow != null) return glow;
         if (i == null) new GlowEnchant();
 
