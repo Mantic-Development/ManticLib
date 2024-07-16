@@ -1,8 +1,10 @@
 package me.fullpage.manticlib.utils.despical.jvm.classes;
 
+import me.fullpage.manticlib.utils.ReflectionUtils;
 import me.fullpage.manticlib.utils.despical.Handle;
 import me.fullpage.manticlib.utils.despical.jvm.ConstructorMemberHandle;
 import me.fullpage.manticlib.utils.despical.jvm.FieldMemberHandle;
+import me.fullpage.manticlib.utils.despical.jvm.FieldMemberHandleJava8;
 import me.fullpage.manticlib.utils.despical.jvm.MethodMemberHandle;
 
 /**
@@ -41,6 +43,9 @@ public abstract class ClassHandle implements Handle<Class<?>> {
 	}
 
 	public FieldMemberHandle field() {
+		if (ReflectionUtils.VER < 9) {
+			return new FieldMemberHandleJava8(this);
+		}
 		return new FieldMemberHandle(this);
 	}
 

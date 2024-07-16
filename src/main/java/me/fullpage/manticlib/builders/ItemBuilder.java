@@ -425,4 +425,31 @@ public class ItemBuilder extends ItemStack {
         return this;
     }
 
+    public ItemBuilder unbreakable(boolean unbreakable) {
+        ItemMeta meta = getItemMeta();
+        meta.setUnbreakable(unbreakable);
+        ItemMeta itemMeta = getItemMeta();
+
+        if (ReflectionUtils.supports(9)) {
+            itemMeta.setUnbreakable(unbreakable);
+        } else {
+            try {
+                Method instanceMethod = itemMeta.getClass().getMethod("spigot");
+                instanceMethod.setAccessible(true);
+
+                Object instance = instanceMethod.invoke(itemMeta);
+                Method unbreakableMethod = instance.getClass().getMethod("setUnbreakable", boolean.class);
+                unbreakableMethod.setAccessible(true);
+                unbreakableMethod.invoke(instance, unbreakable);
+            } catch (Throwable exception) {
+                exception.printStackTrace();
+            }
+        }
+
+        setItemMeta(meta);
+        setItemMeta(itemMeta);
+        return this;
+    }
+
+
 }

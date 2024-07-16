@@ -2,6 +2,7 @@ package me.fullpage.manticlib.utils;
 
 import lombok.SneakyThrows;
 import me.fullpage.manticlib.ManticLib;
+import me.fullpage.manticlib.utils.despical.VersionHandle;
 import me.fullpage.manticlib.utils.despical.jvm.classes.DynamicClassHandle;
 import me.fullpage.manticlib.utils.despical.jvm.classes.StaticClassHandle;
 import me.fullpage.manticlib.utils.despical.minecraft.MinecraftClassHandle;
@@ -127,7 +128,7 @@ public final class ReflectionUtils {
                 String patch = bukkitVer.group("patch");
                 MAJOR_NUMBER = Integer.parseInt(bukkitVer.group("major"));
                 MINOR_NUMBER = Integer.parseInt(bukkitVer.group("minor"));
-                VER= MINOR_NUMBER;
+                VER = MINOR_NUMBER;
                 PATCH_NUMBER = Integer.parseInt((patch == null || patch.isEmpty()) ? "0" : patch);
             } catch (Throwable ex) {
                 throw new RuntimeException("Failed to parse minor number: " + bukkitVer + ' ' + getVersionInformation(), ex);
@@ -226,26 +227,29 @@ public final class ReflectionUtils {
     }
 
     /**
-     * This method is purely for readability.
-     * No performance is gained.
+     * Gives the {@code handle} object if the server version is equal or greater than the given version.
+     * This method is purely for readability and should be always used with {@link VersionHandle#orElse(Object)}.
      *
-     * @since 5.0.0
+     * @see #v(int, int, Object)
+     * @see VersionHandle#orElse(Object)
      */
-    public static <T> VersionHandler<T> v(int version, T handle) {
-        return new VersionHandler<>(version, handle);
+    public static <T> VersionHandle<T> v(int version, T handle) {
+        return new VersionHandle<>(version, handle);
     }
 
     /**
      * Overload for {@link #v(int, T)} that supports patch versions
-     *
-     * @since 9.5.0
      */
-    public static <T> VersionHandler<T> v(int version, int patch, T handle) {
-        return new VersionHandler<>(version, patch, handle);
+    public static <T> VersionHandle<T> v(int version, int patch, T handle) {
+        return new VersionHandle<>(version, patch, handle);
     }
 
-    public static <T> CallableVersionHandler<T> v(int version, Callable<T> handle) {
-        return new CallableVersionHandler<>(version, handle);
+    public static <T> VersionHandle<T> v(int version, Callable<T> handle) {
+        return new VersionHandle<>(version, handle);
+    }
+
+    public static <T> VersionHandle<T> v(int version, int patch, Callable<T> handle) {
+        return new VersionHandle<>(version, patch, handle);
     }
 
     /**
@@ -254,7 +258,6 @@ public final class ReflectionUtils {
      * @param minorNumber the version to compare the server version with.
      * @return true if the version is equal or newer, otherwise false.
      * @see #MINOR_NUMBER
-     * @since 4.0.0
      */
     public static boolean supports(int minorNumber) {
         return MINOR_NUMBER >= minorNumber;
@@ -276,10 +279,9 @@ public final class ReflectionUtils {
      * @return true if the version is equal or newer, otherwise false.
      * @see #MINOR_NUMBER
      * @see #PATCH_NUMBER
-     * @since 7.1.0
      */
     public static boolean supports(int minorNumber, int patchNumber) {
-        return MINOR_NUMBER == minorNumber ? supportsPatch(patchNumber) : supports(minorNumber);
+        return MINOR_NUMBER == minorNumber ? PATCH_NUMBER >= patchNumber : supports(minorNumber);
     }
 
     /**
@@ -288,11 +290,13 @@ public final class ReflectionUtils {
      * @param patchNumber the version to compare the server version with.
      * @return true if the version is equal or newer, otherwise false.
      * @see #PATCH_NUMBER
-     * @since 7.0.0
+     * @deprecated use {@link #supports(int, int)}
      */
+    @Deprecated
     public static boolean supportsPatch(int patchNumber) {
         return PATCH_NUMBER >= patchNumber;
     }
+
 
     /**
      * Get a NMS (net.minecraft.server) class which accepts a package for 1.17 compatibility.
@@ -301,8 +305,8 @@ public final class ReflectionUtils {
      * @param name        the name of the class.
      * @return the NMS class or null if not found.
      * @throws RuntimeException if the class could not be found.
-     * @deprecated use {@link #ofMinecraft()} instead.
      * @see #getNMSClass(String)
+     * @deprecated use {@link #ofMinecraft()} instead.
      */
     @Nonnull
     @Deprecated
@@ -407,82 +411,12 @@ public final class ReflectionUtils {
     }
 
 
-
     @Nonnull
     public static Class<?> toArrayClass(Class<?> clazz) {
         try {
             return Class.forName("[L" + clazz.getName() + ';');
         } catch (ClassNotFoundException ex) {
             throw new RuntimeException("Cannot find array class for class: " + clazz, ex);
-        }
-    }
-
-
-    public static final class VersionHandler<T> {
-        private int version;
-        private int patch;
-        private T handle;
-
-        private VersionHandler(int version, T handle) {
-            this(version, 0, handle);
-        }
-
-        private VersionHandler(int version, int patch, T handle) {
-            if (supports(version) && supportsPatch(patch)) {
-                this.version = version;
-                this.patch = patch;
-                this.handle = handle;
-            }
-        }
-
-        public VersionHandler<T> v(int version, T handle) {
-            return v(version, 0, handle);
-        }
-
-        public VersionHandler<T> v(int version, int patch, T handle) {
-            if (version == this.version && patch == this.patch)
-                throw new IllegalArgumentException("Cannot have duplicate version handles for version: " + version + '.' + patch);
-            if (version > this.version && supports(version) && patch >= this.patch && supportsPatch(patch)) {
-                this.version = version;
-                this.patch = patch;
-                this.handle = handle;
-            }
-            return this;
-        }
-
-        public T orElse(T handle) {
-            return this.version == 0 ? handle : this.handle;
-        }
-    }
-
-    public static final class CallableVersionHandler<T> {
-        private int version;
-        private Callable<T> handle;
-
-        private CallableVersionHandler(int version, Callable<T> handle) {
-            if (supports(version)) {
-                this.version = version;
-                this.handle = handle;
-            }
-        }
-
-        public CallableVersionHandler<T> v(int version, Callable<T> handle) {
-            if (version == this.version)
-                throw new IllegalArgumentException("Cannot have duplicate version handles for version: " + version);
-            if (version > this.version && supports(version)) {
-                this.version = version;
-                this.handle = handle;
-            }
-            return this;
-        }
-
-        public T orElse(Callable<T> handle) {
-            try {
-                return (this.version == 0 ? handle : this.handle).call();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
         }
     }
 
@@ -672,7 +606,7 @@ public final class ReflectionUtils {
 
         Object handle = ReflectionUtils.getHandle(p);
         if (handle != null) {
-             Optional<Field> ping = ReflectionUtils.findField(handle.getClass(), "ping");
+            Optional<Field> ping = ReflectionUtils.findField(handle.getClass(), "ping");
             if (ping.isPresent()) {
                 return ping.get().getInt(handle);
             }
