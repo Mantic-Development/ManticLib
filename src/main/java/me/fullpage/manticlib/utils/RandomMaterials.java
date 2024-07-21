@@ -18,9 +18,7 @@ public class RandomMaterials {
         Optional<Method> isSolid = ReflectionUtils.findMethod(Material.class, "isSolid");
         Optional<Method> isItem = ReflectionUtils.findMethod(Material.class, "isItem");
         Optional<Method> isTransparent = ReflectionUtils.findMethod(Material.class, "isTransparent");
-        Optional<Method> isInteractable = ReflectionUtils.findMethod(Material.class, "isInteractable");
         boolean stoneBricks = false;
-        System.out.println("Starting");
         for (Material material : Material.values()) {
             if (material == null || material.name().contains("AIR") || material.name().startsWith("LEGACY_")) {
                 continue;
@@ -37,10 +35,6 @@ public class RandomMaterials {
                 if (isTransparent.isPresent() && isTransparent.get().invoke(material) == Boolean.TRUE) {
                     continue;
                 }
-
-               /* if (isInteractable.isPresent() && isInteractable.get().invoke(material) == Boolean.FALSE) {
-                    continue;
-                }*/
 
                 if (isSolid.isPresent() && isSolid.get().invoke(material) == Boolean.FALSE) {
                     continue;
