@@ -69,7 +69,7 @@ public class RandomMaterials {
         if (material == null) {
             return false;
         }
-        if (ReflectionUtils.supports(21)) {
+        if (ReflectionUtils.supports(20, 6)) {
             return true;
         }
         try {

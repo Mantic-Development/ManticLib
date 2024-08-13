@@ -1,6 +1,7 @@
 package me.fullpage.manticlib.wrappers;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -8,6 +9,7 @@ import org.bukkit.Location;
 import java.util.Objects;
 
 @AllArgsConstructor
+@Getter
 public class SimpleChunk {
 
     private final String worldName;
