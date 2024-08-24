@@ -304,6 +304,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         this.unregister(simpleCommandMap);
         Map<String, Command> knownCommands = getSimpleCommandMapDotKnownCommands(simpleCommandMap);
         Iterator<Map.Entry<String, Command>> iter = knownCommands.entrySet().iterator();
+        HashMap<String, Command> toRemove = new HashMap<>();
         while (iter.hasNext()) {
             Map.Entry<String, Command> entry = iter.next();
             Command command = entry.getValue();
@@ -318,7 +319,11 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
             }
 
             command.unregister(simpleCommandMap);
-            iter.remove();
+            toRemove.put(entry.getKey(), command);
+        }
+
+        for (Map.Entry<String, Command> entry : toRemove.entrySet()) {
+            knownCommands.remove(entry.getKey(), entry.getValue());
         }
 
     }

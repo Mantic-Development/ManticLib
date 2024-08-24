@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.tr7zw:item-nbt-api:2.13.1") // Check if on latest
+    implementation("de.tr7zw:item-nbt-api:2.13.2") // Check if on latest
     implementation(files("lib/NMSLib_Plugin.jar"))
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     // cannot compile on 1.21 + or inventory issues will occur... but will still work on 1.21+
