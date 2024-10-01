@@ -262,10 +262,10 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
 
     protected boolean hasPermission(CommandSender sender, String permission, boolean sendMessage, String message) {
         if (sender.hasPermission(permission)) {
-            if (sendMessage) {
-                sendMessage(sender, message);
-            }
             return true;
+        }
+        if (sendMessage) {
+            sendMessage(sender, message);
         }
         return false;
     }
