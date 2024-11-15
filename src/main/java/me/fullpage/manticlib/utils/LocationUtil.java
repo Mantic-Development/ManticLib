@@ -33,7 +33,7 @@ public class LocationUtil {
         return loc;
     }
 
-    public boolean inRegion(Location playerLoc, Location point1, Location point2) {
+    public static boolean inRegion(Location playerLoc, Location point1, Location point2) {
         if (playerLoc == null || point1 == null  || point2 == null) {
             return false;
         }

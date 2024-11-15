@@ -1,5 +1,6 @@
 package me.fullpage.manticlib.command.impl;
 
+import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.builders.Page;
@@ -60,10 +61,15 @@ public class ManticLibCmd extends ManticCommand {
             if (isConsole()) {
                 return;
             }
-            this.sendMessage("&7--- &nNBT INFO&r&7 ---" );
+            this.sendMessage("&7--- &nNBT INFO&r&7 ---");
             try {
                 NBTItem nbtItem = new NBTItem(player.getItemInHand());
-                sender.sendMessage("§7NBT: §r" + nbtItem.toString());
+                String string = nbtItem.toString();
+                if (string.isEmpty() || string.equals("{}")) {
+                    sender.sendMessage("§7NBT: §r" + NBT.itemStackToNBT(player.getItemInHand()).toString());
+                } else {
+                    sender.sendMessage("§7NBT: §r" + string);
+                }
             } catch (Throwable e) {
                 this.sendMessage("&4Error: &c" + e.getMessage());
             }
@@ -75,7 +81,7 @@ public class ManticLibCmd extends ManticCommand {
 
             Block targetBlock = player.getTargetBlock(null, 16);
             Material material = targetBlock.getType();
-            this.sendMessage("&7--- &nLooking At&r&7 ---" );
+            this.sendMessage("&7--- &nLooking At&r&7 ---");
             this.sendMessage("&7Material: &r" + material.name());
 
             try {
