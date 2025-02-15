@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.tr7zw:item-nbt-api:2.13.2") // Check if on latest
+    implementation("de.tr7zw:item-nbt-api:2.14.1") // Check if on latest https://github.com/tr7zw/Item-NBT-API
     implementation(files("lib/NMSLib_Plugin.jar"))
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     // cannot compile on 1.21 + or inventory issues will occur... but will still work on 1.21+
@@ -52,7 +52,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.48.3"
+version = "1.0.48.4"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
