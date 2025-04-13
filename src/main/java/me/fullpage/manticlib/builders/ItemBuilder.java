@@ -1,5 +1,7 @@
 package me.fullpage.manticlib.builders;
 
+import com.cryptomorin.xseries.XAttribute;
+import com.google.common.collect.Multimap;
 import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.gui.GuiItem;
 import me.fullpage.manticlib.string.ManticString;
@@ -10,6 +12,8 @@ import me.fullpage.manticlib.utils.SkullUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +32,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -425,6 +430,12 @@ public class ItemBuilder extends ItemStack {
         return this;
     }
 
+    public ItemBuilder addAttribute(Attribute attribute, AttributeModifier attributeModifier) {
+        ItemMeta meta = getItemMeta();
+        meta.addAttributeModifier(attribute, attributeModifier);
+        setItemMeta(meta);
+        return this;
+    }
     public ItemBuilder unbreakable(boolean unbreakable) {
         ItemMeta meta = getItemMeta();
         meta.setUnbreakable(unbreakable);

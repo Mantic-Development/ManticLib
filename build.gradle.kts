@@ -6,6 +6,7 @@ plugins {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven {
         url = uri("https://oss.sonatype.org/content/groups/public/")
     }
@@ -49,10 +50,11 @@ dependencies {
     annotationProcessor("org.jetbrains:annotations:20.1.0")
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
+    implementation("com.github.cryptomorin:XSeries:13.2.0")
 }
 
 group = "me.fullpage"
-version = "1.0.49.0"
+version = "1.0.49.1"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -78,6 +80,7 @@ tasks.shadowJar {
     relocate("me.fullpage.nmslib", "me.fullpage.manticlib.nmslib")
     relocate("de.tr7zw.annotations", "me.fullpage.manticlib.nbtapi.annotations")
     relocate("de.tr7zw.changeme.nbtapi", "me.fullpage.manticlib.nbtapi")
+    relocate("com.github.cryptomorin", "me.fullpage.manticlib.cryptomorin")
 }
 
 //tasks.withType<Jar> {
