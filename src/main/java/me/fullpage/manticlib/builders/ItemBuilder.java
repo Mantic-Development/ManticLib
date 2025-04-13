@@ -1,7 +1,5 @@
 package me.fullpage.manticlib.builders;
 
-import com.cryptomorin.xseries.XAttribute;
-import com.google.common.collect.Multimap;
 import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.gui.GuiItem;
 import me.fullpage.manticlib.string.ManticString;
@@ -32,7 +30,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -436,6 +433,7 @@ public class ItemBuilder extends ItemStack {
         setItemMeta(meta);
         return this;
     }
+
     public ItemBuilder unbreakable(boolean unbreakable) {
         ItemMeta meta = getItemMeta();
         meta.setUnbreakable(unbreakable);

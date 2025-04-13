@@ -80,7 +80,7 @@ tasks.shadowJar {
     relocate("me.fullpage.nmslib", "me.fullpage.manticlib.nmslib")
     relocate("de.tr7zw.annotations", "me.fullpage.manticlib.nbtapi.annotations")
     relocate("de.tr7zw.changeme.nbtapi", "me.fullpage.manticlib.nbtapi")
-    relocate("com.github.cryptomorin", "me.fullpage.manticlib.cryptomorin")
+    relocate("com.cryptomorin", "me.fullpage.manticlib.cryptomorin")
 }
 
 //tasks.withType<Jar> {
