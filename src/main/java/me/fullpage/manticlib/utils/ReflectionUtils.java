@@ -97,6 +97,12 @@ public final class ReflectionUtils {
      */
     public static final int PATCH_NUMBER;
 
+    /**
+     * Mojang moved to {@code year.drop.hotfix} versioning with 26.1 (the release after 1.21.x),
+     * so any major number above 1 is newer than every legacy {@code 1.x} version.
+     */
+    public static final boolean YEAR_BASED_VERSIONING;
+
 
     static {
         /* Old way of doing this.
@@ -130,6 +136,7 @@ public final class ReflectionUtils {
                 MINOR_NUMBER = Integer.parseInt(bukkitVer.group("minor"));
                 VER = MINOR_NUMBER;
                 PATCH_NUMBER = Integer.parseInt((patch == null || patch.isEmpty()) ? "0" : patch);
+                YEAR_BASED_VERSIONING = MAJOR_NUMBER > 1;
             } catch (Throwable ex) {
                 throw new RuntimeException("Failed to parse minor number: " + bukkitVer + ' ' + getVersionInformation(), ex);
             }
@@ -260,15 +267,21 @@ public final class ReflectionUtils {
      * @see #MINOR_NUMBER
      */
     public static boolean supports(int minorNumber) {
+        if (YEAR_BASED_VERSIONING) return true; // 26.1+ is newer than any 1.x version.
         return MINOR_NUMBER >= minorNumber;
     }
 
     /**
      * A more friendly version of {@link #supports(int, int)} for people with OCD.
+     * Also accepts year-based versions, e.g. {@code supports(26, 2, 0)} for MC 26.2.
      */
     public static boolean supports(int majorNumber, int minorNumber, int patchNumber) {
-        if (majorNumber != 1) throw new IllegalArgumentException("Invalid major number: " + majorNumber);
-        return supports(minorNumber, patchNumber);
+        if (majorNumber == 1) return supports(minorNumber, patchNumber);
+        if (majorNumber < 1) throw new IllegalArgumentException("Invalid major number: " + majorNumber);
+
+        if (MAJOR_NUMBER != majorNumber) return MAJOR_NUMBER > majorNumber;
+        if (MINOR_NUMBER != minorNumber) return MINOR_NUMBER > minorNumber;
+        return PATCH_NUMBER >= patchNumber;
     }
 
     /**
@@ -281,6 +294,7 @@ public final class ReflectionUtils {
      * @see #PATCH_NUMBER
      */
     public static boolean supports(int minorNumber, int patchNumber) {
+        if (YEAR_BASED_VERSIONING) return true; // 26.1+ is newer than any 1.x version.
         return MINOR_NUMBER == minorNumber ? PATCH_NUMBER >= patchNumber : supports(minorNumber);
     }
 

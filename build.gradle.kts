@@ -1,6 +1,6 @@
 plugins {
     java
-    id("io.github.goooler.shadow") version "8.1.7"
+    id("com.gradleup.shadow") version "8.3.9"
     `maven-publish`
 }
 
@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.tr7zw:item-nbt-api:2.15.7") // Check if on latest https://github.com/tr7zw/Item-NBT-API
+    implementation("de.tr7zw:item-nbt-api:2.15.8-SNAPSHOT")
     implementation(files("lib/NMSLib_Plugin.jar"))
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     // cannot compile on 1.21 + or inventory issues will occur... but will still work on 1.21+
@@ -50,7 +50,7 @@ dependencies {
     annotationProcessor("org.jetbrains:annotations:20.1.0")
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
-    implementation("com.github.cryptomorin:XSeries:13.2.0")
+    implementation("com.github.cryptomorin:XSeries:13.7.1")
 }
 
 group = "me.fullpage"
