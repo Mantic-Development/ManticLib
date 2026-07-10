@@ -126,5 +126,19 @@ public class Txt {
         return join(separator, parse(strings));
     }
 
+    public static String capitalise(String str, char... delimiters) {
+        if (isNullOrEmpty(str)) {
+            return str;
+        }
+        return ManticString.of(str).capitalise(delimiters).toString();
+    }
+
+    public static String capitaliseFully(String str, char... delimiters) {
+        if (isNullOrEmpty(str)) {
+            return str;
+        }
+        return ManticString.of(str).capitaliseFully(delimiters).toString();
+    }
+
 
 }
