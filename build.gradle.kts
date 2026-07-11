@@ -39,7 +39,7 @@ dependencies {
     implementation(files("lib/NMSLib_Plugin.jar"))
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     // cannot compile on 1.21 + or inventory issues will occur... but will still work on 1.21+
-    compileOnly("org.spigotmc:spigot-api:26.2-R0.1-SNAPSHOT") // 1.8.8-R0.1-SNAPSHOT 1.19.4-R0.1-SNAPSHOT 1.20.1-R0.1-SNAPSHOT 1.21-R0.1-SNAPSHOT 1.20.1-R0.1-SNAPSHOT
+    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT") // 1.8.8-R0.1-SNAPSHOT 1.19.4-R0.1-SNAPSHOT 1.20.1-R0.1-SNAPSHOT 1.21-R0.1-SNAPSHOT 1.20.1-R0.1-SNAPSHOT
     compileOnly(files("lib/InfiniteKothAPI-1.0.jar"))
     compileOnly(files("lib/ManticHoes-2.0.5-strippedforapi.jar"))
     compileOnly(files("lib/ManticSwords-stripped.jar"))
@@ -54,7 +54,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.51.0"
+version = "1.0.51.1"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
