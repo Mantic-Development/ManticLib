@@ -143,7 +143,7 @@ public class Versionator {
                             if (current > oldVersion) {
                                 plugin.getLogger().info("Deleting old file " + f.getName());
                                 try {
-                                    f.delete();
+                                    f.deleteOnExit();
                                 } catch (Throwable e) {
                                     e.printStackTrace();
                                 }
@@ -152,7 +152,7 @@ public class Versionator {
                     } else if (lowerCase.endsWith(".old")) {
                         plugin.getLogger().info("Deleting old file " + f.getName());
                         try {
-                            f.delete();
+                            f.deleteOnExit();
                         } catch (Throwable e) {
                             e.printStackTrace();
                         }
