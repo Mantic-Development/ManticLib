@@ -6,6 +6,8 @@ import me.fullpage.manticlib.interfaces.Permission;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.Collection;
+
 @Getter
 public class TabCompleteElement {
 
@@ -20,6 +22,16 @@ public class TabCompleteElement {
     public TabCompleteElement(int index, String... results) {
         this.index = index;
         this.results = results;
+        this.permission = null;
+        this.conditions = new Condition[0];
+    }
+
+    public TabCompleteElement(int index, Collection<String> results) {
+        this.index = index;
+        this.results = new String[results.size()];
+        for (String result : results) {
+            this.results[index++] = result;
+        }
         this.permission = null;
         this.conditions = new Condition[0];
     }
