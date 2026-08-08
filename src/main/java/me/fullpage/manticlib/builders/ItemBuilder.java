@@ -408,12 +408,18 @@ public class ItemBuilder extends ItemStack {
 
         if (SET_CUSTOM_MODEL_DATA == null) {
             try {
-                SET_CUSTOM_MODEL_DATA = ItemMeta.class.getMethod("setCustomModelData", Integer.class);
-                CUSTOM_MODEL_DATA_CHECKED = true;
-            } catch (Exception e) {
-                CUSTOM_MODEL_DATA_CHECKED = true;
-                return this;
+                // 1.20.5+
+                SET_CUSTOM_MODEL_DATA = ItemMeta.class.getMethod("setCustomModelData", int.class);
+            } catch (NoSuchMethodException e) {
+                try {
+                    // 1.14 - 1.20.4
+                    SET_CUSTOM_MODEL_DATA = ItemMeta.class.getMethod("setCustomModelData", Integer.class);
+                } catch (Exception ex) {
+                    CUSTOM_MODEL_DATA_CHECKED = true;
+                    return this;
+                }
             }
+            CUSTOM_MODEL_DATA_CHECKED = true;
         }
 
         ItemMeta meta = getItemMeta();

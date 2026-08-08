@@ -91,6 +91,10 @@ public class ManticLibCmd extends ManticCommand {
             }
 
             return;
+        } else if (args[0].equalsIgnoreCase("reload")) {
+            ManticLib.get().getConfiguration().load();
+            this.sendMessage("&aSuccessfully reloaded ManticLib!");
+            return;
         }
 
         sendUsageMessage();

@@ -8,6 +8,7 @@ import me.fullpage.manticlib.command.impl.ManticLibCmd;
 import me.fullpage.manticlib.data.Config;
 import me.fullpage.manticlib.integrations.*;
 import me.fullpage.manticlib.integrations.manager.Integration;
+import me.fullpage.manticlib.listeners.CommandForwarder;
 import me.fullpage.manticlib.listeners.PlayerMoveListener;
 import me.fullpage.manticlib.listeners.armour.ArmourListener;
 import me.fullpage.manticlib.listeners.armour.DispenserArmorListener;
@@ -90,6 +91,8 @@ public final class ManticLib extends ManticPlugin {
         List<Material> all = RandomMaterials.getAll();// init
 
         ManticCommand.register(new ManticLibCmd());
+
+        getServer().getPluginManager().registerEvents(new CommandForwarder(), this);
 
     }
 
