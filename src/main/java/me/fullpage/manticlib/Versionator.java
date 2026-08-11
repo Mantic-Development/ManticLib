@@ -38,8 +38,11 @@ public class Versionator {
     }
 
     public static void updateToLatest(Plugin plugin) {
+        if (!ManticLib.get().getConfiguration().isAutoUpdate()) {
+            return;
+        }
         Bukkit.getScheduler().runTaskAsynchronously(ManticLib.get(), () -> {
-            final File directory = new File("plugins");
+             File directory = new File("plugins");
             if (directory == null || !directory.isDirectory()) {
                 throw new IllegalArgumentException("Directory is null or not a directory");
             }
@@ -54,7 +57,7 @@ public class Versionator {
             }
 
 
-            final Integer current = convertVersion(plugin.getDescription().getVersion());
+             Integer current = convertVersion(plugin.getDescription().getVersion());
             if (current >= convertVersion(LATEST_VERSION)) {
                 return;
             }
@@ -62,6 +65,18 @@ public class Versionator {
             if (new File(directory, "ManticLib-" + LATEST_VERSION + ".jar").exists()) {
                 return;
             }
+
+            File[] matches = directory.listFiles((d, name) ->
+                    name.startsWith("ManticLib-") && name.endsWith("-legacy.jar")
+            );
+
+            boolean legacyExists = matches != null && matches.length > 0;
+            if (legacyExists) {
+                Bukkit.getLogger().info("Found legacy ManticLib-" + LATEST_VERSION + ".jar");
+                Bukkit.getLogger().info("Skipping auto-update because of legacy version in use.");
+                return;
+            }
+
 
             plugin.getLogger().info("Downloading the latest version " + LATEST_VERSION);
 
