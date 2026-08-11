@@ -34,12 +34,20 @@ repositories {
     maven { url = uri("https://hub.spigotmc.org/nexus/content/groups/public/") }
 }
 
+val legacyImplementation by configurations.creating
+
 dependencies {
+    // full build
     implementation("de.tr7zw:item-nbt-api:2.15.8-SNAPSHOT")
     implementation(files("lib/NMSLib_Plugin.jar"))
+    implementation("com.github.cryptomorin:XSeries:13.7.1")
+
+    // legacy build
+    legacyImplementation("de.tr7zw:item-nbt-api:2.15.8-SNAPSHOT")
+    legacyImplementation(files("lib/NMSLib_Plugin-1.0-legacy.jar"))
+    legacyImplementation("com.github.cryptomorin:XSeries:13.7.1")
+
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
-    // cannot compile on 1.21 + or inventory issues will occur... but will still work on 1.21+
-    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT") // 1.8.8-R0.1-SNAPSHOT 1.19.4-R0.1-SNAPSHOT 1.20.1-R0.1-SNAPSHOT 1.21-R0.1-SNAPSHOT 1.20.1-R0.1-SNAPSHOT
     compileOnly(files("lib/InfiniteKothAPI-1.0.jar"))
     compileOnly(files("lib/ManticHoes-2.0.5-strippedforapi.jar"))
     compileOnly(files("lib/ManticSwords-stripped.jar"))
@@ -50,7 +58,7 @@ dependencies {
     annotationProcessor("org.jetbrains:annotations:20.1.0")
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
-    implementation("com.github.cryptomorin:XSeries:13.7.1")
+    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
 }
 
 group = "me.fullpage"
@@ -95,8 +103,20 @@ tasks.compileJava {
     options.encoding = "UTF-8"
 }
 
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("legacyShadowJar") {
+    group = "shadow"
+    archiveFileName.set("${project.description}-$version-legacy.jar")
+    from(sourceSets.main.get().output)
+    configurations = listOf(legacyImplementation)
+
+    relocate("me.fullpage.nmslib", "me.fullpage.manticlib.nmslib")
+    relocate("de.tr7zw.annotations", "me.fullpage.manticlib.nbtapi.annotations")
+    relocate("de.tr7zw.changeme.nbtapi", "me.fullpage.manticlib.nbtapi")
+    relocate("com.cryptomorin", "me.fullpage.manticlib.cryptomorin")
+}
+
 tasks.build {
-    dependsOn("shadowJar")
+    dependsOn("shadowJar", "legacyShadowJar")
 }
 
 artifacts {
