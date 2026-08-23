@@ -66,7 +66,7 @@ public class ManticString {
     }
 
     public String colourise(char c) {
-        return ReflectionUtils.VER > 15 ? this.translateHexColorCodes(string) : ChatColor.translateAlternateColorCodes(c, string);
+        return ReflectionUtils.supports(16) ? this.translateHexColorCodes(string) : ChatColor.translateAlternateColorCodes(c, string);
     }
 
     public String translateHexColorCodes(String message) {
@@ -97,7 +97,7 @@ public class ManticString {
         }
         legacyMatcher.appendTail(legacyBuilder);
 
-        if (ReflectionUtils.VER > 15) {
+        if (ReflectionUtils.supports(16)) {
             StringBuffer rgbBuilder = new StringBuffer();
             Matcher rgbMatcher = REPLACE_ALL_RGB_PATTERN.matcher(legacyBuilder.toString());
             while (rgbMatcher.find()) {
@@ -122,7 +122,7 @@ public class ManticString {
      * @throws NumberFormatException If the provided hex color code is invalid or if version is lower than 1.16.
      */
     private static String parseHexColor(String hexColor) throws NumberFormatException {
-        if (ReflectionUtils.VER < 16) throw new NumberFormatException("Version is lower than 1.16");
+        if (!ReflectionUtils.supports(16)) throw new NumberFormatException("Version is lower than 1.16");
         if (hexColor.startsWith("#")) {
             hexColor = hexColor.substring(1);
         }

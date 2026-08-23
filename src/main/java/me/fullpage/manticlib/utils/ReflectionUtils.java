@@ -161,9 +161,11 @@ public final class ReflectionUtils {
     }
 
     /**
-     * Gets the latest known patch number of the given minor version.
+     * Gets the latest known patch number of the given legacy {@code 1.x} minor version.
      * For example: 1.14 -> 4, 1.17 -> 10
      * The latest version is expected to get newer patches, so make sure to account for unexpected results.
+     * <p>
+     * For year-based versions (26.1, 26.2, ...) use {@link #getLatestPatchNumberOf(int, int)} instead.
      *
      * @param minorVersion the minor version to get the patch number of.
      * @return the patch number of the given minor version if recognized, otherwise null.
@@ -200,6 +202,40 @@ public final class ReflectionUtils {
         if (minorVersion > patches.length) return null;
         return patches[minorVersion - 1];
     }
+
+    /**
+     * Gets the latest known patch (hotfix) number of the given version, supporting both the legacy
+     * {@code 1.x} scheme and Mojang's new {@code year.drop.hotfix} scheme introduced with 26.1.
+     * <p>
+     * Examples: {@code (1, 20) -> 6}, {@code (26, 1) -> 2} (26.1.2), {@code (26, 2) -> 0} (no hotfix yet).
+     *
+     * @param majorVersion the major version (1 for legacy releases, 26+ for year-based releases).
+     * @param minorVersion the minor/drop version to get the patch number of.
+     * @return the latest known patch/hotfix number if recognized, otherwise null.
+     * @see #getLatestPatchNumberOf(int)
+     * @since 26.0.0
+     */
+    public static Integer getLatestPatchNumberOf(int majorVersion, int minorVersion) {
+        if (majorVersion == 1) return getLatestPatchNumberOf(minorVersion);
+        if (majorVersion < 1) throw new IllegalArgumentException("Invalid major number: " + majorVersion);
+        if (minorVersion <= 0) throw new IllegalArgumentException("Minor version must be positive: " + minorVersion);
+
+        // https://www.minecraft.net/en-us/article/minecraft-new-version-numbering-system
+        // Year-based drops: 26.1 "Tiny Takeover", 26.2 "Chaos Cubed", 26.3 (in development as of Aug 2026).
+        if (majorVersion == 26) {
+            int[] yearPatches = {
+                    /* 26.1 */ 2, // 26.1.2 (last hotfix)
+                    /* 26.2 */ 0, // no hotfix released yet as of Aug 2026
+            };
+
+            if (minorVersion > yearPatches.length) return null;
+            return yearPatches[minorVersion - 1];
+        }
+
+        // Unknown/future year, not tracked yet.
+        return null;
+    }
+
 
     /**
      * Mojang remapped their NMS in 1.17: <a href="https://www.spigotmc.org/threads/spigot-bungeecord-1-17.510208/#post-4184317">Spigot Thread</a>
@@ -434,15 +470,28 @@ public final class ReflectionUtils {
         }
     }
 
+    /**
+     * @deprecated use {@link #supports(int)} instead. This method does not account for
+     * Mojang's year-based versioning (26.1+) and will always return {@code false} on those servers
+     * since {@link #MINOR_NUMBER} is no longer a legacy {@code 1.x} minor number on those versions.
+     */
     @Deprecated
     public static boolean isOrAbove(int version) {
+        if (YEAR_BASED_VERSIONING) return false; // legacy 1.x check is meaningless on 26.1+
         return version >= MINOR_NUMBER;
     }
 
+    /**
+     * @deprecated use {@link #supports(int)} instead. This method does not account for
+     * Mojang's year-based versioning (26.1+) and will always return {@code false} on those servers
+     * since {@link #MINOR_NUMBER} is no longer a legacy {@code 1.x} minor number on those versions.
+     */
     @Deprecated
     public static boolean isAbove(int version) {
+        if (YEAR_BASED_VERSIONING) return false; // legacy 1.x check is meaningless on 26.1+
         return version > MINOR_NUMBER;
     }
+
 
     public static MinecraftClassHandle ofMinecraft() {
         return new MinecraftClassHandle();
