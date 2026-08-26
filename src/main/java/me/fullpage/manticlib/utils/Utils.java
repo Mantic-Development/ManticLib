@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -237,12 +238,12 @@ public class Utils {
     }
 
 
-    public static void giveItems(Player player, Location dropLocation, Collection<ItemStack> items) {
+    public static void giveItems(Player player,  @Nullable Location dropLocation, Collection<ItemStack> items) {
         giveItems(player, dropLocation, items.toArray(new ItemStack[0]));
     }
 
-    public static void giveItems(Player player, Location dropLocation, ItemStack... items) {
-        if (player == null || items == null || dropLocation == null || items.length == 0) {
+    public static void giveItems(Player player, @Nullable Location dropLocation, ItemStack... items) {
+        if (player == null || items == null|| items.length == 0) {
             return;
         }
 
@@ -285,7 +286,7 @@ public class Utils {
                 }
             }
 
-            if (count > 0) {
+            if (count > 0 && dropLocation != null) {
                 player.getWorld().dropItemNaturally(dropLocation, ItemBuilder.from(drop).amount(count));
             }
 

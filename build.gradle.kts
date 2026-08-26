@@ -38,12 +38,12 @@ val legacyImplementation by configurations.creating
 
 dependencies {
     // full build
-    implementation("de.tr7zw:item-nbt-api:2.15.8-SNAPSHOT")
+    implementation("de.tr7zw:item-nbt-api:2.16.0")
     implementation(files("lib/NMSLib_Plugin.jar"))
     implementation("com.github.cryptomorin:XSeries:13.7.1")
 
     // legacy build
-    legacyImplementation("de.tr7zw:item-nbt-api:2.15.8-SNAPSHOT")
+    legacyImplementation("de.tr7zw:item-nbt-api:2.16.0")
     legacyImplementation(files("lib/NMSLib_Plugin-1.0-legacy.jar"))
     legacyImplementation("com.github.cryptomorin:XSeries:13.7.1")
 
@@ -62,7 +62,7 @@ dependencies {
 }
 
 group = "me.fullpage"
-version = "1.0.51.6"
+version = "1.0.52.0"
 description = "ManticLib"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
