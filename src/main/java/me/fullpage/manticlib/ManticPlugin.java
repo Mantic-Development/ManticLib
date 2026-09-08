@@ -22,6 +22,11 @@ public class ManticPlugin extends JavaPlugin {
     public void onDisable() {
         super.onDisable();
 
+        try {
+            onInnerDisable();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
         HandlerList.unregisterAll(this);
         getServer().getScheduler().cancelTasks(this);
         Set<ManticCommand> toClear = ManticCommand.getCommands(this);
@@ -32,8 +37,6 @@ public class ManticPlugin extends JavaPlugin {
         }
         toClear.forEach(ManticCommand::unregister);
         toClear.clear();
-
-        onInnerDisable();
     }
 
     public void onInnerDisable() {
