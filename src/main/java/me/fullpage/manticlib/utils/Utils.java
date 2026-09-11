@@ -229,23 +229,80 @@ public class Utils {
         return ReflectionUtils.getPing(p);
     }
 
+    /**
+     * @deprecated Use {@link #addItems(Player, Collection)} instead.
+     */
+    @Deprecated
     public static void giveItems(Player player, Collection<ItemStack> items) {
-        giveItems(player, items.toArray(new ItemStack[0]));
+        addItems(player, items);
     }
 
+    /**
+     * @deprecated Use {@link #addItems(Player, ItemStack...)} instead.
+     */
+    @Deprecated
     public static void giveItems(Player player, ItemStack... items) {
-        giveItems(player, player.getLocation().add(0, 0.5, 0), items);
+        addItems(player, items);
     }
 
-
-    public static void giveItems(Player player,  @Nullable Location dropLocation, Collection<ItemStack> items) {
-        giveItems(player, dropLocation, items.toArray(new ItemStack[0]));
+    /**
+     * @deprecated Use {@link #addItems(Player, Location, Collection)} instead.
+     */
+    @Deprecated
+    public static void giveItems(Player player, @Nullable Location dropLocation, Collection<ItemStack> items) {
+        addItems(player, dropLocation, items);
     }
 
+    /**
+     * @deprecated Use {@link #addItems(Player, Location, ItemStack...)} instead.
+     */
+    @Deprecated
     public static void giveItems(Player player, @Nullable Location dropLocation, ItemStack... items) {
-        if (player == null || items == null|| items.length == 0) {
-            return;
+        addItems(player, dropLocation, items);
+    }
+
+    /**
+     * Tries to add all given items to the player's inventory.
+     *
+     * @return true if all items were added to the inventory, false if some items had to be dropped
+     * (i.e. the inventory could not accept them all).
+     */
+    public static boolean addItems(Player player, Collection<ItemStack> items) {
+        return addItems(player, player.getLocation().add(0, 0.5, 0), items.toArray(new ItemStack[0]));
+    }
+
+    /**
+     * Tries to add all given items to the player's inventory.
+     *
+     * @return true if all items were added to the inventory, false if some items had to be dropped
+     * (i.e. the inventory could not accept them all).
+     */
+    public static boolean addItems(Player player, ItemStack... items) {
+        return addItems(player, player.getLocation().add(0, 0.5, 0), items);
+    }
+
+    /**
+     * Tries to add all given items to the player's inventory, dropping leftovers at the given location.
+     *
+     * @return true if all items were added to the inventory, false if some items had to be dropped
+     * (i.e. the inventory could not accept them all).
+     */
+    public static boolean addItems(Player player, @Nullable Location dropLocation, Collection<ItemStack> items) {
+        return addItems(player, dropLocation, items.toArray(new ItemStack[0]));
+    }
+
+    /**
+     * Tries to add all given items to the player's inventory, dropping leftovers at the given location.
+     *
+     * @return true if all items were added to the inventory, false if some items had to be dropped
+     * (i.e. the inventory could not accept them all).
+     */
+    public static boolean addItems(Player player, @Nullable Location dropLocation, ItemStack... items) {
+        if (player == null || items == null || items.length == 0) {
+            return true;
         }
+
+        boolean allAdded = true;
 
         for (ItemStack drop : items) {
             if (drop == null) {
@@ -254,15 +311,16 @@ public class Utils {
 
             int count = drop.getAmount();
             PlayerInventory inventory = player.getInventory();
+
             for (int i = 0; i < inventory.getSize(); i++) {
                 if (count <= 0 || (ReflectionUtils.supports(13) && i >= 36)) { // don't fill armor slots
                     break;
                 }
 
-
                 ItemStack item = inventory.getItem(i);
                 int maxStackSize = item == null ? drop.getMaxStackSize() : item.getMaxStackSize();
                 int toGive = Math.min(maxStackSize, count);
+
                 if (item == null) {
                     inventory.setItem(i, ItemBuilder.from(drop).amount(toGive));
                     count -= toGive;
@@ -286,11 +344,15 @@ public class Utils {
                 }
             }
 
-            if (count > 0 && dropLocation != null) {
-                player.getWorld().dropItemNaturally(dropLocation, ItemBuilder.from(drop).amount(count));
+            if (count > 0) {
+                allAdded = false;
+                if (dropLocation != null) {
+                    player.getWorld().dropItemNaturally(dropLocation, ItemBuilder.from(drop).amount(count));
+                }
             }
-
         }
+
+        return allAdded;
     }
 
     public static void dropItemAt(Location location, ItemStack item) {
