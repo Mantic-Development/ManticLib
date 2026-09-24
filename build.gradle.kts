@@ -38,12 +38,12 @@ val legacyImplementation by configurations.creating
 
 dependencies {
     // full build
-    implementation("de.tr7zw:item-nbt-api:2.16.0")
+    implementation("de.tr7zw:item-nbt-api:2.16.1")
     implementation(files("lib/NMSLib_Plugin.jar"))
     implementation("com.github.cryptomorin:XSeries:13.7.1")
 
     // legacy build
-    legacyImplementation("de.tr7zw:item-nbt-api:2.16.0")
+    legacyImplementation("de.tr7zw:item-nbt-api:2.16.1")
     legacyImplementation(files("lib/NMSLib_Plugin-1.0-legacy.jar"))
     legacyImplementation("com.github.cryptomorin:XSeries:13.7.1")
 
