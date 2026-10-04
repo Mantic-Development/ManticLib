@@ -11,17 +11,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Settings<S extends Settings<S>> implements Registrable, Reloadable {
 
@@ -64,22 +63,33 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
     }
 
     public void save() {
-        if (config == null) {
-            reload();
+        try {
+            saveAsync().join();
+        } catch (CompletionException e) {
+            // The shared writer already logged the destination and cause.
+            if (e.getCause() instanceof RuntimeException) throw (RuntimeException) e.getCause();
         }
-        final File file = config.getFile();
-        if (file.getParentFile() != null && !file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
+    }
 
-        instance = this;
-        apply((S) instance);
+    /**
+     * Captures the data immediately, then queues it for saving. Errors will cause the save to fail.
+     */
+    public CompletableFuture<Void> saveAsync() {
+        Plugin owner = getPlugin();
+        if (config == null) config = JsonConfig.forSaving(getFileString(), owner);
+        File file = config.getFile();
+        return SettingsPersistence.forPlugin(owner).submit(file.toPath(), () -> {
+            instance = this;
+            apply((S) instance);
+            return JsonConfig.GSON.toJson(this);
+        });
+    }
 
-        try (FileWriter writer = new FileWriter(file)) {
-            JsonConfig.GSON.toJson(this, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Finishes pending saves before shutting down. No new saves can be made after shutdown.
+     */
+    public static boolean shutdownSaves(Plugin plugin, long timeout, TimeUnit unit) throws InterruptedException {
+        return SettingsPersistence.forPlugin(plugin).shutdown(timeout, unit);
     }
 
     private void checkOrAdd(final Field[] declaredFields, final JsonObject jsonObject, FileReader reader) {
@@ -102,7 +112,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             }
         }
         if (changed) {
-            this.instance = JsonConfig.GSON.fromJson(reader, this.getClass());
+            this.instance = JsonConfig.GSON.fromJson(jsonObject, this.getClass());
         }
     }
 
@@ -112,56 +122,13 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
             throw new IllegalStateException("config should not be null");
         }
         final JsonObject jsonObject = config.getJsonObject();
-        try (FileReader reader = new FileReader(config.getFile())) {
-            this.instance = JsonConfig.GSON.fromJson(reader, this.getClass());
-            this.checkOrAdd(this.getClass().getDeclaredFields(), jsonObject, reader);
-        } catch (IOException e) {
-            Logger logger = ManticLib.get().getLogger();
-            Plugin providingPlugin = this.getPlugin();
-            logger.log(Level.WARNING, "\033[1;31mCould not load " + providingPlugin.getName() + " settings file: " + this.getFileString(), e);
-            try {
-                Class<?>[] prams = this.getClass().getDeclaredConstructors()[0].getParameterTypes();
-                Constructor<S> constructor = (Constructor<S>) this.getClass().getDeclaredConstructor(prams);
-                constructor.setAccessible(true);
-                Object[] inputPrams = new Object[prams.length];
-                for (int i = 0; i < prams.length; i++) {
-                    Class<?> clazz = prams[i];
-                    if (clazz.isPrimitive()) {
-                        if (clazz.equals(int.class)) {
-                            inputPrams[i] = 0;
-                        } else if (clazz.equals(byte.class)) {
-                            inputPrams[i] = (byte) 0;
-                        } else if (clazz.equals(short.class)) {
-                            inputPrams[i] = (short) 0;
-                        } else if (clazz.equals(long.class)) {
-                            inputPrams[i] = 0L;
-                        } else if (clazz.equals(float.class)) {
-                            inputPrams[i] = 0.0f;
-                        } else if (clazz.equals(double.class)) {
-                            inputPrams[i] = 0.0;
-                        } else if (clazz.equals(boolean.class)) {
-                            inputPrams[i] = false;
-                        } else if (clazz.equals(char.class)) {
-                            inputPrams[i] = ' ';
-                        }
-                    }
-                }
-                instance = constructor.newInstance(inputPrams);
-                final Field[] declaredFields = getClass().getDeclaredFields();
-                for (Field declaredField : declaredFields) {
-                    if (declaredField == null || Modifier.isTransient(declaredField.getModifiers()) || Modifier.isStatic(declaredField.getModifiers()) || Modifier.isFinal(declaredField.getModifiers())) {
-                        continue;
-                    }
-                    declaredField.setAccessible(true);
-                    declaredField.set(this, declaredField.get(instance));
-                }
-            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
-                     IllegalAccessException ex) {
-                ex.printStackTrace();
-            }
+        try {
+            this.instance = JsonConfig.GSON.fromJson(jsonObject, this.getClass());
+            this.checkOrAdd(this.getClass().getDeclaredFields(), jsonObject, null);
         } catch (JsonSyntaxException | NullPointerException e) {
-            e.printStackTrace();
+            getPlugin().getLogger().log(Level.SEVERE, "Could not load settings from " + config.getFile(), e);
             createBackupFile();
+            throw e;
         }
         config.save();
         apply((S) instance);
@@ -217,7 +184,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
         for (int i = 1; ; i++) {
             if (!files.contains(newFileName + i)) {
                 try {
-                    Files.move(file.toPath(), new File(file + ".backup-" + i).toPath());
+                    Files.copy(file.toPath(), new File(file + ".backup-" + i).toPath());
                 } catch (IOException e) {
                     this.getPlugin().getLogger().severe("Unable to create backup file for " + file.getName());
                 }

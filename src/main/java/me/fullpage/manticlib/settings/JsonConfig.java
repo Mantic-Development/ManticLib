@@ -5,6 +5,14 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
+import java.nio.charset.CharacterCodingException;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.CompletionException;
+import java.util.logging.Level;
 
 public final class JsonConfig {
 
@@ -17,6 +25,14 @@ public final class JsonConfig {
 
     private JsonConfig() {
 
+    }
+
+    static JsonConfig forSaving(String name, Plugin plugin) {
+        JsonConfig config = new JsonConfig();
+        config.name = name;
+        config.plugin = plugin;
+        config.jsonObject = new JsonObject();
+        return config;
     }
 
     public JsonConfig(String name, Plugin plugin) {
@@ -38,7 +54,7 @@ public final class JsonConfig {
             }
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = openReader(file, plugin)) {
             StringBuilder builder = new StringBuilder();
             String line;
 
@@ -57,14 +73,36 @@ public final class JsonConfig {
             } else {
                 this.jsonObject = new JsonObject();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | RuntimeException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not load settings from " + file, e);
+            // Create backup of old file
+            try {
+                Path backup = Files.createTempFile(file.toPath().toAbsolutePath().getParent(), file.getName() + ".backup-", ".json");
+                Files.copy(file.toPath(), backup, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException backupError) {
+                e.addSuppressed(backupError);
+            }
+            throw new IllegalStateException("Could not load settings from " + file, e);
         }
     }
 
     public File getFile() {
         if (name == null || name.isEmpty()) return null;
         return new File(plugin.getDataFolder(), this.name);
+    }
+
+    private static BufferedReader openReader(File file, Plugin plugin) throws IOException {
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        String text;
+        try {
+            text = StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(bytes)).toString();
+        } catch (CharacterCodingException e) {
+            Charset legacy = Charset.defaultCharset();
+            if (legacy.equals(StandardCharsets.UTF_8)) throw e;
+            text = legacy.newDecoder().decode(ByteBuffer.wrap(bytes)).toString();
+            plugin.getLogger().warning("Reading legacy " + legacy + " settings from " + file + "; next save uses UTF-8");
+        }
+        return new BufferedReader(new StringReader(text));
     }
 
     public void save() {
@@ -75,10 +113,10 @@ public final class JsonConfig {
 
 
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write(GSON.toJson(this.jsonObject));
-        } catch (IOException e) {
-            e.printStackTrace();
+        try {
+            SettingsPersistence.forPlugin(plugin).submit(file.toPath(), () -> GSON.toJson(this.jsonObject)).join();
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof RuntimeException) throw (RuntimeException) e.getCause();
         }
     }
 

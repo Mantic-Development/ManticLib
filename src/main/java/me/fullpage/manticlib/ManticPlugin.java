@@ -3,6 +3,7 @@ package me.fullpage.manticlib;
 import com.google.common.annotations.Beta;
 import lombok.Getter;
 import me.fullpage.manticlib.command.ManticCommand;
+import me.fullpage.manticlib.settings.Settings;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class ManticPlugin extends JavaPlugin {
@@ -26,6 +28,12 @@ public class ManticPlugin extends JavaPlugin {
             onInnerDisable();
         } catch (Throwable t) {
             t.printStackTrace();
+        }
+        try {
+            Settings.shutdownSaves(this, 10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            getLogger().warning("Interrupted while waiting for settings writes during shutdown");
         }
         HandlerList.unregisterAll(this);
         getServer().getScheduler().cancelTasks(this);
