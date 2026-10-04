@@ -11,8 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     @Getter
@@ -35,7 +33,7 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
         createParentDirectories();
 
         CommentAdder adder = new CommentAdder(
-                yaml.dump(map), config.getComments(), props
+                YamlFieldComments.add(yaml.dump(map), map, yaml), config.getComments(), props
         );
 
         String commentedDump = adder.getCommentedDump();
@@ -67,7 +65,6 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     }
 
     private static final class CommentAdder {
-        private static final Pattern PREFIX_PATTERN = Pattern.compile("^[A-Za-z0-9_-]+:.*");
         private final String dump;
         private final Comments comments;
         private final YamlComments yamlComments;
@@ -87,7 +84,7 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
         public String getCommentedDump() {
             addComments(props.getPrependedComments());
             addClassComments();
-            addFieldComments();
+            builder.append(dump);
             addComments(props.getAppendedComments());
             return builder.toString();
         }
@@ -108,37 +105,5 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
             }
         }
 
-        private void addFieldComments() {
-            if (comments.hasFieldComments()) {
-                List<String> dumpLines = Arrays.asList(dump.split("\n"));
-                addDumpLines(dumpLines);
-            } else {
-                builder.append(dump);
-            }
-        }
-
-        private void addDumpLines(List<String> dumpLines) {
-            for (String dumpLine : dumpLines) {
-                Matcher m = PREFIX_PATTERN.matcher(dumpLine);
-                if (m.matches()) {
-                    addFieldComment(dumpLine);
-                }
-                builder.append(dumpLine).append('\n');
-            }
-        }
-
-        private void addFieldComment(String dumpLine) {
-            Map<String, String> map = yamlComments.fieldCommentAsStrings(
-                    props.getFormatter()
-            );
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                String prefix = entry.getKey() + ":";
-                if (dumpLine.startsWith(prefix)) {
-                    builder.append(entry.getValue()).append('\n');
-                    break;
-                }
-            }
-
-        }
     }
 }

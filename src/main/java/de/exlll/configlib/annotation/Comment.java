@@ -17,8 +17,13 @@ import java.lang.annotation.Target;
  * </li>
  * <li>
  * If this annotation is used on a field, the comments are saved above the field name.
+ * This includes fields of nested {@link ConfigurationElement} objects, including
+ * each occurrence in lists, sets and map values. Custom converters and
+ * {@link NoConvert} values control their own representation; comments inside
+ * those values are not collected automatically.
  * </li>
  * </ul>
+ * Class comments apply only to the root configuration, not nested element classes.
  */
 @Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

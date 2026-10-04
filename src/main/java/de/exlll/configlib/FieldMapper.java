@@ -2,11 +2,12 @@ package de.exlll.configlib;
 
 import de.exlll.configlib.Converter.ConversionInfo;
 import de.exlll.configlib.annotation.Format;
+import de.exlll.configlib.annotation.Comment;
 import de.exlll.configlib.filter.FieldFilter;
 import de.exlll.configlib.format.FieldNameFormatter;
 
 import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.Map;
 
 import static de.exlll.configlib.Validator.*;
@@ -15,7 +16,7 @@ enum FieldMapper {
     ;
 
     static Map<String, Object> instanceToMap(Object inst, MappingInfo mappingInfo) {
-        Map<String, Object> map = new LinkedHashMap<>();
+        CommentedMap map = new CommentedMap();
         Configuration.Properties props = mappingInfo.getProperties();
         FieldFilter filter = props.getFilter();
         for (Field field : filter.filterDeclaredFieldsOf(inst.getClass())) {
@@ -23,6 +24,10 @@ enum FieldMapper {
             FieldNameFormatter fnf = selectFormatter(mappingInfo);
             String fn = fnf.fromFieldName(field.getName());
             map.put(fn, val);
+            Comment comment = field.getAnnotation(Comment.class);
+            if (comment != null) {
+                map.getFieldComments().put(fn, Arrays.asList(comment.value()));
+            }
         }
         return map;
     }
