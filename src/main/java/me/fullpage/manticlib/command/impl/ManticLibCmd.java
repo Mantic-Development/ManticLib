@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.jetbrains.annotations.NotNull;
@@ -79,14 +80,26 @@ public class ManticLibCmd extends ManticCommand {
                 return;
             }
 
-            Block targetBlock = player.getTargetBlock(null, 16);
+            Block targetBlock;
+            try {
+                java.lang.reflect.Method getTargetBlock;
+                try {
+                    getTargetBlock = Player.class.getMethod("getTargetBlock", java.util.Set.class, int.class);
+                } catch (NoSuchMethodException ignored) {
+                    getTargetBlock = Player.class.getMethod("getTargetBlock", java.util.HashSet.class, int.class);
+                }
+                targetBlock = (Block) getTargetBlock.invoke(player, null, 16);
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException("Could not get targeted block", exception);
+            }
             Material material = targetBlock.getType();
             this.sendMessage("&7--- &nLooking At&r&7 ---");
             this.sendMessage("&7Material: &r" + material.name());
 
             try {
                 // send block data if it exists
-                this.sendMessage("&7Block Data: &r" + targetBlock.getBlockData().getAsString());
+                Object blockData = Block.class.getMethod("getBlockData").invoke(targetBlock);
+                this.sendMessage("&7Block Data: &r" + blockData.getClass().getMethod("getAsString").invoke(blockData));
             } catch (Throwable ignored) {
             }
 

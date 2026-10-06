@@ -24,6 +24,9 @@ public abstract class Configuration<C extends Configuration<C>> {
      */
     protected final Comments comments;
     private final Properties props;
+    private final FieldMapper.OptionalDefaults optionalDefaults =
+            new FieldMapper.OptionalDefaults();
+    private boolean optionalDefaultsCaptured;
 
     /**
      * Constructs a new {@code Configuration} object.
@@ -45,11 +48,16 @@ public abstract class Configuration<C extends Configuration<C>> {
      */
     public final void save() {
         try {
-            preSave();
             MappingInfo mappingInfo = MappingInfo.from(this);
+            if (!optionalDefaultsCaptured) {
+                FieldMapper.captureOptionalDefaults(this, mappingInfo);
+                optionalDefaultsCaptured = true;
+            }
+            preSave();
             Map<String, Object> map = FieldMapper
                     .instanceToMap(this, mappingInfo);
             getSource().saveConfiguration(getThis(), map);
+            FieldMapper.retainOptionalDefaults(this, mappingInfo);
         } catch (IOException e) {
             throw new ConfigurationStoreException(e);
         }
@@ -67,8 +75,13 @@ public abstract class Configuration<C extends Configuration<C>> {
         try {
             Map<String, Object> map = getSource().loadConfiguration(getThis());
             MappingInfo mappingInfo = MappingInfo.from(this);
+            if (!optionalDefaultsCaptured) {
+                FieldMapper.captureOptionalDefaults(this, mappingInfo);
+                optionalDefaultsCaptured = true;
+            }
             FieldMapper.instanceFromMap(this, map, mappingInfo);
             postLoad();
+            FieldMapper.retainOptionalDefaults(this, mappingInfo);
         } catch (IOException e) {
             throw new ConfigurationStoreException(e);
         }
@@ -106,6 +119,10 @@ public abstract class Configuration<C extends Configuration<C>> {
 
     Properties getProperties() {
         return props;
+    }
+
+    FieldMapper.OptionalDefaults getOptionalDefaults() {
+        return optionalDefaults;
     }
 
     /**

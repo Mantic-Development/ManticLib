@@ -36,12 +36,8 @@ public class SkullUtils {
 
 
     static {
-        Material material = Material.matchMaterial("SKULL_ITEM");
-        if (material == null) {
-            skull = Material.matchMaterial("PLAYER_HEAD");
-        } else {
-            skull = material;
-        }
+        Material material = Material.matchMaterial("PLAYER_HEAD");
+        skull = material == null ? Material.matchMaterial("SKULL_ITEM") : material;
         try {
             PlayerProfile = Class.forName("org.bukkit.profile.PlayerProfile");
         } catch (ClassNotFoundException e) {
@@ -125,7 +121,7 @@ public class SkullUtils {
         try {
             byte[] decoded = Base64.getDecoder().decode(base64);
             String jsonString = new String(decoded, StandardCharsets.UTF_8);
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             return new URL(jsonObject.getAsJsonObject("textures")
                     .getAsJsonObject("SKIN")
                     .get("url")
@@ -146,18 +142,12 @@ public class SkullUtils {
         }
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(id);
+        if (offlinePlayer == null) return head;
         try {
-            try {
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(id);
-                if (offlinePlayer != null) {
-                    meta.setOwningPlayer(offlinePlayer);
-                }
-            } catch (NullPointerException e) {
-                // from not resetting player data
-                return head;
-            }
-        } catch (NoSuchMethodError e) {
-            meta.setOwner(name);
+            SkullMeta.class.getMethod("setOwningPlayer", OfflinePlayer.class).invoke(meta, offlinePlayer);
+        } catch (ReflectiveOperationException ignored) {
+            if (name != null) meta.setOwner(name);
         }
         head.setItemMeta(meta);
         headCache.put(id, head);
@@ -175,8 +165,9 @@ public class SkullUtils {
 
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         try {
-            meta.setOwningPlayer(Bukkit.getOfflinePlayer(id));
-        } catch (NoSuchMethodError e) {
+            SkullMeta.class.getMethod("setOwningPlayer", OfflinePlayer.class)
+                    .invoke(meta, Bukkit.getOfflinePlayer(id));
+        } catch (ReflectiveOperationException ignored) {
             meta.setOwner(player.getName());
         }
         head.setItemMeta(meta);

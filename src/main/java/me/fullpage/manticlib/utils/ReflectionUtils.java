@@ -221,11 +221,12 @@ public final class ReflectionUtils {
         if (minorVersion <= 0) throw new IllegalArgumentException("Minor version must be positive: " + minorVersion);
 
         // https://www.minecraft.net/en-us/article/minecraft-new-version-numbering-system
-        // Year-based drops: 26.1 "Tiny Takeover", 26.2 "Chaos Cubed", 26.3 (in development as of Aug 2026).
+        // Year-based drops: 26.1 "Tiny Takeover", 26.2 "Chaos Cubed", 26.3 "Wilderness Bound".
         if (majorVersion == 26) {
             int[] yearPatches = {
                     /* 26.1 */ 2, // 26.1.2 (last hotfix)
-                    /* 26.2 */ 0, // no hotfix released yet as of Aug 2026
+                    /* 26.2 */ 0, // no hotfix released
+                    /* 26.3 */ 0, // no hotfix released
             };
 
             if (minorVersion > yearPatches.length) return null;

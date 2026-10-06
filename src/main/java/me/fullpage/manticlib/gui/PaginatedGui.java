@@ -20,6 +20,8 @@ public class PaginatedGui extends Gui {
 
     private final char pageItemKey;
     private int nextPageItemSlot, previousPageItemSlot;
+    private GuiItem nextPageItem, previousPageItem;
+    private GuiItem nextPagePlaceholder, previousPagePlaceholder;
     private List<GuiItem> pageItems;
     private HashMap<UUID, Page> uuidPages; // uuid of player, page number
     private int fillableSlotsPerPage;
@@ -68,26 +70,40 @@ public class PaginatedGui extends Gui {
     }
 
     public PaginatedGui setNextPageItem(@NotNull GuiItem guiItem) {
+        int slot = guiItem instanceof KeyGuiItem
+                ? this.firstSlotWithKey(((KeyGuiItem) guiItem).getKey()) : this.findSlot(guiItem);
+        GuiItem current = slot >= 0 ? this.getItemAt(slot) : null;
+        this.nextPagePlaceholder = current == guiItem ? null : current;
+        this.nextPageItem = guiItem;
         if (guiItem instanceof KeyGuiItem) {
             this.addItem((KeyGuiItem) guiItem);
         }
-        return this.setNextPageItem(this.findSlot(guiItem));
-    }
-
-    public PaginatedGui setNextPageItem(int slot) {
         this.nextPageItemSlot = slot;
         return this;
     }
 
+    public PaginatedGui setNextPageItem(int slot) {
+        this.nextPageItemSlot = slot;
+        this.nextPageItem = slot >= 0 ? this.getItemAt(slot) : null;
+        return this;
+    }
+
     public PaginatedGui setPreviousPageItem(@NotNull GuiItem guiItem) {
+        int slot = guiItem instanceof KeyGuiItem
+                ? this.firstSlotWithKey(((KeyGuiItem) guiItem).getKey()) : this.findSlot(guiItem);
+        GuiItem current = slot >= 0 ? this.getItemAt(slot) : null;
+        this.previousPagePlaceholder = current == guiItem ? null : current;
+        this.previousPageItem = guiItem;
         if (guiItem instanceof KeyGuiItem) {
             this.addItem((KeyGuiItem) guiItem);
         }
-        return this.setPreviousPageItem(this.findSlot(guiItem));
+        this.previousPageItemSlot = slot;
+        return this;
     }
 
     public PaginatedGui setPreviousPageItem(int slot) {
         this.previousPageItemSlot = slot;
+        this.previousPageItem = slot >= 0 ? this.getItemAt(slot) : null;
         return this;
     }
 
@@ -180,20 +196,10 @@ public class PaginatedGui extends Gui {
         final int[] range = getRange(this.pageItems.size(), this.fillableSlotsPerPage, page);
         this.clearKey(this.pageItemKey);
         this.fillKey(this.pageItemKey, pageItems.subList(range[0], range[1]));
-        if (p != null && p.isTransitioningPage() && inventory != null) {
-            if (previousPageItemSlot != Integer.MIN_VALUE) {
-                final GuiItem itemAt = getItemAt(previousPageItemSlot);
-                if (itemAt != null) {
-                    inventory.setItem(previousPageItemSlot, itemAt.getItem());
-                }
-            }
-            if (nextPageItemSlot != Integer.MIN_VALUE) {
-                final GuiItem itemAt = getItemAt(nextPageItemSlot);
-                if (itemAt != null) {
-                    inventory.setItem(nextPageItemSlot, itemAt.getItem());
-                }
-            }
-        }
+        updatePageControl(previousPageItemSlot, previousPageItem, previousPagePlaceholder,
+                maxPage > 1 && page > 1);
+        updatePageControl(nextPageItemSlot, nextPageItem, nextPagePlaceholder,
+                maxPage > 1 && page < maxPage);
 
         super.show(player);
 
@@ -201,6 +207,18 @@ public class PaginatedGui extends Gui {
             p.setTransitioningPage(false);
         }
 
+    }
+
+    private void updatePageControl(int slot, GuiItem item, GuiItem placeholder, boolean visible) {
+        if (slot == Integer.MIN_VALUE || slot < 0) return;
+        if (item == null) {
+            item = getItemAt(slot);
+            if (slot == nextPageItemSlot) nextPageItem = item;
+            else if (slot == previousPageItemSlot) previousPageItem = item;
+        }
+        if (visible && item != null) addItem(item, slot);
+        else if (placeholder != null) addItem(placeholder, slot);
+        else removeItem(slot);
     }
 
     public void removeFromUUIDPages(Player player) {

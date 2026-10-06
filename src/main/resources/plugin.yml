@@ -4,6 +4,6 @@ main: me.fullpage.manticlib.ManticLib
 prefix: ManticLib
 authors: [ Fullpage ]
 description: Libraries for Mantic Plugins
-api-version: 1.13
+api-version: '1.13'
 website: https://github.com/Mantic-Development/ManticLib
 load: STARTUP

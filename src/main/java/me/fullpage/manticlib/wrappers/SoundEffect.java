@@ -82,7 +82,11 @@ public class SoundEffect {
         if (customSound != null && ReflectionUtils.supports(12)) {
             World world = location.getWorld();
             if (world != null) {
-                world.playSound(location, customSound, volume, pitch);
+                try {
+                    World.class.getMethod("playSound", Location.class, String.class, float.class, float.class)
+                            .invoke(world, location, customSound, volume, pitch);
+                } catch (ReflectiveOperationException ignored) {
+                }
             }
             return;
 

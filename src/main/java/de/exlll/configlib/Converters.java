@@ -2,6 +2,7 @@ package de.exlll.configlib;
 
 import de.exlll.configlib.Converter.ConversionInfo;
 import de.exlll.configlib.annotation.Convert;
+import org.bukkit.Material;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -413,6 +414,7 @@ final class Converters {
             return o -> {
                 Map<String, Object> map = toTypeMap(o, null);
                 Object inst = Reflect.newInstance(info.getElementType());
+                FieldMapper.captureOptionalDefaults(inst, info.getMappingInfo());
                 FieldMapper.instanceFromMap(inst, map, info.getMappingInfo());
                 return inst;
             };
@@ -533,6 +535,10 @@ final class Converters {
         @Override
         public Enum<?> convertFrom(String element, ConversionInfo info) {
             Class<? extends Enum> cls = getEnumClass(info);
+            if (cls == Material.class) {
+                Material material = matchMaterial(element);
+                if (material != null) return material;
+            }
             try {
                 /* cast won't fail because we know that it's an enum */
                 @SuppressWarnings("unchecked")
@@ -545,6 +551,17 @@ final class Converters {
                         "enum constant '" + element + "'.\nValid constants are: " +
                         Arrays.toString(cls.getEnumConstants());
                 throw new IllegalArgumentException(msg, e);
+            }
+        }
+
+        private Material matchMaterial(String name) {
+            Material material = Material.matchMaterial(name);
+            if (material != null) return material;
+            try {
+                return (Material) Material.class.getMethod("matchMaterial", String.class, boolean.class)
+                        .invoke(null, name, true);
+            } catch (ReflectiveOperationException ignored) {
+                return null;
             }
         }
 
@@ -585,6 +602,7 @@ final class Converters {
         public Object convertFrom(Object element, ConversionInfo info) {
             checkElementIsConvertibleToConfigurationElement(element, info);
             Object newInstance = Reflect.newInstance(info.getValueType());
+            FieldMapper.captureOptionalDefaults(newInstance, info.getMappingInfo());
             Map<String, Object> typeMap = toTypeMap(element, info.getFieldName());
             FieldMapper.instanceFromMap(newInstance, typeMap, info.getMappingInfo());
             return newInstance;

@@ -75,7 +75,19 @@ public class ItemBuilder extends ItemStack {
      * @since 1.0
      */
     public ItemBuilder(final Material mat) {
-        super(mat);
+        super(normalizeLegacyMaterial(mat));
+    }
+
+    private static Material normalizeLegacyMaterial(final Material material) {
+        if (material == null || !material.name().startsWith("LEGACY_")) {
+            return material;
+        }
+
+        try {
+            return Material.valueOf(material.name().substring("LEGACY_".length()));
+        } catch (IllegalArgumentException ignored) {
+            return material;
+        }
     }
 
     /**
@@ -434,34 +446,31 @@ public class ItemBuilder extends ItemStack {
 
     public ItemBuilder addAttribute(Attribute attribute, AttributeModifier attributeModifier) {
         ItemMeta meta = getItemMeta();
-        meta.addAttributeModifier(attribute, attributeModifier);
-        setItemMeta(meta);
+        try {
+            ItemMeta.class.getMethod("addAttributeModifier", Attribute.class, AttributeModifier.class)
+                    .invoke(meta, attribute, attributeModifier);
+            setItemMeta(meta);
+        } catch (ReflectiveOperationException ignored) {
+        }
         return this;
     }
 
     public ItemBuilder unbreakable(boolean unbreakable) {
         ItemMeta meta = getItemMeta();
-        meta.setUnbreakable(unbreakable);
-        ItemMeta itemMeta = getItemMeta();
-
-        if (ReflectionUtils.supports(9)) {
-            itemMeta.setUnbreakable(unbreakable);
-        } else {
+        try {
+            ItemMeta.class.getMethod("setUnbreakable", boolean.class).invoke(meta, unbreakable);
+        } catch (NoSuchMethodException ignored) {
             try {
-                Method instanceMethod = itemMeta.getClass().getMethod("spigot");
-                instanceMethod.setAccessible(true);
-
-                Object instance = instanceMethod.invoke(itemMeta);
-                Method unbreakableMethod = instance.getClass().getMethod("setUnbreakable", boolean.class);
-                unbreakableMethod.setAccessible(true);
-                unbreakableMethod.invoke(instance, unbreakable);
-            } catch (Throwable exception) {
+                Object spigot = meta.getClass().getMethod("spigot").invoke(meta);
+                spigot.getClass().getMethod("setUnbreakable", boolean.class).invoke(spigot, unbreakable);
+            } catch (ReflectiveOperationException exception) {
                 exception.printStackTrace();
             }
+        } catch (ReflectiveOperationException exception) {
+            exception.printStackTrace();
         }
 
         setItemMeta(meta);
-        setItemMeta(itemMeta);
         return this;
     }
 
