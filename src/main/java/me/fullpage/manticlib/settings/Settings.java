@@ -86,7 +86,7 @@ public class Settings<S extends Settings<S>> implements Registrable, Reloadable 
     }
 
     /**
-     * Finishes pending saves before shutting down. No new saves can be made after shutdown.
+     * Finishes pending saves before shutting down. A later save creates a fresh writer once shutdown completes.
      */
     public static boolean shutdownSaves(Plugin plugin, long timeout, TimeUnit unit) throws InterruptedException {
         return SettingsPersistence.forPlugin(plugin).shutdown(timeout, unit);

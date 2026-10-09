@@ -33,7 +33,7 @@ final class SettingsPersistence {
 
     static synchronized SettingsPersistence forPlugin(Plugin plugin) {
         SettingsPersistence writer = WRITERS.get(plugin);
-        if (writer == null) {
+        if (writer == null || writer.executor.isTerminated()) {
             writer = new SettingsPersistence(plugin);
             WRITERS.put(plugin, writer);
         }
