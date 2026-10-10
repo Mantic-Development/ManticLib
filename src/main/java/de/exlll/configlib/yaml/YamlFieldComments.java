@@ -66,13 +66,15 @@ final class YamlFieldComments {
         if (moveBeforeSequenceDash) {
             int lineStart = dump.lastIndexOf('\n', offset - 1) + 1;
             if (dump.substring(lineStart, offset).trim().equals("-")) {
-                indent = dump.substring(lineStart, dump.indexOf('-', lineStart));
-                offset = lineStart;
+                int dash = dump.indexOf('-', lineStart);
+                indent = dump.substring(lineStart, dash);
+                offset = dash;
             } else if (lineStart > 0) {
                 int previousLineStart = dump.lastIndexOf('\n', lineStart - 2) + 1;
                 if (dump.substring(previousLineStart, lineStart).trim().equals("-")) {
-                    indent = dump.substring(previousLineStart, dump.indexOf('-', previousLineStart));
-                    offset = previousLineStart;
+                    int dash = dump.indexOf('-', previousLineStart);
+                    indent = dump.substring(previousLineStart, dash);
+                    offset = dash;
                 }
             }
         }
