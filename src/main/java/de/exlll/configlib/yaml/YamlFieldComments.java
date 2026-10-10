@@ -29,16 +29,19 @@ final class YamlFieldComments {
         if (node instanceof MappingNode && data instanceof Map) {
             Iterator<? extends Map.Entry<?, ?>> entries = ((Map<?, ?>) data).entrySet().iterator();
             // SnakeYAML represents maps in their iteration order, including non-string keys.
+            boolean firstEntry = true;
             for (NodeTuple tuple : ((MappingNode) node).getValue()) {
                 if (!entries.hasNext()) break;
                 Map.Entry<?, ?> entry = entries.next();
                 if (data instanceof CommentedMap) {
                     List<String> comments = ((CommentedMap) data).getFieldComments().get(entry.getKey());
                     if (comments != null && !comments.isEmpty()) {
-                        addAt(tuple.getKeyNode().getStartMark(), comments, dump, insertions);
+                        addAt(tuple.getKeyNode().getStartMark(), comments, dump, insertions,
+                                firstEntry && comments.get(0).isEmpty());
                     }
                 }
                 collect(tuple.getValueNode(), entry.getValue(), dump, insertions, visited);
+                firstEntry = false;
             }
         } else if (node instanceof SequenceNode && data instanceof Iterable) {
             Iterator<?> elements = ((Iterable<?>) data).iterator();
@@ -57,9 +60,22 @@ final class YamlFieldComments {
     }
 
     private static void addAt(Mark mark, List<String> comments, String dump,
-                              Map<Integer, String> insertions) {
+                              Map<Integer, String> insertions, boolean moveBeforeSequenceDash) {
         int offset = dump.offsetByCodePoints(0, mark.getIndex());
         String indent = String.join("", Collections.nCopies(mark.getColumn(), " "));
+        if (moveBeforeSequenceDash) {
+            int lineStart = dump.lastIndexOf('\n', offset - 1) + 1;
+            if (dump.substring(lineStart, offset).trim().equals("-")) {
+                indent = dump.substring(lineStart, dump.indexOf('-', lineStart));
+                offset = lineStart;
+            } else if (lineStart > 0) {
+                int previousLineStart = dump.lastIndexOf('\n', lineStart - 2) + 1;
+                if (dump.substring(previousLineStart, lineStart).trim().equals("-")) {
+                    indent = dump.substring(previousLineStart, dump.indexOf('-', previousLineStart));
+                    offset = previousLineStart;
+                }
+            }
+        }
         StringBuilder text = new StringBuilder();
         // Flow mappings may start immediately after '{' or ','. A comment needs separation.
         if (offset > 0 && !Character.isWhitespace(dump.charAt(offset - 1))) text.append(' ');
