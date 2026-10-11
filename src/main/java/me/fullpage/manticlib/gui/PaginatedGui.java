@@ -107,6 +107,22 @@ public class PaginatedGui extends Gui {
         return this;
     }
 
+    /**
+     * Set the non-navigating item shown when no previous page exists. Null keeps an empty slot.
+     */
+    public PaginatedGui setPreviousPagePlaceholder(GuiItem item) {
+        this.previousPagePlaceholder = item;
+        return this;
+    }
+
+    /**
+     * Set the non-navigating item shown when no next page exists. Null keeps an empty slot.
+     */
+    public PaginatedGui setNextPagePlaceholder(GuiItem item) {
+        this.nextPagePlaceholder = item;
+        return this;
+    }
+
     private int findSlot(@NotNull GuiItem guiItem) {
         if (guiItem instanceof KeyGuiItem) {
             return this.firstSlotWithKey(((KeyGuiItem) guiItem).getKey());
