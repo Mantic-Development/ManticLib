@@ -67,7 +67,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
             uuid = player.getUniqueId();
         }
 
-        if (permission == null || sender.hasPermission(permission)) {
+        if (hasCommandPermission(sender)) {
             if ((minimumArgs != null && args.length < minimumArgs) || (maximumArgs != null && args.length > maximumArgs)) {
                 sendUsageMessage();
                 return true;
@@ -78,6 +78,10 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
         }
 
         return true;
+    }
+
+    protected boolean hasCommandPermission(CommandSender sender) {
+        return permission == null || sender.hasPermission(permission);
     }
 
     @Nullable

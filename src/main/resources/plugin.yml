@@ -7,3 +7,7 @@ description: Libraries for Mantic Plugins
 api-version: '1.13'
 website: https://github.com/Mantic-Development/ManticLib
 load: STARTUP
+permissions:
+  manticlib.versions:
+    description: View installed Mantic plugin versions
+    default: op

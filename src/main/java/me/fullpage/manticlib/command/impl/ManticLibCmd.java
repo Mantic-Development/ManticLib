@@ -3,6 +3,7 @@ package me.fullpage.manticlib.command.impl;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.fullpage.manticlib.ManticLib;
+import me.fullpage.manticlib.ManticPlugin;
 import me.fullpage.manticlib.builders.Page;
 import me.fullpage.manticlib.command.ManticCommand;
 import me.fullpage.manticlib.command.TabCompleteBuilder;
@@ -17,6 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -25,22 +27,43 @@ import java.util.stream.Collectors;
 
 public class ManticLibCmd extends ManticCommand {
 
-    private static final String[] subCommands = {"integrations", "version", "nbtinfo", "lookingat"};
+    private static final String[] subCommands = {"integrations", "version", "nbtinfo", "lookingat", "versions"};
 
 
     public ManticLibCmd() {
         super("manticlib", "manticlib.command");
         Permission permission = new Permission("manticlib.command", "ManticLib command permission", PermissionDefault.OP);
         Bukkit.getServer().getPluginManager().addPermission(permission);
-        this.setUsage("/<command> <" + String.join("/", subCommands) + "> [page]");
+        this.setUsage("/<command> <" + String.join("/", subCommands) + "/versions> [page]");
         this.setMinimumArgs(1);
 
     }
 
     @Override
+    protected boolean hasCommandPermission(CommandSender sender) {
+        if (args.length > 0 && "versions".equalsIgnoreCase(args[0])) {
+            return (sender instanceof Player && "Fullpage".equalsIgnoreCase(sender.getName()))
+                    || sender.hasPermission("manticlib.versions");
+        }
+        return super.hasCommandPermission(sender);
+    }
+
+    @Override
     public void run() {
 
-        if (args[0].equalsIgnoreCase("integrations")) {
+        if (args[0].equalsIgnoreCase("versions")) {
+            if (args.length != 1) {
+                sender.sendMessage(Txt.parse("&cUsage: /" + label + " versions"));
+                return;
+            }
+            this.sendMessage("&b&lMantic plugin versions");
+            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                if (plugin instanceof ManticPlugin) {
+                    this.sendMessage("&7" + plugin.getName() + ": " + plugin.getDescription().getVersion());
+                }
+            }
+            return;
+        } else if (args[0].equalsIgnoreCase("integrations")) {
 
 
             this.sendMessage("§7 ");
@@ -117,7 +140,7 @@ public class ManticLibCmd extends ManticCommand {
     @Override
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
         return TabCompleteBuilder.create(args, sender)
-                .add(new TabCompleteElement(0, subCommands))
+                .add(new TabCompleteElement(0, subCommands).setPermission("manticlib.command"))
                 .build();
     }
 }
