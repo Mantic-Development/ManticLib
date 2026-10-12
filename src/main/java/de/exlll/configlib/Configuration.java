@@ -40,6 +40,17 @@ public abstract class Configuration<C extends Configuration<C>> {
     }
 
     /**
+     * Captures optional defaults after field initialization, before a factory customizes this configuration.
+     * Call at the end of a subclass constructor to keep those later changes visible when first saving.
+     */
+    protected final void captureOptionalDefaults() {
+        if (!optionalDefaultsCaptured) {
+            FieldMapper.captureOptionalDefaults(this, MappingInfo.from(this));
+            optionalDefaultsCaptured = true;
+        }
+    }
+
+    /**
      * Saves this {@code Configuration}.
      *
      * @throws ConfigurationException      if any field is not properly configured
