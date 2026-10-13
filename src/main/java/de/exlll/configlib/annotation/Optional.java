@@ -10,6 +10,10 @@ import java.lang.annotation.Target;
  * its value matches its initial default. The field is still read when loading,
  * and non-default values are written back.
  *
+ * <p>When generating a customized configuration, use
+ * {@code Configuration.create(factory, customize)} to record constructor defaults
+ * before changing optional settings. The factory itself does not load or save files.</p>
+ *
  * <p>Prefer this for optional leaf settings, such as item name, lore, or custom
  * metadata. Keep a parent section or collection visible when users need it to
  * discover where those settings belong.</p>

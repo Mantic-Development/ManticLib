@@ -391,6 +391,21 @@ public class Gui implements Listener, InventoryHolder {
 
     public static class GUIListener implements Listener {
 
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void onDrag(InventoryDragEvent event) {
+            if (!(event.getWhoClicked() instanceof Player)) return;
+            Pair<Inventory, Gui> pair = getInventoryGUIPair((Player) event.getWhoClicked());
+            if (pair == null || !pair.getRight().isCancelByDefault()) return;
+            Inventory top = event.getView().getTopInventory();
+            if (!top.equals(pair.getLeft())) return;
+            for (int slot : event.getRawSlots()) {
+                if (slot >= 0 && slot < top.getSize()) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
         @EventHandler
         public void onClick(InventoryClickEvent event) {
             if (!(event.getWhoClicked() instanceof Player)) {

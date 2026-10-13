@@ -9,6 +9,8 @@ import de.exlll.configlib.format.FieldNameFormatters;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Parent class of all configurations.
@@ -40,8 +42,33 @@ public abstract class Configuration<C extends Configuration<C>> {
     }
 
     /**
+     * Constructs a configuration and records its optional defaults before applying customization.
+     * The supplier must return a fresh configuration whose constructor has finished.
+     * Neither loading nor saving is performed by this method.
+     *
+     * <p>Use this when generating configurations with values that differ from their declared
+     * defaults, so those values remain present when first saved. Constructors and existing
+     * load/save methods retain their current behavior.</p>
+     *
+     * @param factory supplier of the new configuration
+     * @param customize action applied after the defaults are captured
+     * @param <T> concrete configuration type, including subclasses of YAML configurations
+     * @return the customized configuration
+     * @throws NullPointerException if either argument or the supplied configuration is null
+     */
+    public static <T extends Configuration<?>> T create(Supplier<? extends T> factory, Consumer<? super T> customize) {
+        Objects.requireNonNull(factory, "factory");
+        Objects.requireNonNull(customize, "customize");
+        T configuration = Objects.requireNonNull(factory.get(), "factory returned null");
+        configuration.captureOptionalDefaults();
+        customize.accept(configuration);
+        return configuration;
+    }
+
+    /**
      * Captures optional defaults after field initialization, before a factory customizes this configuration.
      * Call at the end of a subclass constructor to keep those later changes visible when first saving.
+     * New configuration factories can use {@link #create(Supplier, Consumer)} instead.
      */
     protected final void captureOptionalDefaults() {
         if (!optionalDefaultsCaptured) {
