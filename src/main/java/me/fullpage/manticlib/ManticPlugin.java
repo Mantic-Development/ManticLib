@@ -33,6 +33,8 @@ public class ManticPlugin extends JavaPlugin {
         if (lib != null && lib.getNmsHandler() != null) {
             try {
                 lib.getNmsHandler().removePacketListeners(this);
+            } catch (NoSuchMethodError ignored) {
+                // the legacy jar shades an older NMSLib without packet listeners
             } catch (Throwable t) {
                 t.printStackTrace();
             }
