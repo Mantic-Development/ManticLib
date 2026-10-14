@@ -59,13 +59,8 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
             return true;
         }
 
-        if (isConsole()) {
-            player = null;
-            uuid = null;
-        } else {
-            player = (Player) sender;
-            uuid = player.getUniqueId();
-        }
+        player = sender instanceof Player ? (Player) sender : null;
+        uuid = player == null ? null : player.getUniqueId();
 
         if (hasCommandPermission(sender)) {
             if ((minimumArgs != null && args.length < minimumArgs) || (maximumArgs != null && args.length > maximumArgs)) {
@@ -220,7 +215,7 @@ public abstract class ManticCommand extends Command implements PluginIdentifiabl
 
 
     protected boolean isConsole() {
-        return sender instanceof ConsoleCommandSender;
+        return !(sender instanceof Player);
     }
 
     public void setCanConsole(boolean canConsole) {

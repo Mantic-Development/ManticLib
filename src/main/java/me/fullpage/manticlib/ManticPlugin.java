@@ -24,11 +24,7 @@ public class ManticPlugin extends JavaPlugin {
     public void onDisable() {
         super.onDisable();
 
-        try {
-            onInnerDisable();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        // Stop netty-thread listeners first so they never run against services onInnerDisable tears down.
         ManticLib lib = ManticLib.get();
         if (lib != null && lib.getNmsHandler() != null) {
             try {
@@ -38,6 +34,11 @@ public class ManticPlugin extends JavaPlugin {
             } catch (Throwable t) {
                 t.printStackTrace();
             }
+        }
+        try {
+            onInnerDisable();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
         try {
             Settings.shutdownSaves(this, 10, TimeUnit.SECONDS);
