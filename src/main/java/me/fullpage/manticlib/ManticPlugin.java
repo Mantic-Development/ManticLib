@@ -29,6 +29,14 @@ public class ManticPlugin extends JavaPlugin {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        ManticLib lib = ManticLib.get();
+        if (lib != null && lib.getNmsHandler() != null) {
+            try {
+                lib.getNmsHandler().removePacketListeners(this);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
         try {
             Settings.shutdownSaves(this, 10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
