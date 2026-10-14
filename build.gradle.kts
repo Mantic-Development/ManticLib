@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.gradleup.shadow") version "8.3.9"
+    id("com.gradleup.shadow") version "9.6.1"
     `maven-publish`
 }
 
@@ -34,7 +34,7 @@ repositories {
     maven { url = uri("https://hub.spigotmc.org/nexus/content/groups/public/") }
 }
 
-val legacyImplementation by configurations.creating
+val legacyImplementation = configurations.create("legacyImplementation")
 
 dependencies {
     // full build
@@ -56,8 +56,8 @@ dependencies {
     compileOnly("com.mojang:authlib:1.5.25")
     compileOnly("org.jetbrains:annotations:20.1.0")
     annotationProcessor("org.jetbrains:annotations:20.1.0")
-    compileOnly("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    compileOnly("org.projectlombok:lombok:1.18.48")
+    annotationProcessor("org.projectlombok:lombok:1.18.48")
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
 }
 
@@ -73,11 +73,11 @@ publishing {
 }
 
 tasks.processResources {
-
+    val props = mapOf("project" to mapOf("version" to version))
+    inputs.properties(props)
     filesMatching("**/plugin.yml") {
-        expand(project.properties)
+        expand(props)
     }
-
 }
 
 tasks.shadowJar {
@@ -107,7 +107,7 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("lega
     group = "shadow"
     archiveFileName.set("${project.description}-$version-legacy.jar")
     from(sourceSets.main.get().output)
-    configurations = listOf(legacyImplementation)
+    configurations = setOf(legacyImplementation)
 
     relocate("me.fullpage.nmslib", "me.fullpage.manticlib.nmslib")
     relocate("de.tr7zw.annotations", "me.fullpage.manticlib.nbtapi.annotations")
@@ -117,8 +117,4 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("lega
 
 tasks.build {
     dependsOn("shadowJar", "legacyShadowJar")
-}
-
-artifacts {
-    archives(tasks.shadowJar)
 }
