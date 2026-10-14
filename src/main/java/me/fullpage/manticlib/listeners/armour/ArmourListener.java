@@ -3,7 +3,6 @@ package me.fullpage.manticlib.listeners.armour;
 import me.fullpage.manticlib.ManticLib;
 import me.fullpage.manticlib.events.armourequipevent.ArmourEquipEvent;
 import me.fullpage.manticlib.events.armourequipevent.ArmourType;
-import me.fullpage.manticlib.string.Txt;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,7 +17,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.EnumSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class ArmourListener implements Listener {
 
@@ -27,10 +28,15 @@ public class ArmourListener implements Listener {
     public static final String[] blocked = {"NOTE_BLOCK", "FURNACE", "CHEST", "TRAPPED_CHEST", "BEACON", "DISPENSER", "DROPPER", "HOPPER", "WORKBENCH", "ENCHANTMENT_TABLE", "ENDER_CHEST", "ANVIL", "BED_BLOCK", "FENCE_GATE", "SPRUCE_FENCE_GATE", "BIRCH_FENCE_GATE", "ACACIA_FENCE_GATE", "JUNGLE_FENCE_GATE", "DARK_OAK_FENCE_GATE", "IRON_DOOR_BLOCK", "WOODEN_DOOR", "SPRUCE_DOOR", "BIRCH_DOOR", "JUNGLE_DOOR", "ACACIA_DOOR", "DARK_OAK_DOOR", "WOOD_BUTTON", "STONE_BUTTON", "TRAP_DOOR", "IRON_TRAPDOOR", "DIODE_BLOCK_OFF", "DIODE_BLOCK_ON", "REDSTONE_COMPARATOR_OFF", "REDSTONE_COMPARATOR_ON", "FENCE", "SPRUCE_FENCE", "BIRCH_FENCE", "JUNGLE_FENCE", "DARK_OAK_FENCE", "ACACIA_FENCE", "NETHER_FENCE", "BREWING_STAND", "CAULDRON", "LEGACY_SIGN_POST", "LEGACY_WALL_SIGN", "LEGACY_SIGN", "ACACIA_SIGN", "ACACIA_WALL_SIGN", "BIRCH_SIGN", "BIRCH_WALL_SIGN", "DARK_OAK_SIGN", "DARK_OAK_WALL_SIGN", "JUNGLE_SIGN", "JUNGLE_WALL_SIGN", "OAK_SIGN", "OAK_WALL_SIGN", "SPRUCE_SIGN", "SPRUCE_WALL_SIGN", "LEVER", "BLACK_SHULKER_BOX", "BLUE_SHULKER_BOX", "BROWN_SHULKER_BOX", "CYAN_SHULKER_BOX", "GRAY_SHULKER_BOX", "GREEN_SHULKER_BOX", "LIGHT_BLUE_SHULKER_BOX", "LIME_SHULKER_BOX", "MAGENTA_SHULKER_BOX", "ORANGE_SHULKER_BOX", "PINK_SHULKER_BOX", "PURPLE_SHULKER_BOX", "RED_SHULKER_BOX", "SILVER_SHULKER_BOX", "WHITE_SHULKER_BOX", "YELLOW_SHULKER_BOX", "DAYLIGHT_DETECTOR_INVERTED", "DAYLIGHT_DETECTOR", "BARREL", "BLAST_FURNACE", "SMOKER", "CARTOGRAPHY_TABLE", "COMPOSTER", "GRINDSTONE", "LECTERN", "LOOM", "STONECUTTER", "BELL"};
 
 
-    private final List<String> blockedMaterials;
+    private final Set<Material> blockedMaterials = EnumSet.noneOf(Material.class);
 
     public ArmourListener() {
-        this.blockedMaterials = Txt.list(blocked);
+        // getEnumConstants(), not values(): Commodore rewrites values() to drop LEGACY_* on 1.13+; same equalsIgnoreCase test as before
+        for (Material material : Material.class.getEnumConstants()) {
+            for (String name : blocked) {
+                if (material.name().equalsIgnoreCase(name)) { blockedMaterials.add(material); break; }
+            }
+        }
         if (!REGISTERED) {
             ManticLib.get().getServer().getPluginManager().registerEvents(this, ManticLib.get());
             REGISTERED = true;
@@ -144,16 +150,13 @@ public class ArmourListener implements Listener {
             if (!e.useInteractedBlock().equals(Result.DENY)) {
                 if (e.getClickedBlock() != null && e.getAction() == Action.RIGHT_CLICK_BLOCK && !player.isSneaking()) {// Having both of these checks is useless, might as well do it though.
                     // Some blocks have actions when you right click them which stops the client from equipping the armor in hand.
-                    Material mat = e.getClickedBlock().getType();
-                    for (String s : blockedMaterials) {
-                        if (mat.name().equalsIgnoreCase(s)) return;
-                    }
+                    if (blockedMaterials.contains(Objects.requireNonNull(e.getClickedBlock().getType()))) return;
                 }
             }
             ArmourType newArmorType = ArmourType.matchType(e.getItem());
             if (newArmorType != null) {
                 if (newArmorType.equals(ArmourType.HELMET) && isAirOrNull(e.getPlayer().getInventory().getHelmet()) || newArmorType.equals(ArmourType.CHESTPLATE) && isAirOrNull(e.getPlayer().getInventory().getChestplate()) || newArmorType.equals(ArmourType.LEGGINGS) && isAirOrNull(e.getPlayer().getInventory().getLeggings()) || newArmorType.equals(ArmourType.BOOTS) && isAirOrNull(e.getPlayer().getInventory().getBoots())) {
-                    ArmourEquipEvent armorEquipEvent = new ArmourEquipEvent(e.getPlayer(), ArmourEquipEvent.EquipMethod.HOTBAR, ArmourType.matchType(e.getItem()), null, e.getItem());
+                    ArmourEquipEvent armorEquipEvent = new ArmourEquipEvent(e.getPlayer(), ArmourEquipEvent.EquipMethod.HOTBAR, newArmorType, null, e.getItem());
                     Bukkit.getServer().getPluginManager().callEvent(armorEquipEvent);
                     if (armorEquipEvent.isCancelled()) {
                         e.setCancelled(true);
