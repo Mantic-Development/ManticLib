@@ -461,8 +461,8 @@ public class ItemBuilder extends ItemStack {
             ItemMeta.class.getMethod("setUnbreakable", boolean.class).invoke(meta, unbreakable);
         } catch (NoSuchMethodException ignored) {
             try {
-                Object spigot = meta.getClass().getMethod("spigot").invoke(meta);
-                spigot.getClass().getMethod("setUnbreakable", boolean.class).invoke(spigot, unbreakable);
+                Object spigot = ItemMeta.class.getMethod("spigot").invoke(meta);
+                ItemMeta.class.getMethod("spigot").getReturnType().getMethod("setUnbreakable", boolean.class).invoke(spigot, unbreakable);
             } catch (ReflectiveOperationException exception) {
                 exception.printStackTrace();
             }
