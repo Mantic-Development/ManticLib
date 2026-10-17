@@ -1,5 +1,6 @@
 package de.exlll.configlib.yaml;
 
+import de.exlll.configlib.CommentedMap;
 import de.exlll.configlib.Comments;
 import de.exlll.configlib.ConfigurationSource;
 import lombok.Getter;
@@ -31,6 +32,7 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     public void saveConfiguration(YamlConfiguration config, Map<String, Object> map)
             throws IOException {
         createParentDirectories();
+        map = unshared(map);
 
         CommentAdder adder = new CommentAdder(
                 YamlFieldComments.add(yaml.dump(map), map, yaml), config.getComments(), props
@@ -38,6 +40,29 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
 
         String commentedDump = adder.getCommentedDump();
         Files.write(configPath, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
+    }
+
+    // SnakeYAML writes a collection reached twice (one shared default, like an empty list) as an anchor and aliases, so editing
+    // one of them in the file would change all of them.
+    @SuppressWarnings("unchecked")
+    private static <T> T unshared(T value) {
+        if (value instanceof Map) {
+            Map<Object, Object> copy = new LinkedHashMap<>();
+            if (value instanceof CommentedMap) {
+                // The field comments ride on the map; a plain copy would drop every comment from the file.
+                CommentedMap commented = new CommentedMap();
+                commented.getFieldComments().putAll(((CommentedMap) value).getFieldComments());
+                copy = (Map<Object, Object>) (Map<?, ?>) commented;
+            }
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) copy.put(entry.getKey(), unshared(entry.getValue()));
+            return (T) copy;
+        }
+        if (value instanceof Collection) {
+            Collection<Object> copy = value instanceof Set ? new LinkedHashSet<>() : new ArrayList<>();
+            for (Object element : (Collection<?>) value) copy.add(unshared(element));
+            return (T) copy;
+        }
+        return value;
     }
 
     private void createParentDirectories() throws IOException {
