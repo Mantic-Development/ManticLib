@@ -1,5 +1,6 @@
 package de.exlll.configlib.yaml;
 
+import de.exlll.configlib.CommentedMap;
 import de.exlll.configlib.Comments;
 import de.exlll.configlib.ConfigurationSource;
 import lombok.Getter;
@@ -47,6 +48,12 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
     private static <T> T unshared(T value) {
         if (value instanceof Map) {
             Map<Object, Object> copy = new LinkedHashMap<>();
+            if (value instanceof CommentedMap) {
+                // The field comments ride on the map; a plain copy would drop every comment from the file.
+                CommentedMap commented = new CommentedMap();
+                commented.getFieldComments().putAll(((CommentedMap) value).getFieldComments());
+                copy = (Map<Object, Object>) (Map<?, ?>) commented;
+            }
             for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) copy.put(entry.getKey(), unshared(entry.getValue()));
             return (T) copy;
         }
