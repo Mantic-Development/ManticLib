@@ -8,9 +8,11 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 final class YamlSource implements ConfigurationSource<YamlConfiguration> {
@@ -39,7 +41,18 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
         );
 
         String commentedDump = adder.getCommentedDump();
-        Files.write(configPath, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
+        // A crash mid-write must leave the old file, never a truncated one.
+        Path temporary = Files.createTempFile(configPath.toAbsolutePath().getParent(), "." + configPath.getFileName(), ".tmp");
+        try {
+            Files.write(temporary, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
+            try {
+                Files.move(temporary, configPath, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temporary, configPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(temporary);
+        }
     }
 
     // SnakeYAML writes a collection reached twice (one shared default, like an empty list) as an anchor and aliases, so editing
