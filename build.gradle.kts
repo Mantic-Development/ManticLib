@@ -1,3 +1,10 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.jar.Manifest
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+
 plugins {
     java
     id("com.gradleup.shadow") version "9.6.1"
@@ -117,4 +124,58 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("lega
 
 tasks.build {
     dependsOn("shadowJar", "legacyShadowJar")
+}
+
+// NMSLib's full reactor needs BuildTools jars, so only NMSLib_API and NMSLib_V26_2 are built (mvn -o -pl NMSLib_API,NMSLib_V26_2 -am install) and swapped in.
+tasks.register("refreshNmsLib") {
+    group = "build"
+    description = "Swaps the built NMSLib API and v26_2 classes into lib/NMSLib_Plugin.jar and records the NMSLib commit in its manifest (-PnmsLib=<checkout>, default ../NMSLib)"
+    val nmsLib = file(findProperty("nmsLib") ?: "../NMSLib")
+    val jar = file("lib/NMSLib_Plugin.jar")
+    doLast {
+        val prefix = "me/fullpage/nmslib/"
+        val v26 = prefix + "v26_2/"
+        val api = nmsLib.resolve("NMSLib_API/target/classes")
+        val impl = nmsLib.resolve("NMSLib_V26_2/target/classes")
+        if (!api.isDirectory || !impl.isDirectory) throw GradleException("Build NMSLib first: mvn -o -pl NMSLib_API,NMSLib_V26_2 -am install in $nmsLib")
+        fun classes(root: File, keep: (String) -> Boolean) = root.walkTopDown().filter { it.isFile }
+            .associateBy { it.relativeTo(root).invariantSeparatorsPath }.filterKeys { it.endsWith(".class") && keep(it) }
+        val fresh = classes(api) { it.startsWith(prefix) && it.removePrefix(prefix).let { rest -> '/' !in rest || rest.startsWith("packet/") || rest.startsWith("chunk/") } } +
+                classes(impl) { it.startsWith(v26) }
+        val git = ProcessBuilder("git", "-C", nmsLib.path, "describe", "--always", "--dirty").redirectErrorStream(true).start()
+        val commit = git.inputStream.bufferedReader().readText().trim()
+        if (git.waitFor() != 0) throw GradleException("Could not read the NMSLib commit in $nmsLib: $commit")
+        val added = 1767225600000L
+        val tmp = File(jar.path + ".tmp")
+        var replaced = 0
+        var dropped = 0
+        ZipFile(jar).use { src ->
+            ZipOutputStream(tmp.outputStream()).use { out ->
+                val manifest = src.getEntry("META-INF/MANIFEST.MF")?.let { entry -> src.getInputStream(entry).use { Manifest(it) } }
+                        ?: Manifest().apply { mainAttributes.putValue("Manifest-Version", "1.0") }
+                manifest.mainAttributes.putValue("NMSLib-Commit", commit)
+                out.putNextEntry(ZipEntry("META-INF/MANIFEST.MF").apply { time = added })
+                manifest.write(out)
+                val existing = HashSet<String>()
+                for (entry in src.entries()) {
+                    existing += entry.name
+                    if (entry.name == "META-INF/MANIFEST.MF") continue
+                    val file = fresh[entry.name]
+                    if (file == null && entry.name.startsWith(v26) && !entry.name.endsWith("/")) {
+                        dropped++
+                        continue
+                    }
+                    out.putNextEntry(ZipEntry(entry.name).apply { time = entry.time })
+                    if (file != null) replaced++
+                    (file?.inputStream() ?: src.getInputStream(entry)).use { it.copyTo(out) }
+                }
+                for (name in (fresh.keys - existing).sorted()) {
+                    out.putNextEntry(ZipEntry(name).apply { time = added })
+                    fresh.getValue(name).inputStream().use { it.copyTo(out) }
+                }
+                logger.lifecycle("NMSLib $commit: replaced $replaced, dropped $dropped, added ${(fresh.keys - existing).size}")
+            }
+        }
+        Files.move(tmp.toPath(), jar.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    }
 }
