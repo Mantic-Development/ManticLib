@@ -381,6 +381,7 @@ public class ItemBuilder extends ItemStack {
             stacks = new ItemStack[dataInput.readInt()];
         } catch (IOException e1) {
             e1.printStackTrace();
+            return null;
         }
 
         for (int i = 0; i < stacks.length; i++) {

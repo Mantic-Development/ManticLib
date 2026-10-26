@@ -324,7 +324,7 @@ public class Gui implements Listener, InventoryHolder {
                 for (char c : chars) {
                     if (key == c) {
                         int index = y * 9 + x;
-                        final ItemStack item = getInventory().getItem(index);
+                        final ItemStack item = inventory.getItem(index);
                         if (item != null && !item.getType().equals(Material.AIR)) {
                             itemStacks.add(item);
                         }
@@ -342,7 +342,7 @@ public class Gui implements Listener, InventoryHolder {
     }
 
     public boolean isViewing(Player player) {
-        return viewers.contains(player);
+        return viewers.contains(player.getUniqueId());
     }
 
     public void setDestroyOnClose(boolean destroyOnClose) {

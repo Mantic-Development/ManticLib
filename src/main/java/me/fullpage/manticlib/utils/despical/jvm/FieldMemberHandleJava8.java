@@ -25,8 +25,6 @@ public class FieldMemberHandleJava8 extends FieldMemberHandle {
         MODIFIERS_FIELD = modifierFieldJvm;
     }
 
-    protected Boolean getter;
-
     public FieldMemberHandleJava8(ClassHandle clazz) {
         super(clazz);
     }
