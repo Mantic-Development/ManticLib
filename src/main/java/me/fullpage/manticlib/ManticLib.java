@@ -14,6 +14,7 @@ import me.fullpage.manticlib.listeners.armour.ArmourListener;
 import me.fullpage.manticlib.listeners.armour.DispenserArmorListener;
 import me.fullpage.manticlib.utils.GlowEnchant;
 import me.fullpage.manticlib.utils.RandomMaterials;
+import me.fullpage.manticlib.utils.SkullUtils;
 import me.fullpage.nmslib.NMSHandler;
 import me.fullpage.nmslib.plugin.NMSLib;
 import org.bukkit.Material;
@@ -94,6 +95,8 @@ public final class ManticLib extends ManticPlugin {
 
         getServer().getPluginManager().registerEvents(new CommandForwarder(), this);
 
+        SkullUtils.init();
+
     }
 
     @Override
@@ -107,5 +110,6 @@ public final class ManticLib extends ManticPlugin {
                 }
             }
         }
+        SkullUtils.shutdown();
     }
 }
