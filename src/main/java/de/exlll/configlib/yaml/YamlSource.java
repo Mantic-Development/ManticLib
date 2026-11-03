@@ -87,13 +87,14 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
         } catch (UnsupportedOperationException | IllegalArgumentException ignored) {
         }
         PosixFileAttributeView view = Files.getFileAttributeView(to, PosixFileAttributeView.class);
-        view.setPermissions(attributes.permissions());
+        // Owner and group first, while the copy is still private to us, so the file's mode never applies to the wrong group.
         try {
             if (!attributes.group().equals(view.readAttributes().group())) view.setGroup(attributes.group());
             if (!attributes.owner().equals(view.getOwner())) view.setOwner(attributes.owner());
         } catch (IOException e) {
             return false;
         }
+        view.setPermissions(attributes.permissions());
         return true;
     }
 
