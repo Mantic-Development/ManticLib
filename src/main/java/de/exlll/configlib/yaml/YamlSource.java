@@ -8,14 +8,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.PosixFileAttributeView;
-import java.nio.file.attribute.PosixFileAttributes;
 import java.util.*;
 
 final class YamlSource implements ConfigurationSource<YamlConfiguration> {
@@ -43,59 +38,8 @@ final class YamlSource implements ConfigurationSource<YamlConfiguration> {
                 YamlFieldComments.add(yaml.dump(map), map, yaml), config.getComments(), props
         );
 
-        List<String> lines = Arrays.asList(adder.getCommentedDump().split("\n"));
-        Path target = Files.exists(configPath) ? configPath.toRealPath() : configPath;
-        if (!Files.isRegularFile(target) || !Files.isWritable(target) || !replace(target, lines)) {
-            Files.write(target, lines, StandardCharsets.UTF_8);
-        }
-    }
-
-    // A crash mid-write must leave the old file, never a truncated one, so an existing file is swapped for a finished copy. Where the
-    // swap would show (hard links, an owner or group it cannot keep, a bind-mounted file) the file is rewritten in place instead.
-    private static boolean replace(Path target, List<String> lines) throws IOException {
-        Path temporary;
-        try {
-            temporary = Files.createTempFile(target.getParent(), "." + target.getFileName(), ".tmp");
-        } catch (IOException e) {
-            return false;
-        }
-        try {
-            Files.write(temporary, lines, StandardCharsets.UTF_8);
-            if (!keepAttributes(target, temporary)) return false;
-            try {
-                Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING);
-            }
-            return true;
-        } catch (FileSystemException e) {
-            return false;
-        } finally {
-            Files.deleteIfExists(temporary);
-        }
-    }
-
-    private static boolean keepAttributes(Path from, Path to) throws IOException {
-        PosixFileAttributes attributes;
-        try {
-            attributes = Files.readAttributes(from, PosixFileAttributes.class);
-        } catch (UnsupportedOperationException e) {
-            return true;
-        }
-        try {
-            if (((Number) Files.getAttribute(from, "unix:nlink")).intValue() > 1) return false;
-        } catch (UnsupportedOperationException | IllegalArgumentException ignored) {
-        }
-        PosixFileAttributeView view = Files.getFileAttributeView(to, PosixFileAttributeView.class);
-        // Owner and group first, while the copy is still private to us, so the file's mode never applies to the wrong group.
-        try {
-            if (!attributes.group().equals(view.readAttributes().group())) view.setGroup(attributes.group());
-            if (!attributes.owner().equals(view.getOwner())) view.setOwner(attributes.owner());
-        } catch (IOException e) {
-            return false;
-        }
-        view.setPermissions(attributes.permissions());
-        return true;
+        String commentedDump = adder.getCommentedDump();
+        Files.write(configPath, Arrays.asList(commentedDump.split("\n")), StandardCharsets.UTF_8);
     }
 
     // SnakeYAML writes a collection reached twice (one shared default, like an empty list) as an anchor and aliases, so editing
