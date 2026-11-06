@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 
@@ -473,6 +474,10 @@ final class Converters {
         public Object convertFrom(Object element, ConversionInfo info) {
             if (info.getFieldType() == element.getClass()) {
                 return element;
+            }
+            // Older Bukkit SnakeYAML writes supplementary Unicode in strings as UTF-8 !!binary.
+            if (info.getFieldType() == String.class && element instanceof byte[]) {
+                return new String((byte[]) element, StandardCharsets.UTF_8);
             }
             if (element instanceof Number) {
                 return convertNumber(info.getFieldType(), (Number) element);

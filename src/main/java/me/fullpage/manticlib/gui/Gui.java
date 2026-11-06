@@ -28,6 +28,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class Gui implements Listener, InventoryHolder {
@@ -391,12 +392,33 @@ public class Gui implements Listener, InventoryHolder {
 
     public static class GUIListener implements Listener {
 
+        // Bukkit changed InventoryView from a class to an interface.
+        private static final Method VIEW_TITLE = viewMethod("getTitle");
+        private static final Method VIEW_TOP = viewMethod("getTopInventory");
+
+        private static Method viewMethod(String name) {
+            try {
+                return InventoryView.class.getMethod(name);
+            } catch (NoSuchMethodException error) {
+                throw new IllegalStateException("Missing inventory view method " + name, error);
+            }
+        }
+
+        private static Object viewValue(Method method, InventoryView view) {
+            try {
+                return method.invoke(view);
+            } catch (ReflectiveOperationException error) {
+                throw new IllegalStateException("Could not read the inventory view", error);
+            }
+        }
+
+
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onDrag(InventoryDragEvent event) {
             if (!(event.getWhoClicked() instanceof Player)) return;
             Pair<Inventory, Gui> pair = getInventoryGUIPair((Player) event.getWhoClicked());
             if (pair == null || !pair.getRight().isCancelByDefault()) return;
-            Inventory top = event.getView().getTopInventory();
+            Inventory top = event.getInventory();
             if (!top.equals(pair.getLeft())) return;
             for (int slot : event.getRawSlots()) {
                 if (slot >= 0 && slot < top.getSize()) {
@@ -420,7 +442,7 @@ public class Gui implements Listener, InventoryHolder {
 
             Inventory storedInventory = inventoryGUIPair.getLeft();
             InventoryView view = event.getView();
-            Inventory inventory = view.getTopInventory();
+            Inventory inventory = event.getInventory();
 
             if (!inventory.equals(storedInventory)) {
                 return;
@@ -428,7 +450,7 @@ public class Gui implements Listener, InventoryHolder {
 
             Gui gui = inventoryGUIPair.getRight();
 
-            if ((gui == null) || (!view.getTitle().equals(gui.title))
+            if ((gui == null) || (!viewValue(VIEW_TITLE, view).equals(gui.title))
                     || (inventory.getType() != gui.getInventory().getType()) || (inventory.getSize() != gui.getInventory().getSize())) {
                 return;
             }
@@ -439,7 +461,7 @@ public class Gui implements Listener, InventoryHolder {
             }
 
             int slot = -1;
-            if (event.getRawSlot() < view.getTopInventory().getSize()) {
+            if (event.getRawSlot() < inventory.getSize()) {
                 slot = event.getRawSlot();
             } else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 slot = event.getInventory().firstEmpty();
@@ -520,7 +542,7 @@ public class Gui implements Listener, InventoryHolder {
 
             Inventory storedInventory = inventoryGUIPair.getLeft();
             InventoryView openInventory = event.getPlayer().getOpenInventory();
-            Inventory inventory = openInventory.getTopInventory();
+            Inventory inventory = (Inventory) viewValue(VIEW_TOP, openInventory);
 
             if (!inventory.equals(storedInventory)) {
                 return;
@@ -528,7 +550,7 @@ public class Gui implements Listener, InventoryHolder {
 
             Gui gui = inventoryGUIPair.getRight();
 
-            if ((gui == null) || (!openInventory.getTitle().equals(gui.title))
+            if ((gui == null) || (!viewValue(VIEW_TITLE, openInventory).equals(gui.title))
                     || (inventory.getType() != gui.getInventory().getType()) || (inventory.getSize() != gui.getInventory().getSize())) {
                 return;
             }
