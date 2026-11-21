@@ -129,9 +129,7 @@ tasks.build {
 // NMSLib's full reactor needs BuildTools jars, so only NMSLib_API and NMSLib_V26_2 are built (mvn -o -pl NMSLib_API,NMSLib_V26_2 -am install) and swapped in.
 tasks.register("refreshNmsLib") {
     group = "build"
-    description = "Swaps the built NMSLib API and v26_2 classes into lib/NMSLib_Plugin.jar and records the NMSLib commit in its manifest (-PnmsLib=<checkout>, default ../NMSLib)"
-    val nmsLib = file(findProperty("nmsLib") ?: "../NMSLib")
-    val jar = file("lib/NMSLib_Plugin.jar")
+   val nmsLib = file(findProperty("nmsLib") ?: "../NMSLib")
     doLast {
         val prefix = "me/fullpage/nmslib/"
         val v26 = prefix + "v26_2/"
@@ -146,36 +144,41 @@ tasks.register("refreshNmsLib") {
         val commit = git.inputStream.bufferedReader().readText().trim()
         if (git.waitFor() != 0) throw GradleException("Could not read the NMSLib commit in $nmsLib: $commit")
         val added = 1767225600000L
-        val tmp = File(jar.path + ".tmp")
-        var replaced = 0
-        var dropped = 0
-        ZipFile(jar).use { src ->
-            ZipOutputStream(tmp.outputStream()).use { out ->
-                val manifest = src.getEntry("META-INF/MANIFEST.MF")?.let { entry -> src.getInputStream(entry).use { Manifest(it) } }
-                        ?: Manifest().apply { mainAttributes.putValue("Manifest-Version", "1.0") }
-                manifest.mainAttributes.putValue("NMSLib-Commit", commit)
-                out.putNextEntry(ZipEntry("META-INF/MANIFEST.MF").apply { time = added })
-                manifest.write(out)
-                val existing = HashSet<String>()
-                for (entry in src.entries()) {
-                    existing += entry.name
-                    if (entry.name == "META-INF/MANIFEST.MF") continue
-                    val file = fresh[entry.name]
-                    if (file == null && entry.name.startsWith(v26) && !entry.name.endsWith("/")) {
-                        dropped++
-                        continue
+        fun refreshJar(jar: File, updates: Map<String, File>, replacePrefix: String? = null) {
+            val tmp = File(jar.path + ".tmp")
+            var replaced = 0
+            var dropped = 0
+            ZipFile(jar).use { src ->
+                ZipOutputStream(tmp.outputStream()).use { out ->
+                    val manifest = src.getEntry("META-INF/MANIFEST.MF")?.let { entry -> src.getInputStream(entry).use { Manifest(it) } }
+                            ?: Manifest().apply { mainAttributes.putValue("Manifest-Version", "1.0") }
+                    manifest.mainAttributes.putValue("NMSLib-Commit", commit)
+                    out.putNextEntry(ZipEntry("META-INF/MANIFEST.MF").apply { time = added })
+                    manifest.write(out)
+                    val existing = HashSet<String>()
+                    for (entry in src.entries()) {
+                        existing += entry.name
+                        if (entry.name == "META-INF/MANIFEST.MF") continue
+                        val file = updates[entry.name]
+                        if (file == null && replacePrefix != null && entry.name.startsWith(replacePrefix) && !entry.name.endsWith("/")) {
+                            dropped++
+                            continue
+                        }
+                        out.putNextEntry(ZipEntry(entry.name).apply { time = entry.time })
+                        if (file != null) replaced++
+                        (file?.inputStream() ?: src.getInputStream(entry)).use { it.copyTo(out) }
                     }
-                    out.putNextEntry(ZipEntry(entry.name).apply { time = entry.time })
-                    if (file != null) replaced++
-                    (file?.inputStream() ?: src.getInputStream(entry)).use { it.copyTo(out) }
+                    for (name in (updates.keys - existing).sorted()) {
+                        out.putNextEntry(ZipEntry(name).apply { time = added })
+                        updates.getValue(name).inputStream().use { it.copyTo(out) }
+                    }
+                    logger.lifecycle("${jar.name} $commit: replaced $replaced, dropped $dropped, added ${(updates.keys - existing).size}")
                 }
-                for (name in (fresh.keys - existing).sorted()) {
-                    out.putNextEntry(ZipEntry(name).apply { time = added })
-                    fresh.getValue(name).inputStream().use { it.copyTo(out) }
-                }
-                logger.lifecycle("NMSLib $commit: replaced $replaced, dropped $dropped, added ${(fresh.keys - existing).size}")
             }
+            Files.move(tmp.toPath(), jar.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
-        Files.move(tmp.toPath(), jar.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        refreshJar(file("lib/NMSLib_Plugin.jar"), fresh, v26)
+        val armorDisplay = fresh.filterKeys { it.startsWith(prefix + "packet/EquippedArmorDisplay") }
+        if (armorDisplay.isNotEmpty()) refreshJar(file("lib/NMSLib_Plugin-1.0-legacy.jar"), armorDisplay)
     }
 }
