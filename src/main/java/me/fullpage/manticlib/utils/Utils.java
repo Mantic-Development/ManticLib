@@ -303,6 +303,8 @@ public class Utils {
         }
 
         boolean allAdded = true;
+        PlayerInventory inventory = player.getInventory();
+        int storageSize = Math.min(inventory.getSize(), 36); // Hotbar and main inventory only.
 
         for (ItemStack drop : items) {
             if (drop == null) {
@@ -310,37 +312,27 @@ public class Utils {
             }
 
             int count = drop.getAmount();
-            PlayerInventory inventory = player.getInventory();
 
-            for (int i = 0; i < inventory.getSize(); i++) {
-                if (count <= 0 || (ReflectionUtils.supports(13) && i >= 36)) { // don't fill armor slots
-                    break;
-                }
-
+            for (int i = 0; i < storageSize && count > 0; i++) {
                 ItemStack item = inventory.getItem(i);
-                int maxStackSize = item == null ? drop.getMaxStackSize() : item.getMaxStackSize();
-                int toGive = Math.min(maxStackSize, count);
-
-                if (item == null) {
-                    inventory.setItem(i, ItemBuilder.from(drop).amount(toGive));
-                    count -= toGive;
+                if (item == null || item.getType() == Material.AIR || !drop.isSimilar(item)) {
                     continue;
                 }
 
-                Material material = item.getType();
-                if (material == Material.AIR) {
+                int amount = item.getAmount();
+                int toStack = Math.min(item.getMaxStackSize() - amount, count);
+                if (toStack > 0) {
+                    item.setAmount(amount + toStack);
+                    count -= toStack;
+                }
+            }
+
+            for (int i = 0; i < storageSize && count > 0; i++) {
+                ItemStack item = inventory.getItem(i);
+                if (item == null || item.getType() == Material.AIR) {
+                    int toGive = Math.min(drop.getMaxStackSize(), count);
                     inventory.setItem(i, ItemBuilder.from(drop).amount(toGive));
                     count -= toGive;
-                    continue;
-                }
-
-                if (drop.isSimilar(item)) {
-                    int amount = item.getAmount();
-                    if (amount < maxStackSize) {
-                        int toReplace = Math.min(maxStackSize - amount, toGive);
-                        item.setAmount(amount + toReplace);
-                        count -= toReplace;
-                    }
                 }
             }
 
